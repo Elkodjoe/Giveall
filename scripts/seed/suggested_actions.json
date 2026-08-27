@@ -3,9 +3,9 @@
     "id": "act_words_001",
     "type": "appreciation",
     "loveLanguageType": "words",
-    "attachmentTarget": ["anxious", "secure"],
+    "attachmentTarget": ["anxious"],
     "effortLevel": "low",
-    "trigger": "safe_score < 6",
+    "trigger": "safe_score < 6 and attachment=anxious",
     "copy": "Send a voice note: 'Thinking of you before your meeting today. You've got this.'",
     "whyItWorks": "Consistency builds safety for anxious attachment"
   },
@@ -18,6 +18,26 @@
     "trigger": "safe_score < 6 and attachment=avoidant",
     "copy": "Low-pressure meme: 'Saw this and thought of you. No need to reply, just made me smile.'",
     "whyItWorks": "Low demand increases safety for avoidant"
+  },
+  {
+    "id": "act_vuln_001",
+    "type": "appreciation",
+    "loveLanguageType": "words",
+    "attachmentTarget": ["fearful"],
+    "effortLevel": "medium",
+    "trigger": "safe_score < 6 and attachment=fearful",
+    "copy": "Share one small worry first, then appreciation. Shows it's safe to be vulnerable.",
+    "whyItWorks": "Safe, controlled vulnerability builds trust without overwhelming fearful attachment"
+  },
+  {
+    "id": "act_direct_001",
+    "type": "checkin",
+    "loveLanguageType": "words",
+    "attachmentTarget": ["secure"],
+    "effortLevel": "medium",
+    "trigger": "safe_score < 6 and attachment=secure",
+    "copy": "Ask directly: 'I felt a bit distant yesterday, can we reset tonight?'",
+    "whyItWorks": "Secure attachment tolerates direct repair well; naming the gap resolves it fastest"
   },
   {
     "id": "act_seen_001",

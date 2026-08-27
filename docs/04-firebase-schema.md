@@ -41,7 +41,7 @@ Neither function is deployed yet — `functions/package.json` has the `deploy` s
 
 Run `npm run seed` with `GOOGLE_APPLICATION_CREDENTIALS` pointed at a service account key to load them into Firestore (see `scripts/seed/import-seed-data.ts`).
 
-**Coverage gap**: the real `suggested_actions` seed has only 4 entries and doesn't cover a `fearful`-attachment `safe_score` repair action, even though `src/engine/decisionMatrix.ts` prescribes a distinct "Safe Vulnerability" strategy for that case. Add a `fearful`-targeted entry (or an `"all"`-targeted one covering it) before relying on `suggested_actions` as the sole source for what the app shows — right now the client-side engine's hardcoded copy is the only thing covering that branch.
+**Coverage gap — fixed**: the seed originally had only 4 entries and didn't cover `fearful`- or `secure`-attachment `safe_score` actions distinctly (it lumped `secure` in with `anxious`-specific copy). Added `act_vuln_001` (fearful) and `act_direct_001` (secure), copied verbatim from `src/engine/decisionMatrix.ts`'s `SAFE_SCORE_STRATEGY`, so the seed data and the client-side engine now agree on all four attachment styles.
 
 ## Known naming inconsistencies not yet resolved
 
