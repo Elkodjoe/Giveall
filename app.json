@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Giveall",
+    "slug": "giveall",
+    "scheme": "giveall",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.giveall.app",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
+    },
+    "android": {
+      "package": "com.giveall.app"
+    },
+    "plugins": ["expo-router"]
+  }
+}
