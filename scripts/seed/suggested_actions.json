@@ -1,102 +1,42 @@
 [
   {
-    "id": "act_safe_anxious_1",
-    "type": "repair",
-    "attachmentTarget": "anxious",
-    "loveLanguageType": "words",
-    "effortLevel": 1,
-    "copy": "Morning voice note, same time daily: \"Thinking of you before your meeting\"",
-    "triggeredWhen": "safe_score is lowest AVW axis and attachmentStyle == anxious",
-    "tags": ["low-effort", "consistency", "reassurance"]
-  },
-  {
-    "id": "act_safe_avoidant_1",
-    "type": "repair",
-    "attachmentTarget": "avoidant",
-    "loveLanguageType": "acts",
-    "effortLevel": 1,
-    "copy": "No-reply-needed check-in: \"Saw this meme and thought of you, no need to reply\"",
-    "triggeredWhen": "safe_score is lowest AVW axis and attachmentStyle == avoidant",
-    "tags": ["low-effort", "low-pressure"]
-  },
-  {
-    "id": "act_safe_fearful_1",
-    "type": "repair",
-    "attachmentTarget": "fearful",
-    "loveLanguageType": "words",
-    "effortLevel": 2,
-    "copy": "Share one small worry first, then appreciation. Shows it's safe to be vulnerable.",
-    "triggeredWhen": "safe_score is lowest AVW axis and attachmentStyle == fearful",
-    "tags": ["vulnerability", "safe-share"]
-  },
-  {
-    "id": "act_safe_secure_1",
-    "type": "repair",
-    "attachmentTarget": "secure",
-    "loveLanguageType": "words",
-    "effortLevel": 2,
-    "copy": "Ask directly: \"I felt a bit distant yesterday, can we reset tonight?\"",
-    "triggeredWhen": "safe_score is lowest AVW axis and attachmentStyle == secure",
-    "tags": ["direct", "repair"]
-  },
-  {
-    "id": "act_seen_recall_1",
-    "type": "recall_detail",
-    "attachmentTarget": "secure",
-    "loveLanguageType": "time",
-    "effortLevel": 1,
-    "copy": "Ask about the thing they mentioned in passing last week. Really listen for the detail this time.",
-    "triggeredWhen": "seen_score is lowest AVW axis for 2+ days",
-    "tags": ["low-effort", "high-signal", "memory-vault"]
-  },
-  {
-    "id": "act_sought_appreciation_1",
+    "id": "act_words_001",
     "type": "appreciation",
-    "attachmentTarget": "secure",
     "loveLanguageType": "words",
-    "effortLevel": 1,
-    "copy": "Send a specific appreciation using the Appreciation Generator: name one exact thing they did and how it made you feel.",
-    "triggeredWhen": "sought_score < 3 for 2 days",
-    "tags": ["low-effort", "high-signal", "words"]
+    "attachmentTarget": ["anxious", "secure"],
+    "effortLevel": "low",
+    "trigger": "safe_score < 6",
+    "copy": "Send a voice note: 'Thinking of you before your meeting today. You've got this.'",
+    "whyItWorks": "Consistency builds safety for anxious attachment"
   },
   {
-    "id": "act_micro_surprise_1",
-    "type": "micro_surprise",
-    "attachmentTarget": "anxious",
+    "id": "act_space_001",
+    "type": "checkin",
+    "loveLanguageType": "quality_time",
+    "attachmentTarget": ["avoidant"],
+    "effortLevel": "low",
+    "trigger": "safe_score < 6 and attachment=avoidant",
+    "copy": "Low-pressure meme: 'Saw this and thought of you. No need to reply, just made me smile.'",
+    "whyItWorks": "Low demand increases safety for avoidant"
+  },
+  {
+    "id": "act_seen_001",
+    "type": "recall_detail",
+    "loveLanguageType": "quality_time",
+    "attachmentTarget": "all",
+    "effortLevel": "low",
+    "trigger": "seen_score < 6",
+    "copy": "Recall detail: Last week they mentioned {{memoryVaultDetail}}. Ask about it today.",
+    "whyItWorks": "Being remembered = feeling seen (Gottman)"
+  },
+  {
+    "id": "act_wanted_001",
+    "type": "desire",
     "loveLanguageType": "words",
-    "effortLevel": 1,
-    "copy": "Send: \"Thinking of you today...\"",
-    "triggeredWhen": "sought_score < 3 for 2 days",
-    "tags": ["low-effort", "high-signal"]
-  },
-  {
-    "id": "act_sought_public_1",
-    "type": "micro_surprise",
-    "attachmentTarget": "secure",
-    "loveLanguageType": "words",
-    "effortLevel": 2,
-    "copy": "Compliment them in front of a friend today, something specific from your Desire Inventory.",
-    "triggeredWhen": "sought_score is lowest AVW axis and desireInventory has an unused entry",
-    "tags": ["public", "desire-inventory"]
-  },
-  {
-    "id": "act_touch_1",
-    "type": "micro_surprise",
-    "attachmentTarget": "secure",
-    "loveLanguageType": "touch",
-    "effortLevel": 1,
-    "copy": "A long hug, no words needed, when you next see each other.",
-    "triggeredWhen": "loveLanguageWeights.touch is the top weight and sought_score is lowest",
-    "tags": ["touch", "low-effort"]
-  },
-  {
-    "id": "act_gifts_1",
-    "type": "micro_surprise",
-    "attachmentTarget": "secure",
-    "loveLanguageType": "gifts",
-    "effortLevel": 2,
-    "copy": "Pick up one small thing today that shows you were thinking of them, no occasion needed.",
-    "triggeredWhen": "loveLanguageWeights.gifts is the top weight and sought_score is lowest",
-    "tags": ["gifts", "spontaneous"]
+    "attachmentTarget": "all",
+    "effortLevel": "medium",
+    "trigger": "sought_score < 6",
+    "copy": "Specific desire: 'I love how you light up when you talk about {{interest}}. It's incredibly attractive.'",
+    "whyItWorks": "Specific > generic for feeling wanted"
   }
 ]

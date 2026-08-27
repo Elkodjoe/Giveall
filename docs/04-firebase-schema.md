@@ -37,11 +37,21 @@ Neither function is deployed yet — `functions/package.json` has the `deploy` s
 
 ## Seeding suggested_actions and curiosity_cards
 
-The original handoff mentioned seed JSON files but never actually included their content — `scripts/seed/suggested_actions.json` and `scripts/seed/curiosity_cards.json` were written from scratch instead, derived from the existing decision matrix (`src/engine/decisionMatrix.ts`) and curiosity ladder (`src/engine/curiosityLadder.ts`) so the seed data agrees with what the client-side engine already prescribes. `curiosity_cards` ids intentionally match the hardcoded `CARDS` array in `curiosityLadder.ts` — edit both if you change one.
+`scripts/seed/suggested_actions.json` and `scripts/seed/curiosity_cards.json` now hold the actual seed content from the handoff (an earlier pass had to invent placeholder content because no real seed JSON had come through yet). `curiosity_cards` ids intentionally match the hardcoded `CARDS` array in `src/engine/curiosityLadder.ts` — edit both if you change one.
 
 Run `npm run seed` with `GOOGLE_APPLICATION_CREDENTIALS` pointed at a service account key to load them into Firestore (see `scripts/seed/import-seed-data.ts`).
+
+**Coverage gap**: the real `suggested_actions` seed has only 4 entries and doesn't cover a `fearful`-attachment `safe_score` repair action, even though `src/engine/decisionMatrix.ts` prescribes a distinct "Safe Vulnerability" strategy for that case. Add a `fearful`-targeted entry (or an `"all"`-targeted one covering it) before relying on `suggested_actions` as the sole source for what the app shows — right now the client-side engine's hardcoded copy is the only thing covering that branch.
+
+## Known naming inconsistencies not yet resolved
+
+Different pasted fragments of the original handoff used different field names and value shapes for the same concepts. Rather than guess which was authoritative, `src/firebase/types.ts` picked one and these are flagged here for whoever owns the real handoff to confirm:
+
+- **Love language keys**: standardized on `quality_time` (matches `src/engine/types.ts`'s existing `LoveLanguage` union and the richer seed data) — an earlier pasted Cloud Function pseudocode used `time` instead; `functions/src/recalculateWeights.ts` has been corrected to `quality_time`.
+- **`attachmentStyle` value format**: `src/engine/types.ts`'s `AttachmentStyle` union (`'secure' | 'anxious' | 'avoidant' | 'fearful'`) is used throughout. A separate pasted `profiles_template` example used hyphenated labels like `"anxious-preoccupied"` instead — not adopted, since it doesn't match any type already in use.
+- **`attachmentScores` normalization**: `ProfileDoc.attachmentScores` is documented as summing to ~1.0. The same `profiles_template` example showed raw, unnormalized values (`secure: 45, anxious: 70, avoidant: 30, fearful: 40`, summing to 185) — if the real scoring model is meant to be unnormalized counts rather than a probability distribution, `ProfileDoc` needs updating to match; not changed here since only one conflicting example exists.
+- **`mood` field on `daily_checkins`**: `DailyCheckinDoc.mood` is a `number` (1-5). A pasted `daily_checkins_template` example showed `"mood": "hopeful"` (a string) and an additional `bid_logged_today: boolean` field not currently in `DailyCheckinDoc`. Not adopted — flagging for confirmation rather than picking one arbitrarily.
 
 ## What's still a placeholder
 
 - No Figma design tokens file content was received — the dark theme in `app/` (`docs/01-onboarding-flow.md`'s screens) has not been reconciled with any alternate palette.
-- Client-side `src/firebase/collections.ts` had no auth wiring as of the first Firebase pass — see `src/firebase/auth.ts` for what's now available.

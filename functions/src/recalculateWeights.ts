@@ -2,7 +2,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { LoveLanguageKey, ProfileDoc, ActionLogDoc } from '../../src/firebase/types';
 
-const LOVE_LANGUAGES: LoveLanguageKey[] = ['words', 'acts', 'touch', 'time', 'gifts'];
+const LOVE_LANGUAGES: LoveLanguageKey[] = ['words', 'acts', 'touch', 'quality_time', 'gifts'];
 const MIN_LOGS_FOR_SIGNAL = 3;
 const EMA_ALPHA = 0.3; // weight given to the new signal vs. the existing weight
 const WEIGHT_MIN = 0.05;

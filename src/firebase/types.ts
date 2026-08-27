@@ -27,7 +27,7 @@ export interface UserDoc {
   timezone: string; // IANA tz name
 }
 
-export type LoveLanguageKey = 'words' | 'acts' | 'touch' | 'time' | 'gifts';
+export type LoveLanguageKey = 'words' | 'acts' | 'touch' | 'quality_time' | 'gifts';
 
 export interface ProfileDoc {
   userId: string;
@@ -65,13 +65,17 @@ export interface BidDoc {
 // Public, read-only catalog of prescribable actions (seeded, not user-authored).
 export interface SuggestedActionDoc {
   id: string;
-  type: 'micro_surprise' | 'recall_detail' | 'appreciation' | 'repair';
-  attachmentTarget: AttachmentStyle;
+  type: 'micro_surprise' | 'recall_detail' | 'appreciation' | 'checkin' | 'desire' | 'repair';
   loveLanguageType: LoveLanguageKey;
-  effortLevel: 1 | 2 | 3;
+  // 'all' targets every attachment style — most actions (e.g. Recall Detail,
+  // Specific Desire) are universal; only safe_score repair actions are
+  // usually attachment-specific. See src/engine/decisionMatrix.ts for the
+  // equivalent client-side branching logic this seed data parallels.
+  attachmentTarget: AttachmentStyle[] | 'all';
+  effortLevel: 'low' | 'medium' | 'high';
+  trigger: string; // e.g. "safe_score < 6" or "seen_score < 6"
   copy: string;
-  triggeredWhen: string; // human-readable trigger rule, e.g. "sought_score < 3 for 2 days"
-  tags: string[];
+  whyItWorks: string;
 }
 
 // A user's log of having been shown/completed a suggested_actions entry.
@@ -88,8 +92,9 @@ export interface ActionLogDoc {
 export interface CuriosityCardDoc {
   id: string;
   level: 1 | 2 | 3; // 1-joy, 2-values, 3-vulnerability; maps to CuriosityTier in src/engine/curiosityLadder.ts
+  week: number; // specific unlock week, finer-grained than CuriosityTier's 3 bands
   question: string;
-  weekUnlock: number;
+  category: string; // e.g. "joy", "appreciation", "seen", "dreams", "safety", "vulnerability", "history"
 }
 
 // Per-user completion state for a curiosity card, stored under the user

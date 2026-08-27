@@ -1,56 +1,51 @@
 [
   {
-    "id": "gj-1",
+    "id": "cc_l1_01",
     "level": 1,
-    "question": "What moment made you proud of us this week?",
-    "weekUnlock": 1
+    "week": 1,
+    "question": "What moment made you feel most proud of us this week?",
+    "category": "joy"
   },
   {
-    "id": "gj-2",
+    "id": "cc_l1_02",
     "level": 1,
-    "question": "What made you laugh together recently?",
-    "weekUnlock": 1
+    "week": 2,
+    "question": "What's a small thing I do that you secretly love?",
+    "category": "appreciation"
   },
   {
-    "id": "gj-3",
+    "id": "cc_l1_03",
     "level": 1,
-    "question": "What small thing did they do that you appreciated but never said out loud?",
-    "weekUnlock": 1
+    "week": 3,
+    "question": "When did you feel most seen by me recently?",
+    "category": "seen"
   },
   {
-    "id": "vd-1",
+    "id": "cc_l2_01",
     "level": 2,
+    "week": 5,
     "question": "What's a hidden dream you've never told me?",
-    "weekUnlock": 5
+    "category": "dreams"
   },
   {
-    "id": "vd-2",
+    "id": "cc_l2_02",
     "level": 2,
-    "question": "What does a great life look like to you in 10 years?",
-    "weekUnlock": 5
+    "week": 7,
+    "question": "What does feeling safe mean to you in love?",
+    "category": "safety"
   },
   {
-    "id": "vd-3",
-    "level": 2,
-    "question": "What value do you hope we never compromise on?",
-    "weekUnlock": 5
-  },
-  {
-    "id": "vr-1",
+    "id": "cc_l3_01",
     "level": 3,
+    "week": 12,
     "question": "When do you feel most alone, even when I'm here?",
-    "weekUnlock": 13
+    "category": "vulnerability"
   },
   {
-    "id": "vr-2",
+    "id": "cc_l3_02",
     "level": 3,
-    "question": "What's something you're afraid to ask me for?",
-    "weekUnlock": 13
-  },
-  {
-    "id": "vr-3",
-    "level": 3,
-    "question": "What repair, if any, still feels unfinished between us?",
-    "weekUnlock": 13
+    "week": 14,
+    "question": "What's a story from your childhood that shaped how you love?",
+    "category": "history"
   }
 ]
