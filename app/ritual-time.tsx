@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import { useOnboarding } from '../src/state/OnboardingContext';
+import { colors, radius, fontFamily } from '../src/theme/tokens';
 
 // Screen 6 — Soft Permission + Ritual Time.
 // Notification permission is requested AFTER the time choice, never before —
@@ -38,7 +39,7 @@ export default function RitualTimeScreen() {
             style={[styles.option, selected === time && styles.optionSelected]}
             onPress={() => choose(time)}
           >
-            <Text style={styles.optionLabel}>{time}</Text>
+            <Text style={[styles.optionLabel, selected === time && styles.optionLabelSelected]}>{time}</Text>
           </Pressable>
         ))}
       </View>
@@ -47,17 +48,19 @@ export default function RitualTimeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#160F1C', padding: 24, justifyContent: 'center' },
-  headline: { color: '#F5EEF7', fontSize: 24, fontWeight: '700', marginBottom: 8, textAlign: 'center' },
-  sub: { color: '#C9BCD1', fontSize: 15, marginBottom: 32, textAlign: 'center' },
+  container: { flex: 1, backgroundColor: colors.background, padding: 24, justifyContent: 'center' },
+  headline: { fontFamily: fontFamily.bold, color: colors.textPrimary, fontSize: 22, lineHeight: 28, marginBottom: 8, textAlign: 'center' },
+  sub: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 15, marginBottom: 32, textAlign: 'center' },
   options: { flexDirection: 'row', gap: 12, justifyContent: 'center' },
   option: {
     borderWidth: 1,
-    borderColor: '#3A2E44',
-    borderRadius: 16,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
     paddingVertical: 16,
     paddingHorizontal: 20,
   },
-  optionSelected: { backgroundColor: '#E8637A', borderColor: '#E8637A' },
-  optionLabel: { color: '#F5EEF7', fontSize: 16, fontWeight: '600' },
+  optionSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  optionLabel: { fontFamily: fontFamily.semiBold, color: colors.textPrimary, fontSize: 16 },
+  optionLabelSelected: { color: colors.textInverse },
 });

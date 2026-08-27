@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import { colors } from '../theme/tokens';
 
 export function ProgressBar({ step, total }: { step: number; total: number }) {
   const pct = Math.min(1, Math.max(0, step / total));
@@ -12,15 +13,15 @@ export function ProgressBar({ step, total }: { step: number; total: number }) {
 
 const styles = StyleSheet.create({
   track: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#2A2230',
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.blush,
     overflow: 'hidden',
     marginBottom: 24,
   },
   fill: {
     height: '100%',
-    backgroundColor: '#E8637A',
-    borderRadius: 3,
+    backgroundColor: colors.primary,
+    borderRadius: 2,
   },
 });

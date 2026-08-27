@@ -1,6 +1,6 @@
-# Giveall — Relationship Fitness / Love OS
+# GiveAll — Relationship Fitness / Love OS
 
-**One-liner:** Love is a daily practice. Giveall is a 90-second daily fitness app for your relationship — it reads your Attachment style, Love Language, and real-time relational data, then prescribes one small, specific action a day to help you feel (and make someone feel) Attractive, Valued, and Wanted.
+**One-liner:** Love is a daily practice. GiveAll is a 90-second daily fitness app for your relationship — it reads your Attachment style, Love Language, and real-time relational data, then prescribes one small, specific action a day to help you feel (and make someone feel) Attractive, Valued, and Wanted. Brand story: "Give All of your love, daily. Generous, warm, abundant." (repo/package name stays lowercase `giveall`, matching the GitHub repo — see `05-design-tokens.md` for the display brand.)
 
 ## Core vocabulary (use consistently across product, copy, and code)
 
@@ -22,13 +22,16 @@
 - **`seen_score`** — do they feel *known*, not just liked? Low score → pull from Memory Vault, prescribe a "Recall Detail" action.
 - **`sought_score`** — do they feel actively desired/chosen, not just tolerated? Low score → pull from Desire Inventory, prescribe a specific wanting action.
 
-Scores are 0–100, updated by: onboarding baseline, daily check-in self-report, Bid Tracker ratio, and Curiosity Card engagement. See `02-love-os-brain.md` for the full decision matrix.
+Scores are 0–100 in the client-side engine (`src/engine/types.ts`'s `AvwScores`), updated by: onboarding baseline, daily check-in self-report, Bid Tracker ratio, and Curiosity Card engagement. Note: the persisted `daily_checkins` Firestore doc (`src/firebase/types.ts`) uses a 1–10 raw input scale for `seen_score`/`safe_score`/`sought_score` — nothing currently converts between the two scales; that mapping needs to be written before the Firestore-backed check-in flow feeds the engine. See `02-love-os-brain.md` for the full decision matrix.
 
 ## Docs in this folder
 
 1. `01-onboarding-flow.md` — the first 90 seconds, screen by screen, with copy and rationale.
 2. `02-love-os-brain.md` — the rules engine: inputs, decision matrix, recalibration logic, bid tracker, curiosity ladder.
 3. `03-power-ups.md` — AI appreciation-generator prompt, retention notification rules, privacy guardrail copy.
+4. `04-firebase-schema.md` — Firestore collections, the locked schema decisions, and known gaps.
+5. `05-design-tokens.md` — the GiveAll color/typography/spacing tokens and where they're applied.
+6. `06-firebase-provisioning.md` — manual steps to create and deploy the Firebase project (needs your Google account).
 
 ## Code scaffold
 

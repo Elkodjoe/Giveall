@@ -12,10 +12,13 @@
     "seed": "ts-node scripts/seed/import-seed-data.ts"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.2.3",
     "expo": "~51.0.0",
+    "expo-font": "~12.0.5",
     "expo-haptics": "~13.0.1",
     "expo-notifications": "~0.28.0",
     "expo-router": "~3.5.0",
+    "expo-splash-screen": "~0.27.4",
     "@react-native-async-storage/async-storage": "1.23.1",
     "expo-status-bar": "~1.12.0",
     "firebase": "^10.12.0",

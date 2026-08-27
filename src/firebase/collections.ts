@@ -59,8 +59,8 @@ export async function getProfile(userId: string): Promise<ProfileDoc | undefined
   return snap.exists() ? snap.data() : undefined;
 }
 
-export async function setProfile(userId: string, profile: ProfileDoc): Promise<void> {
-  await setDoc(doc(profilesCol, userId), profile);
+export async function setProfile(userId: string, profile: Omit<ProfileDoc, 'updatedAt'>): Promise<void> {
+  await setDoc(doc(collection(db, 'profiles'), userId), { ...profile, updatedAt: serverTimestamp() });
 }
 
 export async function getDailyCheckinsLastNDays(userId: string, days: number): Promise<DailyCheckinDoc[]> {
@@ -77,8 +77,8 @@ export async function getDailyCheckinsLastNDays(userId: string, days: number): P
   return snap.docs.map((d) => d.data());
 }
 
-export async function addDailyCheckin(checkin: DailyCheckinDoc): Promise<void> {
-  await addDoc(dailyCheckinsCol, checkin);
+export async function addDailyCheckin(checkin: Omit<DailyCheckinDoc, 'createdAt'>): Promise<void> {
+  await addDoc(collection(db, 'daily_checkins'), { ...checkin, createdAt: serverTimestamp() });
 }
 
 export async function getBidsLastNDays(userId: string, days: number): Promise<BidDoc[]> {
@@ -95,8 +95,8 @@ export async function getBidsLastNDays(userId: string, days: number): Promise<Bi
   return snap.docs.map((d) => d.data());
 }
 
-export async function addBid(bid: BidDoc): Promise<void> {
-  await addDoc(bidsCol, bid);
+export async function addBid(bid: Omit<BidDoc, 'createdAt'>): Promise<void> {
+  await addDoc(collection(db, 'bids'), { ...bid, createdAt: serverTimestamp() });
 }
 
 export async function getSuggestedActions(): Promise<SuggestedActionDoc[]> {
@@ -152,10 +152,13 @@ function partnershipId(uidA: string, uidB: string): string {
 
 export async function requestPartnership(uidA: string, uidB: string): Promise<void> {
   const id = partnershipId(uidA, uidB);
-  await setDoc(doc(partnershipsCol, id), {
-    participants: [uidA, uidB].sort() as [string, string],
+  // Same FieldValue-vs-Timestamp mismatch as logAction() above — write
+  // through the uncoverted collection ref for this one field.
+  await setDoc(doc(collection(db, 'partnerships'), id), {
+    users: [uidA, uidB].sort() as [string, string],
     optIns: { [uidA]: true, [uidB]: false },
     status: 'pending',
+    createdAt: serverTimestamp(),
   });
 }
 

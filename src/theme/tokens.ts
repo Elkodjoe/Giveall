@@ -1,0 +1,71 @@
+// GiveAll design tokens. Mirrors docs/05-design-tokens.md — keep both in
+// sync if either changes. React Native doesn't take letterSpacing/fontSize
+// as CSS shorthand strings, so numeric values here vs. the docs' "32px" etc.
+
+export const colors = {
+  primary: '#FF6B5B',
+  primaryLight: '#FF8E7A',
+  primaryDark: '#E85A4A',
+  secondary: '#FFC857',
+  secondaryLight: '#FFD97A',
+  background: '#FFF8F0',
+  surface: '#FFFFFF',
+  surfaceAlt: '#FFF1E6',
+  textPrimary: '#2D2A26',
+  textSecondary: '#8C7E77',
+  textInverse: '#FFFFFF',
+  success: '#A8D8B9',
+  warning: '#FFC857',
+  error: '#FF6B5B',
+  border: '#FFE4E1',
+  blush: '#FFE4E1',
+  sage: '#A8D8B9',
+} as const;
+
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+} as const;
+
+export const radius = {
+  sm: 12,
+  md: 16,
+  lg: 24,
+  full: 9999,
+} as const;
+
+// Google Fonts family names as loaded via @expo-google-fonts/inter in
+// app/_layout.tsx's useFonts call — see typography below for which weight
+// maps to which named family.
+export const fontFamily = {
+  regular: 'Inter_400Regular',
+  semiBold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+  extraBold: 'Inter_800ExtraBold',
+} as const;
+
+export const typography = {
+  heading1: { fontFamily: fontFamily.extraBold, fontSize: 32, lineHeight: 36 },
+  heading2: { fontFamily: fontFamily.bold, fontSize: 22, lineHeight: 28 },
+  body: { fontFamily: fontFamily.regular, fontSize: 16, lineHeight: 24 },
+  caption: { fontFamily: fontFamily.semiBold, fontSize: 12, letterSpacing: 0.8 },
+} as const;
+
+export const button = {
+  height: 52,
+  radius: radius.md,
+};
+
+export const card = {
+  radius: radius.lg,
+  shadow: {
+    shadowColor: 'rgba(45,42,38,0.06)',
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 24,
+    shadowOpacity: 1,
+    elevation: 4, // Android shadow approximation
+  },
+};

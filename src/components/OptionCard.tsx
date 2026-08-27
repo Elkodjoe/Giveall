@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { colors, radius, fontFamily } from '../theme/tokens';
 
 export function OptionCard({ label, onPress }: { label: string; onPress: () => void }) {
   const handlePress = () => {
@@ -17,20 +18,21 @@ export function OptionCard({ label, onPress }: { label: string; onPress: () => v
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#241C2B',
-    borderRadius: 16,
-    paddingVertical: 18,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    paddingVertical: 20,
     paddingHorizontal: 20,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#3A2E44',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   pressed: {
-    backgroundColor: '#2E2436',
+    backgroundColor: colors.surfaceAlt,
   },
   label: {
-    color: '#F5EEF7',
+    fontFamily: fontFamily.semiBold,
+    color: colors.textPrimary,
     fontSize: 16,
-    fontWeight: '500',
+    flex: 1,
   },
 });

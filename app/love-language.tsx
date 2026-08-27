@@ -6,6 +6,7 @@ import { OptionCard } from '../src/components/OptionCard';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { LOVE_LANGUAGE_PAIRS } from '../src/data/onboardingQuestions';
+import { colors, fontFamily } from '../src/theme/tokens';
 
 // Screen 4 — Love Language Forced Choice. 4 taps, not a ranked list.
 export default function LoveLanguageScreen() {
@@ -38,7 +39,7 @@ export default function LoveLanguageScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#160F1C', padding: 24 },
-  headline: { color: '#F5EEF7', fontSize: 22, fontWeight: '700', marginBottom: 24 },
+  container: { flex: 1, backgroundColor: colors.background, padding: 24 },
+  headline: { fontFamily: fontFamily.bold, color: colors.textPrimary, fontSize: 22, lineHeight: 28, marginBottom: 16 },
   options: { flex: 1 },
 });

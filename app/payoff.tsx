@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { tallyAttachment, tallyLoveLanguage, buildPayoffSummary } from '../src/engine/onboardingScoring';
+import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 
 // Screen 5 — The Payoff Preview. The Aha Moment: value delivered before any ask.
 // "First Win" copy here is a static placeholder for the demo; production
@@ -51,35 +52,42 @@ export default function PayoffScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#160F1C', padding: 24 },
-  summary: { color: '#F5EEF7', fontSize: 18, lineHeight: 26, marginBottom: 24 },
+  container: { flex: 1, backgroundColor: colors.background, padding: 24 },
+  summary: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 18, lineHeight: 26, marginBottom: 24 },
   winCard: {
-    backgroundColor: '#241C2B',
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#3A2E44',
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: card.radius,
+    padding: 24,
     flex: 1,
+    ...card.shadow,
   },
-  winLabel: { color: '#E8637A', fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-  winSubLabel: { color: '#C9BCD1', fontSize: 15, marginTop: 4, marginBottom: 16 },
-  winText: { color: '#F5EEF7', fontSize: 20, lineHeight: 28, fontStyle: 'italic' },
+  winLabel: {
+    fontFamily: fontFamily.semiBold,
+    color: colors.primary,
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  winSubLabel: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 15, marginTop: 4, marginBottom: 16 },
+  winText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 20, lineHeight: 28, fontStyle: 'italic' },
   ctaRow: { flexDirection: 'row', gap: 12, marginTop: 16 },
   ctaSecondary: {
     flex: 1,
-    borderRadius: 16,
-    paddingVertical: 18,
+    borderRadius: button.radius,
+    height: button.height,
+    justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#3A2E44',
+    borderColor: colors.border,
   },
-  ctaSecondaryLabel: { color: '#F5EEF7', fontSize: 16, fontWeight: '600' },
+  ctaSecondaryLabel: { fontFamily: fontFamily.semiBold, color: colors.textPrimary, fontSize: 16 },
   ctaPrimary: {
     flex: 1,
-    backgroundColor: '#E8637A',
-    borderRadius: 16,
-    paddingVertical: 18,
+    backgroundColor: colors.primary,
+    borderRadius: button.radius,
+    height: button.height,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  ctaPrimaryLabel: { color: '#160F1C', fontSize: 16, fontWeight: '700' },
+  ctaPrimaryLabel: { fontFamily: fontFamily.bold, color: colors.textInverse, fontSize: 16 },
 });

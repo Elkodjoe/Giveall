@@ -12,7 +12,7 @@ export const activatePartnership = onDocumentWritten('partnerships/{partnershipI
   const after = event.data?.after.data() as PartnershipDoc | undefined;
   if (!after || after.status !== 'pending') return;
 
-  const [uidA, uidB] = after.participants;
+  const [uidA, uidB] = after.users;
   const bothOptedIn = after.optIns[uidA] === true && after.optIns[uidB] === true;
   if (!bothOptedIn) return;
 

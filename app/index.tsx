@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors, radius, button, fontFamily } from '../src/theme/tokens';
 
 // Screen 1 — The Promise. See docs/01-onboarding-flow.md.
 export default function PromiseScreen() {
@@ -23,16 +24,16 @@ export default function PromiseScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#160F1C', padding: 24, justifyContent: 'space-between' },
+  container: { flex: 1, backgroundColor: colors.background, padding: 24, justifyContent: 'space-between' },
   content: { flex: 1, justifyContent: 'center' },
-  headline: { color: '#F5EEF7', fontSize: 34, fontWeight: '700', marginBottom: 16 },
-  sub: { color: '#C9BCD1', fontSize: 17, lineHeight: 24 },
+  headline: { fontFamily: fontFamily.extraBold, color: colors.textPrimary, fontSize: 32, lineHeight: 36, marginBottom: 12 },
+  sub: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 16, lineHeight: 24 },
   cta: {
-    backgroundColor: '#E8637A',
-    borderRadius: 16,
-    paddingVertical: 18,
+    backgroundColor: colors.primary,
+    borderRadius: button.radius,
+    height: button.height,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
   },
-  ctaLabel: { color: '#160F1C', fontSize: 17, fontWeight: '700' },
+  ctaLabel: { fontFamily: fontFamily.bold, color: colors.textInverse, fontSize: 16 },
 });

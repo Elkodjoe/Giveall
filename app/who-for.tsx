@@ -6,6 +6,7 @@ import { OptionCard } from '../src/components/OptionCard';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import type { Mode } from '../src/engine/types';
+import { colors, fontFamily } from '../src/theme/tokens';
 
 // Screen 2 — Who Are You Here For? Branches `mode` for the whole algorithm.
 const OPTIONS: { label: string; mode: Mode }[] = [
@@ -38,7 +39,7 @@ export default function WhoForScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#160F1C', padding: 24 },
-  headline: { color: '#F5EEF7', fontSize: 26, fontWeight: '700', marginBottom: 24 },
+  container: { flex: 1, backgroundColor: colors.background, padding: 24 },
+  headline: { fontFamily: fontFamily.bold, color: colors.textPrimary, fontSize: 22, lineHeight: 28, marginBottom: 16 },
   options: { flex: 1 },
 });

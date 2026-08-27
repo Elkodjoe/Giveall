@@ -12,45 +12,107 @@ export interface FirestoreTimestamp {
 type Timestamp = FirestoreTimestamp;
 
 // Firestore document shapes. Fields and collection names mirror the
-// designer/dev Figma+Firebase handoff (see docs/04-firebase-schema.md).
+// designer/dev Figma+Firebase handoff (see docs/04-firebase-schema.md,
+// "Locked schema v2" section) — the three naming conflicts flagged in an
+// earlier pass (attachmentStyle format, attachmentScores normalization,
+// mood field type) are resolved here per that lock-in.
 // Distinct from src/engine/types.ts, which models the client-side rules
 // engine's primary/secondary categorical view — these are the persisted,
 // continuous-weight documents the nightly recalibration job reads/writes.
 
+// Firestore's persisted attachment style enum — snake_case, distinct from
+// src/engine/types.ts's AttachmentStyle (short categorical names used
+// throughout the client-side rules engine). See attachmentStyleToFirestore
+// / attachmentStyleFromFirestore below for the mapping between the two;
+// the engine's shorter union was NOT renamed to match, to avoid an invasive
+// rename across already-tested engine code for a naming-only difference.
+export type FirestoreAttachmentStyle =
+  | 'secure'
+  | 'anxious_preoccupied'
+  | 'dismissive_avoidant'
+  | 'fearful_avoidant';
+
+const ATTACHMENT_STYLE_TO_FIRESTORE: Record<AttachmentStyle, FirestoreAttachmentStyle> = {
+  secure: 'secure',
+  anxious: 'anxious_preoccupied',
+  avoidant: 'dismissive_avoidant',
+  fearful: 'fearful_avoidant',
+};
+
+const ATTACHMENT_STYLE_FROM_FIRESTORE: Record<FirestoreAttachmentStyle, AttachmentStyle> = {
+  secure: 'secure',
+  anxious_preoccupied: 'anxious',
+  dismissive_avoidant: 'avoidant',
+  fearful_avoidant: 'fearful',
+};
+
+export function attachmentStyleToFirestore(style: AttachmentStyle): FirestoreAttachmentStyle {
+  return ATTACHMENT_STYLE_TO_FIRESTORE[style];
+}
+
+export function attachmentStyleFromFirestore(style: FirestoreAttachmentStyle): AttachmentStyle {
+  return ATTACHMENT_STYLE_FROM_FIRESTORE[style];
+}
+
 export interface UserDoc {
   uid: string;
+  displayName?: string;
+  email?: string;
   createdAt: Timestamp;
-  onboardingPersona: 'crush' | 'new' | 'longterm' | 'healing';
+  onboardingPersona: 'crush' | 'dating_new' | 'longterm' | 'healing';
   notificationTime: string; // "HH:mm", 24h
-  subscriptionTier: 'free' | 'premium_solo' | 'premium_partner';
+  subscriptionTier: 'free' | 'premium_solo' | 'premium_couples';
+  appName: 'GiveAll';
   partnerId?: string; // set only after double opt-in via /partnerships
   timezone: string; // IANA tz name
 }
 
 export type LoveLanguageKey = 'words' | 'acts' | 'touch' | 'quality_time' | 'gifts';
 
+// attachmentScores: normalized 0.0-1.0, sums to 1.0 (validated by the
+// validateProfile Cloud Function, tolerance +/-0.02 — see functions/src/validateProfile.ts).
+// attachmentScoresRaw: unnormalized counts, kept for debugging/audit only —
+// never read by product logic.
 export interface ProfileDoc {
   userId: string;
-  attachmentStyle: AttachmentStyle;
-  attachmentScores: Record<AttachmentStyle, number>; // sums to ~1.0
+  attachmentStyle: FirestoreAttachmentStyle;
+  attachmentStyleDominant: FirestoreAttachmentStyle;
+  attachmentScores: Record<FirestoreAttachmentStyle, number> & { _sum: number };
+  attachmentScoresRaw: Record<FirestoreAttachmentStyle, number>;
   loveLanguageGive: LoveLanguageKey;
   loveLanguageReceive: LoveLanguageKey;
   loveLanguageWeights: Record<LoveLanguageKey, number>; // sums to ~1.0, EMA-updated nightly
   desireInventory: string[];
+  notificationTime: string; // "HH:mm", 24h
+  updatedAt: Timestamp;
 }
+
+export type MoodLabel =
+  | 'hopeful'
+  | 'joyful'
+  | 'calm'
+  | 'neutral'
+  | 'anxious'
+  | 'lonely'
+  | 'disconnected'
+  | 'triggered'
+  | 'loved';
 
 export interface DailyCheckinDoc {
   userId: string;
   date: string; // "YYYY-MM-DD"
-  seen_score: number; // 1-5
-  safe_score: number; // 1-5
-  sought_score: number; // 1-5
-  mood: number; // 1-5
+  seen_score: number; // 1-10
+  safe_score: number; // 1-10
+  sought_score: number; // 1-10
+  moodScore: number; // 1-10, queryable
+  moodLabel: MoodLabel;
   contextTags: string[];
+  bid_logged_today: boolean;
+  createdAt: Timestamp;
   note?: string;
 }
 
-export type BidType = 'comment' | 'touch' | 'joke' | 'question' | 'help';
+export type BidType = 'comment' | 'touch' | 'joke' | 'help';
 export type BidResponseType = 'toward' | 'away' | 'against';
 
 export interface BidDoc {
@@ -60,6 +122,7 @@ export interface BidDoc {
   bidType: BidType;
   response: BidResponseType;
   ratioWeekly: number; // % toward over trailing 7 days, denormalized for quick reads
+  createdAt: Timestamp;
 }
 
 // Public, read-only catalog of prescribable actions (seeded, not user-authored).
@@ -108,7 +171,7 @@ export interface CuriosityCardProgressDoc {
 
 export interface MemoryVaultDoc {
   userId: string;
-  type: 'photo' | 'joke' | 'detail' | 'appreciation';
+  type: 'photo' | 'joke' | 'detail' | 'interest';
   content: string;
   date: string; // "YYYY-MM-DD"
   sentiment: 'warm' | 'neutral' | 'tense';
@@ -116,7 +179,8 @@ export interface MemoryVaultDoc {
 }
 
 export interface PartnershipDoc {
-  participants: [string, string]; // two uids, doc id is "{uidA}_{uidB}" sorted
+  users: [string, string]; // two uids, doc id is "{uidA}_{uidB}" sorted
   optIns: Record<string, boolean>; // uid -> has this participant opted in
-  status: 'pending' | 'active';
+  status: 'pending' | 'active' | 'blocked';
+  createdAt: Timestamp;
 }

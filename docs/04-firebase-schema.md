@@ -43,15 +43,14 @@ Run `npm run seed` with `GOOGLE_APPLICATION_CREDENTIALS` pointed at a service ac
 
 **Coverage gap — fixed**: the seed originally had only 4 entries and didn't cover `fearful`- or `secure`-attachment `safe_score` actions distinctly (it lumped `secure` in with `anxious`-specific copy). Added `act_vuln_001` (fearful) and `act_direct_001` (secure), copied verbatim from `src/engine/decisionMatrix.ts`'s `SAFE_SCORE_STRATEGY`, so the seed data and the client-side engine now agree on all four attachment styles.
 
-## Known naming inconsistencies not yet resolved
+## Locked schema v2 — naming conflicts resolved
 
-Different pasted fragments of the original handoff used different field names and value shapes for the same concepts. Rather than guess which was authoritative, `src/firebase/types.ts` picked one and these are flagged here for whoever owns the real handoff to confirm:
+The three naming conflicts flagged in an earlier pass are now resolved and reflected in `src/firebase/types.ts`:
 
-- **Love language keys**: standardized on `quality_time` (matches `src/engine/types.ts`'s existing `LoveLanguage` union and the richer seed data) — an earlier pasted Cloud Function pseudocode used `time` instead; `functions/src/recalculateWeights.ts` has been corrected to `quality_time`.
-- **`attachmentStyle` value format**: `src/engine/types.ts`'s `AttachmentStyle` union (`'secure' | 'anxious' | 'avoidant' | 'fearful'`) is used throughout. A separate pasted `profiles_template` example used hyphenated labels like `"anxious-preoccupied"` instead — not adopted, since it doesn't match any type already in use.
-- **`attachmentScores` normalization**: `ProfileDoc.attachmentScores` is documented as summing to ~1.0. The same `profiles_template` example showed raw, unnormalized values (`secure: 45, anxious: 70, avoidant: 30, fearful: 40`, summing to 185) — if the real scoring model is meant to be unnormalized counts rather than a probability distribution, `ProfileDoc` needs updating to match; not changed here since only one conflicting example exists.
-- **`mood` field on `daily_checkins`**: `DailyCheckinDoc.mood` is a `number` (1-5). A pasted `daily_checkins_template` example showed `"mood": "hopeful"` (a string) and an additional `bid_logged_today: boolean` field not currently in `DailyCheckinDoc`. Not adopted — flagging for confirmation rather than picking one arbitrarily.
+- **`attachmentStyle` format** → snake_case enum, no hyphens: `'secure' | 'anxious_preoccupied' | 'dismissive_avoidant' | 'fearful_avoidant'` (type `FirestoreAttachmentStyle`). This is distinct from `src/engine/types.ts`'s shorter `AttachmentStyle` union (`'secure' | 'anxious' | 'avoidant' | 'fearful'`), which was **not** renamed — that would be an invasive rename across already-tested engine code for a naming-only difference. `attachmentStyleToFirestore()` / `attachmentStyleFromFirestore()` in `src/firebase/types.ts` convert between the two.
+- **`attachmentScores` normalization** → split into two fields: `attachmentScores` (normalized floats summing to 1.0, with an explicit `_sum` field) and `attachmentScoresRaw` (unnormalized counts, debugging/audit only — never read by product logic). `functions/src/validateProfile.ts` is a Firestore trigger that logs a warning if `_sum` drifts more than ±0.02 from 1.0.
+- **`mood` field on `daily_checkins`** → split into `moodScore` (int 1-10, queryable — e.g. `where moodScore < 5`) and `moodLabel` (one of 9 enum values: hopeful/joyful/calm/neutral/anxious/lonely/disconnected/triggered/loved). Also added `bid_logged_today: boolean` per the locked schema.
 
-## What's still a placeholder
+Also renamed `PartnershipDoc.participants` → `users` (locked schema's field name) — updated in `firestore.rules`, `src/firebase/collections.ts`, and `functions/src/activatePartnership.ts` together.
 
-- No Figma design tokens file content was received — the dark theme in `app/` (`docs/01-onboarding-flow.md`'s screens) has not been reconciled with any alternate palette.
+`firestore.indexes.json` now exists at the repo root with composite indexes for the `userId` + date/timestamp range queries in `collections.ts` (plus one for `memory_vault`'s unused-entries query, not in the original list but needed for the same reason). Not deployed yet — see `06-firebase-provisioning.md`.

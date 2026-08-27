@@ -1,11 +1,15 @@
 {
   "expo": {
-    "name": "Giveall",
+    "name": "GiveAll",
     "slug": "giveall",
     "scheme": "giveall",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FFF8F0",
+    "splash": {
+      "backgroundColor": "#FFF8F0"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.giveall.app",
