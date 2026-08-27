@@ -35,8 +35,13 @@ The two are meant to compose, not compete:
 
 Neither function is deployed yet — `functions/package.json` has the `deploy` script once a Firebase project is provisioned.
 
+## Seeding suggested_actions and curiosity_cards
+
+The original handoff mentioned seed JSON files but never actually included their content — `scripts/seed/suggested_actions.json` and `scripts/seed/curiosity_cards.json` were written from scratch instead, derived from the existing decision matrix (`src/engine/decisionMatrix.ts`) and curiosity ladder (`src/engine/curiosityLadder.ts`) so the seed data agrees with what the client-side engine already prescribes. `curiosity_cards` ids intentionally match the hardcoded `CARDS` array in `curiosityLadder.ts` — edit both if you change one.
+
+Run `npm run seed` with `GOOGLE_APPLICATION_CREDENTIALS` pointed at a service account key to load them into Firestore (see `scripts/seed/import-seed-data.ts`).
+
 ## What's still a placeholder
 
-- No seed data (`suggested_actions` / `curiosity_cards` documents) has been provided yet — despite being mentioned in the original handoff, no seed JSON file content was actually received. `src/firebase/collections.ts` reads these collections but nothing populates them.
-- No Figma design tokens file content was received either — the dark theme in `app/` (`docs/01-onboarding-flow.md`'s screens) has not been reconciled with any alternate palette.
-- Client-side `src/firebase/collections.ts` has no auth wiring — every read/write assumes a `userId`/`uid` is already available from wherever auth ends up living.
+- No Figma design tokens file content was received — the dark theme in `app/` (`docs/01-onboarding-flow.md`'s screens) has not been reconciled with any alternate palette.
+- Client-side `src/firebase/collections.ts` had no auth wiring as of the first Firebase pass — see `src/firebase/auth.ts` for what's now available.

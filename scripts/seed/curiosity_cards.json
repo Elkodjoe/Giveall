@@ -1,0 +1,56 @@
+[
+  {
+    "id": "gj-1",
+    "level": 1,
+    "question": "What moment made you proud of us this week?",
+    "weekUnlock": 1
+  },
+  {
+    "id": "gj-2",
+    "level": 1,
+    "question": "What made you laugh together recently?",
+    "weekUnlock": 1
+  },
+  {
+    "id": "gj-3",
+    "level": 1,
+    "question": "What small thing did they do that you appreciated but never said out loud?",
+    "weekUnlock": 1
+  },
+  {
+    "id": "vd-1",
+    "level": 2,
+    "question": "What's a hidden dream you've never told me?",
+    "weekUnlock": 5
+  },
+  {
+    "id": "vd-2",
+    "level": 2,
+    "question": "What does a great life look like to you in 10 years?",
+    "weekUnlock": 5
+  },
+  {
+    "id": "vd-3",
+    "level": 2,
+    "question": "What value do you hope we never compromise on?",
+    "weekUnlock": 5
+  },
+  {
+    "id": "vr-1",
+    "level": 3,
+    "question": "When do you feel most alone, even when I'm here?",
+    "weekUnlock": 13
+  },
+  {
+    "id": "vr-2",
+    "level": 3,
+    "question": "What's something you're afraid to ask me for?",
+    "weekUnlock": 13
+  },
+  {
+    "id": "vr-3",
+    "level": 3,
+    "question": "What repair, if any, still feels unfinished between us?",
+    "weekUnlock": 13
+  }
+]
