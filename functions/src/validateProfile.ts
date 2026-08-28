@@ -1,8 +1,7 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import type { ProfileDoc } from '../../src/firebase/types';
-
-const SUM_TOLERANCE = 0.02;
+import { validateAttachmentScores } from '../../src/firebase/attachmentScores';
 
 /**
  * attachmentScores is meant to be a normalized probability distribution
@@ -15,12 +14,11 @@ export const validateProfile = onDocumentCreated('profiles/{userId}', async (eve
   const data = event.data?.data() as ProfileDoc | undefined;
   if (!data?.attachmentScores) return;
 
-  const sum = data.attachmentScores._sum;
-  if (Math.abs(sum - 1.0) > SUM_TOLERANCE) {
+  if (!validateAttachmentScores(data.attachmentScores)) {
     await getFirestore().collection('validation_events').add({
       userId: event.params.userId,
       type: 'attachmentScores_sum_invalid',
-      sum,
+      attachmentScores: data.attachmentScores,
       timestamp: FieldValue.serverTimestamp(),
     });
   }
