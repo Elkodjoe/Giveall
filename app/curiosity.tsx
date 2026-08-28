@@ -3,23 +3,22 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../src/state/AuthContext';
-import { nextCard, tierForWeek } from '../src/engine/curiosityLadder';
+import { nextCard, tierForWeek, weeksSinceStart as computeWeeksSinceStart } from '../src/engine/curiosityLadder';
 import { isFirebaseConfigured } from '../src/firebase/config';
-import { getCompletedCuriosityCardIds, markCuriosityCardCompleted } from '../src/firebase/collections';
+import { getCompletedCuriosityCardIds, markCuriosityCardCompleted, getUser } from '../src/firebase/collections';
 import { colors, card, button, fontFamily } from '../src/theme/tokens';
 
 // Curiosity Card — one conversation prompt at a time, gated by the
-// intimacy ladder (see src/engine/curiosityLadder.ts). No real onboarding
-// completion date is tracked yet anywhere in the app, so `weeksSinceStart`
-// is fixed at 0 here (always the gratitude/joy tier) rather than computed
-// from a persisted start date — same class of simplification as
-// bids.tsx's "no meaningful historical demo" note. Fix this together with
-// whatever eventually writes UserDoc.createdAt.
-const WEEKS_SINCE_START = 0;
-
+// intimacy ladder (see src/engine/curiosityLadder.ts), anchored to
+// UserDoc.createdAt (written by app/ritual-time.tsx on onboarding
+// completion — see createUserIfNeeded()). Without Firebase configured
+// there's no persisted start date, so it falls back to week 0 (always the
+// gratitude/joy tier) — the same graceful-degradation pattern as the other
+// screens, not a real substitute for tracking time.
 export default function CuriosityScreen() {
   const { uid } = useAuth();
   const [completedIds, setCompletedIds] = useState<string[]>([]);
+  const [weeks, setWeeks] = useState(0);
   const [justCompleted, setJustCompleted] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -30,10 +29,17 @@ export default function CuriosityScreen() {
       .catch(() => {
         // best-effort seed; local-only completion still works if this fails
       });
+    getUser(uid)
+      .then((user) => {
+        if (user) setWeeks(computeWeeksSinceStart(user.createdAt.toDate().toISOString()));
+      })
+      .catch(() => {
+        // falls back to week 0 (gratitude/joy tier) if this fails
+      });
   }, [uid]);
 
-  const tier = tierForWeek(WEEKS_SINCE_START);
-  const currentCard = nextCard(WEEKS_SINCE_START, completedIds);
+  const tier = tierForWeek(weeks);
+  const currentCard = nextCard(weeks, completedIds);
 
   const markDone = async () => {
     if (!currentCard) return;

@@ -1,4 +1,4 @@
-import type { AttachmentStyle } from '../engine/types';
+import type { AttachmentStyle, Mode } from '../engine/types';
 
 // Deliberately not `firebase/firestore`'s Timestamp: this file is shared
 // between the Expo client (firebase JS SDK) and Cloud Functions
@@ -54,12 +54,30 @@ export function attachmentStyleFromFirestore(style: FirestoreAttachmentStyle): A
   return ATTACHMENT_STYLE_FROM_FIRESTORE[style];
 }
 
+// Firestore's persisted onboarding persona — distinct spellings from
+// src/engine/types.ts's Mode ('new' -> 'dating_new', 'ltr' -> 'longterm')
+// for the same reason as FirestoreAttachmentStyle above: this is the
+// designer/dev handoff's naming, kept as-is rather than reconciled onto
+// the engine's shorter internal names.
+export type OnboardingPersona = 'crush' | 'dating_new' | 'longterm' | 'healing';
+
+const MODE_TO_ONBOARDING_PERSONA: Record<Mode, OnboardingPersona> = {
+  crush: 'crush',
+  new: 'dating_new',
+  ltr: 'longterm',
+  healing: 'healing',
+};
+
+export function modeToOnboardingPersona(mode: Mode): OnboardingPersona {
+  return MODE_TO_ONBOARDING_PERSONA[mode];
+}
+
 export interface UserDoc {
   uid: string;
   displayName?: string;
   email?: string;
   createdAt: Timestamp;
-  onboardingPersona: 'crush' | 'dating_new' | 'longterm' | 'healing';
+  onboardingPersona: OnboardingPersona;
   notificationTime: string; // "HH:mm", 24h
   subscriptionTier: 'free' | 'premium_solo' | 'premium_couples';
   appName: 'GiveAll';

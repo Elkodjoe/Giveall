@@ -4,6 +4,10 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import { useOnboarding } from '../src/state/OnboardingContext';
+import { useAuth } from '../src/state/AuthContext';
+import { isFirebaseConfigured } from '../src/firebase/config';
+import { createUserIfNeeded } from '../src/firebase/collections';
+import { modeToOnboardingPersona } from '../src/firebase/types';
 import { colors, radius, fontFamily } from '../src/theme/tokens';
 
 // Screen 6 — Soft Permission + Ritual Time.
@@ -11,9 +15,26 @@ import { colors, radius, fontFamily } from '../src/theme/tokens';
 // this ordering is load-bearing for conversion, see docs/01-onboarding-flow.md.
 const TIME_OPTIONS = ['7pm', '9pm', 'Custom'];
 
+// UserDoc.notificationTime wants "HH:mm" 24h; there's no actual custom-time
+// picker built yet, so "Custom" falls back to the same default as "7pm".
+const NOTIFICATION_TIME_24H: Record<string, string> = {
+  '7pm': '19:00',
+  '9pm': '21:00',
+  Custom: '19:00',
+};
+
+function deviceTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return 'UTC';
+  }
+}
+
 export default function RitualTimeScreen() {
   const router = useRouter();
-  const { setRitualTime } = useOnboarding();
+  const { mode, setRitualTime } = useOnboarding();
+  const { uid } = useAuth();
   const [selected, setSelected] = useState<string | null>(null);
 
   const choose = async (time: string) => {
@@ -24,6 +45,25 @@ export default function RitualTimeScreen() {
     } catch {
       // permission prompt unavailable (e.g. web/simulator) — non-fatal
     }
+
+    // Best-effort: app/curiosity.tsx anchors the intimacy ladder to
+    // UserDoc.createdAt, so this needs to exist by the time that screen is
+    // reached, but a failure here shouldn't block finishing onboarding.
+    if (isFirebaseConfigured && uid) {
+      try {
+        await createUserIfNeeded({
+          uid,
+          onboardingPersona: modeToOnboardingPersona(mode ?? 'ltr'),
+          notificationTime: NOTIFICATION_TIME_24H[time] ?? '19:00',
+          subscriptionTier: 'free',
+          appName: 'GiveAll',
+          timezone: deviceTimezone(),
+        });
+      } catch {
+        // non-fatal, see comment above
+      }
+    }
+
     // '/' is Screen 1 (The Promise) — routing there after onboarding would
     // restart the flow. '/checkin' is the daily-use home for now; there's
     // no separate dashboard/home screen yet.

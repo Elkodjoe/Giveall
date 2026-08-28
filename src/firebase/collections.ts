@@ -58,6 +58,15 @@ export async function getUser(uid: string): Promise<UserDoc | undefined> {
   return snap.exists() ? snap.data() : undefined;
 }
 
+// Idempotent: leaves an existing UserDoc's createdAt untouched (that's the
+// value app/curiosity.tsx anchors the intimacy ladder to — overwriting it
+// on every onboarding-completion visit would silently reset the ladder).
+export async function createUserIfNeeded(user: Omit<UserDoc, 'createdAt'>): Promise<void> {
+  const existing = await getUser(user.uid);
+  if (existing) return;
+  await setDoc(doc(collection(db, 'users'), user.uid), { ...user, createdAt: serverTimestamp() });
+}
+
 export async function getProfile(userId: string): Promise<ProfileDoc | undefined> {
   const snap = await getDoc(doc(profilesCol, userId));
   return snap.exists() ? snap.data() : undefined;
