@@ -22,7 +22,7 @@
 - **`seen_score`** — do they feel *known*, not just liked? Low score → pull from Memory Vault, prescribe a "Recall Detail" action.
 - **`sought_score`** — do they feel actively desired/chosen, not just tolerated? Low score → pull from Desire Inventory, prescribe a specific wanting action.
 
-Scores are 0–100 in the client-side engine (`src/engine/types.ts`'s `AvwScores`), updated by: onboarding baseline, daily check-in self-report, Bid Tracker ratio, and Curiosity Card engagement. Note: the persisted `daily_checkins` Firestore doc (`src/firebase/types.ts`) uses a 1–10 raw input scale for `seen_score`/`safe_score`/`sought_score` — nothing currently converts between the two scales; that mapping needs to be written before the Firestore-backed check-in flow feeds the engine. See `02-love-os-brain.md` for the full decision matrix.
+Scores are 0–100 in the client-side engine (`src/engine/types.ts`'s `AvwScores`), updated by: onboarding baseline, daily check-in self-report, Bid Tracker ratio, and Curiosity Card engagement. The persisted `daily_checkins` Firestore doc (`src/firebase/types.ts`) uses a 1–10 raw input scale for `seen_score`/`safe_score`/`sought_score` (what a slider UI shows) — `src/engine/scale.ts`'s `toAvwScore()`/`fromAvwScore()` convert between the two; always go through them rather than mixing raw and engine-scale values. See `02-love-os-brain.md` for the full decision matrix.
 
 ## Docs in this folder
 

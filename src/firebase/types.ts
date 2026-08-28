@@ -145,6 +145,10 @@ export interface SuggestedActionDoc {
 export interface ActionLogDoc {
   userId: string;
   actionId: string; // references SuggestedActionDoc.id
+  // Denormalized from suggested_actions/{actionId} at write time so the
+  // nightly recalibration job (functions/src/recalculateWeights.ts) can
+  // group by language without an N+1 lookup per log entry.
+  loveLanguageType: LoveLanguageKey;
   timestamp: Timestamp;
   partnerMoodDelta: -2 | -1 | 0 | 1 | 2; // self-reported
   wasCompleted: boolean;

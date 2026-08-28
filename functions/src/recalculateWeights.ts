@@ -1,34 +1,32 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { getFirestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import type { LoveLanguageKey, ProfileDoc, ActionLogDoc } from '../../src/firebase/types';
 
 const LOVE_LANGUAGES: LoveLanguageKey[] = ['words', 'acts', 'touch', 'quality_time', 'gifts'];
-const MIN_LOGS_FOR_SIGNAL = 3;
-const EMA_ALPHA = 0.3; // weight given to the new signal vs. the existing weight
-const WEIGHT_MIN = 0.05;
-const WEIGHT_MAX = 0.6;
+const EMA_ALPHA = 0.3; // deliberate: slow blending, not abrupt replacement
+const MIN_LOGS_FOR_RECALIBRATION = 5;
 
-// clamp partnerMoodDelta (-2..2) to a 0..1 signal for the EMA blend
-function normalizeMoodDelta(delta: number): number {
-  return (delta + 2) / 4;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
+type PartialWeights = Partial<Record<LoveLanguageKey, number>>;
 
 function normalizeWeights(weights: Record<LoveLanguageKey, number>): Record<LoveLanguageKey, number> {
-  const sum = LOVE_LANGUAGES.reduce((total, lang) => total + weights[lang], 0);
+  const sum = LOVE_LANGUAGES.reduce((total, lang) => total + weights[lang], 0) || 1;
   const normalized = {} as Record<LoveLanguageKey, number>;
   for (const lang of LOVE_LANGUAGES) normalized[lang] = weights[lang] / sum;
   return normalized;
 }
 
+function topLanguage(weights: Record<LoveLanguageKey, number>): LoveLanguageKey {
+  return LOVE_LANGUAGES.reduce((top, lang) => (weights[lang] > weights[top] ? lang : top));
+}
+
 /**
  * Recomputes one user's loveLanguageWeights from the last 7 days of
- * action_logs, using an exponential moving average so a single noisy day
- * can't swing the weights — see docs/02-love-os-brain.md #3 for the product
- * rule (never recalibrate silently) this implements.
+ * action_logs. Two rules from docs/02-love-os-brain.md #3 this
+ * deliberately implements:
+ *   - never recalibrate silently: every run writes a recalibration_events
+ *     doc, whether it actually recalibrates or skips (and why).
+ *   - blend gradually via EMA rather than replacing weights outright, so
+ *     a single noisy day (or week) can't swing prescriptions abruptly.
  */
 export async function recalculateUserWeights(userId: string): Promise<void> {
   const db = getFirestore();
@@ -36,6 +34,7 @@ export async function recalculateUserWeights(userId: string): Promise<void> {
   const profileSnap = await db.doc(`profiles/${userId}`).get();
   if (!profileSnap.exists) return;
   const profile = profileSnap.data() as ProfileDoc;
+  const existingWeights = profile.loveLanguageWeights;
 
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -45,56 +44,74 @@ export async function recalculateUserWeights(userId: string): Promise<void> {
     .where('userId', '==', userId)
     .where('timestamp', '>=', sevenDaysAgo)
     .get();
-  const logs = logsSnap.docs.map((d) => d.data() as ActionLogDoc & { loveLanguageType?: LoveLanguageKey });
 
-  if (logs.length < MIN_LOGS_FOR_SIGNAL) return;
-
-  const actionIds = [...new Set(logs.map((l) => l.actionId))];
-  const actionDocs = await Promise.all(actionIds.map((id) => db.doc(`suggested_actions/${id}`).get()));
-  const languageByActionId = new Map<string, LoveLanguageKey>();
-  actionDocs.forEach((snap) => {
-    if (snap.exists) languageByActionId.set(snap.id, snap.data()?.loveLanguageType);
-  });
-
-  const newWeights = { ...profile.loveLanguageWeights };
-  for (const lang of LOVE_LANGUAGES) {
-    const relevant = logs.filter((l) => languageByActionId.get(l.actionId) === lang);
-    if (relevant.length === 0) continue;
-    const avgSignal =
-      relevant.reduce((sum, l) => sum + normalizeMoodDelta(l.partnerMoodDelta), 0) / relevant.length;
-    const prevWeight = profile.loveLanguageWeights[lang];
-    const blended = EMA_ALPHA * avgSignal + (1 - EMA_ALPHA) * prevWeight;
-    newWeights[lang] = clamp(blended, WEIGHT_MIN, WEIGHT_MAX);
-  }
-
-  const normalized = normalizeWeights(newWeights);
-  const previousTop = topLanguage(profile.loveLanguageWeights);
-  const newTop = topLanguage(normalized);
-
-  await db.doc(`profiles/${userId}`).update({ loveLanguageWeights: normalized });
-
-  // Recalibration must never be silent — see docs/02-love-os-brain.md #3.
-  // Client reads this doc and shows: "We learned you feel most loved
-  // through {newTop} — adjusting your reps."
-  if (newTop !== previousTop) {
+  if (logsSnap.size < MIN_LOGS_FOR_RECALIBRATION) {
     await db.collection('recalibration_events').add({
       userId,
-      previousTop,
-      newTop,
-      weights: normalized,
-      occurredAt: new Date(),
-      acknowledged: false,
+      type: 'skipped_insufficient_logs',
+      logCount: logsSnap.size,
+      reason: `Need ${MIN_LOGS_FOR_RECALIBRATION}, got ${logsSnap.size}`,
+      timestamp: FieldValue.serverTimestamp(),
     });
+    return;
   }
+
+  const grouped: Partial<Record<LoveLanguageKey, number[]>> = {};
+  logsSnap.forEach((l) => {
+    const d = l.data() as ActionLogDoc;
+    (grouped[d.loveLanguageType] ??= []).push(d.partnerMoodDelta);
+  });
+
+  const rawAvgs: PartialWeights = {};
+  for (const lang of LOVE_LANGUAGES) {
+    const vals = grouped[lang];
+    if (vals?.length) rawAvgs[lang] = vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
+
+  // Shift so the lowest raw average lands just above zero, then normalize —
+  // preserves relative ranking while keeping every weight non-negative.
+  const presentAvgs = Object.values(rawAvgs) as number[];
+  const minVal = Math.min(0, ...presentAvgs);
+  const shifted: PartialWeights = {};
+  for (const lang of LOVE_LANGUAGES) {
+    if (rawAvgs[lang] !== undefined) shifted[lang] = rawAvgs[lang]! - minVal + 0.1;
+  }
+  const shiftedTotal = (Object.values(shifted) as number[]).reduce((a, b) => a + b, 0) || 1;
+  const targetWeights: PartialWeights = {};
+  for (const lang of LOVE_LANGUAGES) {
+    if (shifted[lang] !== undefined) targetWeights[lang] = shifted[lang]! / shiftedTotal;
+  }
+
+  const blended = {} as Record<LoveLanguageKey, number>;
+  for (const lang of LOVE_LANGUAGES) {
+    const existing = existingWeights[lang] ?? 1 / LOVE_LANGUAGES.length;
+    const target = targetWeights[lang] ?? 0;
+    blended[lang] = EMA_ALPHA * target + (1 - EMA_ALPHA) * existing;
+  }
+  const normalized = normalizeWeights(blended);
+
+  await db.collection('recalibration_events').add({
+    userId,
+    type: 'recalibrated',
+    previousWeights: existingWeights,
+    targetWeights,
+    blendedWeights: normalized,
+    topLanguageChanged: topLanguage(normalized) !== topLanguage(existingWeights),
+    emaAlpha: EMA_ALPHA,
+    logCount: logsSnap.size,
+    rawAvgs,
+    timestamp: FieldValue.serverTimestamp(),
+  });
+
+  await profileSnap.ref.update({
+    loveLanguageWeights: normalized,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 }
 
-function topLanguage(weights: Record<LoveLanguageKey, number>): LoveLanguageKey {
-  return LOVE_LANGUAGES.reduce((top, lang) => (weights[lang] > weights[top] ? lang : top));
-}
-
-// Runs nightly at 2am UTC — every active user's weights get one fresh pass.
+// Runs nightly at 2am UTC — every profile gets one fresh pass.
 export const nightlyRecalculateWeights = onSchedule('0 2 * * *', async () => {
   const db = getFirestore();
-  const usersSnap = await db.collection('users').get();
-  await Promise.all(usersSnap.docs.map((u) => recalculateUserWeights(u.id)));
+  const profilesSnap = await db.collection('profiles').get();
+  await Promise.all(profilesSnap.docs.map((p) => recalculateUserWeights(p.id)));
 });
