@@ -16,7 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     ensureSignedIn()
       .then((user) => {
-        if (!cancelled) setUid(user.uid);
+        if (!cancelled) setUid(user?.uid ?? null);
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);

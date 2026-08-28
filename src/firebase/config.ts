@@ -13,5 +13,13 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Whether real Firebase credentials are present. Until a Firebase project
+// is provisioned (see docs/06-firebase-provisioning.md) EXPO_PUBLIC_* env
+// vars are unset, and Firebase SDK calls (especially initializeAuth) throw
+// synchronously if used with an empty apiKey — auth.ts checks this before
+// calling initializeAuth so the app can still render without Firebase
+// configured, since nothing in the onboarding flow needs it yet.
+export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey);
+
 export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(firebaseApp);

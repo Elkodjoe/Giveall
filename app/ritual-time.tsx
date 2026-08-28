@@ -24,7 +24,10 @@ export default function RitualTimeScreen() {
     } catch {
       // permission prompt unavailable (e.g. web/simulator) — non-fatal
     }
-    router.push('/');
+    // '/' is Screen 1 (The Promise) — routing there after onboarding would
+    // restart the flow. '/checkin' is the daily-use home for now; there's
+    // no separate dashboard/home screen yet.
+    router.replace('/checkin');
   };
 
   return (

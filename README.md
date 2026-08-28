@@ -8,7 +8,8 @@ A 90-second daily relationship fitness app. See `docs/00-product-overview.md` fo
 - `src/engine/` — the rules engine as plain TypeScript, no React/RN dependency. Unit-tested (`src/engine/__tests__`). This is the reusable "brain" — safe to lift into a backend later if logic needs to move server-side.
 - `src/data/` — onboarding question banks (attachment scenarios, love language forced-choice pairs).
 - `src/components/`, `src/state/` — RN UI pieces for the onboarding flow.
-- `app/` — Expo Router screens implementing Onboarding Screens 1–6.
+- `app/` — Expo Router screens: Onboarding Screens 1–6, plus `checkin.tsx`, the daily 90-second check-in that runs the decision matrix end-to-end.
+- `src/firebase/` — Firestore document types, security rules-matching collection helpers, and auth. Works without a Firebase project configured — see `docs/06-firebase-provisioning.md`.
 
 ## Getting started
 
@@ -20,4 +21,4 @@ npm test        # runs the engine unit tests
 
 ## Status
 
-Onboarding flow (Screens 1–6) and the core rules engine (decision matrix, bid tracker, curiosity ladder, recalibration, appreciation prompt builder, retention notification copy) are scaffolded and unit-tested. Not yet wired: persistence/backend, an actual LLM call for the Appreciation Generator (see `src/engine/appreciationGenerator.ts` — prompt is ready, provider call is a TODO), and daily check-in / Bid Tracker screens beyond onboarding.
+Onboarding flow (Screens 1–6) and the daily check-in screen are built, running the full rules engine (decision matrix, bid tracker, curiosity ladder, recalibration, appreciation prompt builder, retention notification copy), all unit-tested, and verified end-to-end in the actual running app (Expo web). Firestore schema, security rules, and Cloud Functions are written but not deployed — no Firebase project exists yet, see `docs/06-firebase-provisioning.md`. The check-in screen is currently client-only (builds a profile from in-memory onboarding answers rather than a persisted `ProfileDoc` — see `app/checkin.tsx`'s top comment); wiring it to `src/firebase/collections.ts` is next. Not yet wired: an actual LLM call for the Appreciation Generator (see `src/engine/appreciationGenerator.ts` — prompt is ready, provider call is a TODO), and a Bid Tracker screen.
