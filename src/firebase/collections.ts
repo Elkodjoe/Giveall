@@ -23,6 +23,7 @@ import type {
   SuggestedActionDoc,
   ActionLogDoc,
   CuriosityCardDoc,
+  CuriosityCardProgressDoc,
   MemoryVaultDoc,
   PartnershipDoc,
 } from './types';
@@ -46,6 +47,9 @@ const bidsCol = collection(db, 'bids').withConverter(converter<BidDoc>());
 const suggestedActionsCol = collection(db, 'suggested_actions').withConverter(converter<SuggestedActionDoc>());
 const actionLogsCol = collection(db, 'action_logs').withConverter(converter<ActionLogDoc>());
 const curiosityCardsCol = collection(db, 'curiosity_cards').withConverter(converter<CuriosityCardDoc>());
+const curiosityCardProgressCol = collection(db, 'curiosity_card_progress').withConverter(
+  converter<CuriosityCardProgressDoc>(),
+);
 const memoryVaultCol = collection(db, 'memory_vault').withConverter(converter<MemoryVaultDoc>());
 const partnershipsCol = collection(db, 'partnerships').withConverter(converter<PartnershipDoc>());
 
@@ -129,6 +133,27 @@ export async function getCuriosityCardsForLevel(level: 1 | 2 | 3): Promise<Curio
   const q = query(curiosityCardsCol, where('level', '==', level));
   const snap = await getDocs(q);
   return snap.docs.map((d) => d.data());
+}
+
+export async function getCompletedCuriosityCardIds(userId: string): Promise<string[]> {
+  const q = query(curiosityCardProgressCol, where('userId', '==', userId), where('isCompleted', '==', true));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data().cardId);
+}
+
+function curiosityCardProgressId(userId: string, cardId: string): string {
+  return `${userId}_${cardId}`;
+}
+
+export async function markCuriosityCardCompleted(userId: string, cardId: string): Promise<void> {
+  // Doc id is deterministic ("{userId}_{cardId}") so this is an idempotent
+  // upsert — marking the same card done twice doesn't create duplicates.
+  await setDoc(doc(collection(db, 'curiosity_card_progress'), curiosityCardProgressId(userId, cardId)), {
+    userId,
+    cardId,
+    isCompleted: true,
+    completedAt: serverTimestamp(),
+  });
 }
 
 export async function addMemoryVaultEntry(entry: MemoryVaultDoc): Promise<void> {

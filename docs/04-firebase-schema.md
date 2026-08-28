@@ -14,6 +14,7 @@ Persistence layer added on top of the rules engine in `src/engine/` (that engine
 | `action_logs` | `ActionLogDoc` | A user's record of being shown/completing a `suggested_actions` entry, with self-reported mood delta. |
 | `curiosity_cards` | `CuriosityCardDoc` | Public, seeded prompt catalog — `level` (1/2/3) maps to `CuriosityTier` in `src/engine/curiosityLadder.ts`. |
 | `memory_vault` | `MemoryVaultDoc` | Same concept as `MemoryVaultEntry` in `src/engine/types.ts`, persisted form. |
+| `curiosity_card_progress` | `CuriosityCardProgressDoc` | Per-user completion state, doc id `"{userId}_{cardId}"`. **Not in the original handoff** — `CuriosityCardProgressDoc` was defined in `types.ts` but referenced no collection with rules of its own, same class of gap as `partnerships` below; found while building `app/curiosity.tsx`. |
 | `partnerships` | `PartnershipDoc` | Double opt-in linking. **Not in the original handoff** — added because `firestore.rules`' `/profiles` partner-read check referenced a `partnerships` collection that had no rules of its own; see rules file comment. |
 
 ## Reconciling categorical (engine) vs. continuous (Firestore) models

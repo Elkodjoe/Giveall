@@ -23,6 +23,13 @@ service cloud.firestore {
     match /memory_vault/{docId} {
       allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
     }
+    // CuriosityCardProgressDoc (src/firebase/types.ts) referenced this
+    // collection but it had no rules of its own — same class of gap as
+    // partnerships below. Doc id is "{userId}_{cardId}" for idempotent
+    // upserts (see markCuriosityCardCompleted in collections.ts).
+    match /curiosity_card_progress/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
     // Double opt-in partner linking: doc id is "{uidA}_{uidB}" (sorted).
     // Not in the original handoff — added so the "active" status the
     // /profiles rule above checks is actually reachable. Both parties must

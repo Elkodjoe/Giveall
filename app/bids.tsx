@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../src/state/AuthContext';
 import { summarizeWeek, shouldTriggerRepairQuest, SECURE_ZONE_THRESHOLD } from '../src/engine/bidTracker';
@@ -24,6 +25,7 @@ const RESPONSES: { value: BidResponse; label: string }[] = [
 ];
 
 export default function BidsScreen() {
+  const router = useRouter();
   const { uid } = useAuth();
   const [bidLog, setBidLog] = useState<BidLogEntry[]>([]);
   const [description, setDescription] = useState('');
@@ -150,6 +152,10 @@ export default function BidsScreen() {
         </View>
 
         {saveError && <Text style={styles.errorText}>Couldn't save that bid: {saveError}</Text>}
+
+        <Pressable style={styles.link} onPress={() => router.push('/curiosity')}>
+          <Text style={styles.linkText}>Open today's Curiosity Card →</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -217,4 +223,6 @@ const styles = StyleSheet.create({
   badgeWarning: { fontFamily: fontFamily.semiBold, color: colors.textSecondary, fontSize: 14 },
   repairQuest: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13, marginTop: 8 },
   errorText: { fontFamily: fontFamily.regular, color: colors.error, fontSize: 13, marginTop: 12, textAlign: 'center' },
+  link: { marginTop: 24, alignItems: 'center' },
+  linkText: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14 },
 });
