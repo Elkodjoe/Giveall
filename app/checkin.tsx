@@ -3,19 +3,24 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScoreSelector } from '../src/components/ScoreSelector';
 import { useOnboarding } from '../src/state/OnboardingContext';
+import { useAuth } from '../src/state/AuthContext';
 import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScoring';
 import { checkinToAvw } from '../src/engine/scale';
 import { getMicroAttunement } from '../src/engine/decisionMatrix';
 import type { UserProfile } from '../src/engine/types';
 import type { MoodLabel } from '../src/firebase/types';
+import { isFirebaseConfigured } from '../src/firebase/config';
+import { getProfile, setProfile, addDailyCheckin } from '../src/firebase/collections';
+import { buildInitialProfile } from '../src/firebase/profileSeeding';
 import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 
-// Daily Check-in — the 90-second core loop screen. Client-only for now:
-// builds a UserProfile from onboarding answers already in memory and runs
-// it straight through the decision matrix, same as payoff.tsx's demo
-// pattern. Production would instead read a persisted ProfileDoc from
-// Firestore and write this check-in via addDailyCheckin() (see
-// src/firebase/collections.ts) before/alongside running the engine.
+// Daily Check-in — the 90-second core loop screen. Always runs the
+// decision matrix against a UserProfile built from onboarding answers
+// already in memory (works with zero Firestore setup, same as payoff.tsx's
+// demo pattern). When Firebase is configured and signed in, also persists:
+// creates the profile on first visit (buildInitialProfile) and writes the
+// check-in via addDailyCheckin() — best-effort, never blocks showing the
+// action if either write fails or is skipped.
 const MOOD_LABELS: MoodLabel[] = [
   'hopeful',
   'joyful',
@@ -28,13 +33,30 @@ const MOOD_LABELS: MoodLabel[] = [
   'loved',
 ];
 
+// DailyCheckinDoc requires a numeric moodScore alongside moodLabel, but the
+// UI only collects the label — this fixed mapping fills the required field
+// until a dedicated numeric mood slider exists.
+const MOOD_SCORE_BY_LABEL: Record<MoodLabel, number> = {
+  loved: 10,
+  joyful: 9,
+  hopeful: 8,
+  calm: 7,
+  neutral: 5,
+  anxious: 3,
+  lonely: 3,
+  disconnected: 2,
+  triggered: 1,
+};
+
 export default function CheckinScreen() {
-  const { mode, attachmentAnswers, loveLanguagePicks } = useOnboarding();
+  const { mode, attachmentAnswers, loveLanguagePicks, ritualTime } = useOnboarding();
+  const { uid } = useAuth();
   const [seenScore, setSeenScore] = useState(5);
   const [safeScore, setSafeScore] = useState(5);
   const [soughtScore, setSoughtScore] = useState(5);
   const [moodLabel, setMoodLabel] = useState<MoodLabel | null>(null);
   const [showAction, setShowAction] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const action = useMemo(() => {
     const { primary: attachmentStyle, spike } = tallyAttachment(attachmentAnswers);
@@ -56,6 +78,41 @@ export default function CheckinScreen() {
 
     return getMicroAttunement(profile);
   }, [mode, attachmentAnswers, loveLanguagePicks, seenScore, safeScore, soughtScore]);
+
+  const handleSeeAction = async () => {
+    setShowAction(true);
+    setSaveError(null);
+
+    if (!isFirebaseConfigured || !uid || !moodLabel) return;
+
+    try {
+      let profile = await getProfile(uid);
+      if (!profile) {
+        const initial = buildInitialProfile({
+          userId: uid,
+          attachmentAnswers,
+          loveLanguagePicks,
+          notificationTime: ritualTime ?? '19:00',
+        });
+        await setProfile(uid, initial);
+      }
+
+      await addDailyCheckin({
+        userId: uid,
+        date: new Date().toISOString().slice(0, 10),
+        seen_score: seenScore,
+        safe_score: safeScore,
+        sought_score: soughtScore,
+        moodScore: MOOD_SCORE_BY_LABEL[moodLabel],
+        moodLabel,
+        contextTags: [],
+        bid_logged_today: false,
+      });
+    } catch (err) {
+      // Non-fatal: the computed action above already rendered regardless.
+      setSaveError(err instanceof Error ? err.message : 'Could not save check-in.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -80,7 +137,7 @@ export default function CheckinScreen() {
           ))}
         </View>
 
-        <Pressable style={styles.cta} onPress={() => setShowAction(true)}>
+        <Pressable style={styles.cta} onPress={handleSeeAction}>
           <Text style={styles.ctaLabel}>See Today's Action</Text>
         </Pressable>
 
@@ -94,6 +151,8 @@ export default function CheckinScreen() {
             </Text>
           </View>
         )}
+
+        {saveError && <Text style={styles.errorText}>Couldn't save your check-in: {saveError}</Text>}
       </ScrollView>
     </SafeAreaView>
   );
@@ -144,4 +203,5 @@ const styles = StyleSheet.create({
   actionStrategy: { fontFamily: fontFamily.bold, color: colors.textPrimary, fontSize: 18, marginBottom: 8 },
   actionText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 16, lineHeight: 24, marginBottom: 12 },
   actionMeta: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13 },
+  errorText: { fontFamily: fontFamily.regular, color: colors.error, fontSize: 13, marginTop: 12, textAlign: 'center' },
 });
