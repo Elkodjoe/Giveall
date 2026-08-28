@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { ScoreSelector } from '../src/components/ScoreSelector';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { useAuth } from '../src/state/AuthContext';
@@ -49,6 +50,7 @@ const MOOD_SCORE_BY_LABEL: Record<MoodLabel, number> = {
 };
 
 export default function CheckinScreen() {
+  const router = useRouter();
   const { mode, attachmentAnswers, loveLanguagePicks, ritualTime } = useOnboarding();
   const { uid } = useAuth();
   const [seenScore, setSeenScore] = useState(5);
@@ -153,6 +155,10 @@ export default function CheckinScreen() {
         )}
 
         {saveError && <Text style={styles.errorText}>Couldn't save your check-in: {saveError}</Text>}
+
+        <Pressable style={styles.link} onPress={() => router.push('/bids')}>
+          <Text style={styles.linkText}>Log a bid for connection →</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -204,4 +210,6 @@ const styles = StyleSheet.create({
   actionText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 16, lineHeight: 24, marginBottom: 12 },
   actionMeta: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13 },
   errorText: { fontFamily: fontFamily.regular, color: colors.error, fontSize: 13, marginTop: 12, textAlign: 'center' },
+  link: { marginTop: 24, alignItems: 'center' },
+  linkText: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14 },
 });
