@@ -34,21 +34,6 @@ const MOOD_LABELS: MoodLabel[] = [
   'loved',
 ];
 
-// DailyCheckinDoc requires a numeric moodScore alongside moodLabel, but the
-// UI only collects the label — this fixed mapping fills the required field
-// until a dedicated numeric mood slider exists.
-const MOOD_SCORE_BY_LABEL: Record<MoodLabel, number> = {
-  loved: 10,
-  joyful: 9,
-  hopeful: 8,
-  calm: 7,
-  neutral: 5,
-  anxious: 3,
-  lonely: 3,
-  disconnected: 2,
-  triggered: 1,
-};
-
 export default function CheckinScreen() {
   const router = useRouter();
   const { mode, attachmentAnswers, loveLanguagePicks, ritualTime } = useOnboarding();
@@ -56,6 +41,7 @@ export default function CheckinScreen() {
   const [seenScore, setSeenScore] = useState(5);
   const [safeScore, setSafeScore] = useState(5);
   const [soughtScore, setSoughtScore] = useState(5);
+  const [moodScore, setMoodScore] = useState(5);
   const [moodLabel, setMoodLabel] = useState<MoodLabel | null>(null);
   const [showAction, setShowAction] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -105,7 +91,7 @@ export default function CheckinScreen() {
         seen_score: seenScore,
         safe_score: safeScore,
         sought_score: soughtScore,
-        moodScore: MOOD_SCORE_BY_LABEL[moodLabel],
+        moodScore,
         moodLabel,
         contextTags: [],
         bid_logged_today: false,
@@ -125,8 +111,9 @@ export default function CheckinScreen() {
         <ScoreSelector label="Seen" value={seenScore} onChange={setSeenScore} />
         <ScoreSelector label="Safe" value={safeScore} onChange={setSafeScore} />
         <ScoreSelector label="Sought" value={soughtScore} onChange={setSoughtScore} />
+        <ScoreSelector label="Mood" value={moodScore} onChange={setMoodScore} />
 
-        <Text style={styles.moodLabel}>Mood</Text>
+        <Text style={styles.moodLabel}>In one word</Text>
         <View style={styles.moodGrid}>
           {MOOD_LABELS.map((m) => (
             <Pressable
