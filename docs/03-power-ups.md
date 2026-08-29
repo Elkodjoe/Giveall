@@ -23,7 +23,11 @@ Output: one specific, personal line ready to send as-is.
 - Input: "You are funny."
 - Output: "I love how you do that deadpan voice when you're nervous — it makes me feel like we're on the same team."
 
-Implementation: `src/engine/appreciationGenerator.ts` exposes `buildAppreciationPrompt(input)` which assembles the system prompt + user context into a ready-to-send LLM request payload. The actual model call is left as a TODO (pick provider in a later pass) — see file comments.
+Implementation: `src/engine/appreciationGenerator.ts` exposes `buildAppreciationPrompt(input)` which assembles the system prompt + user context into a ready-to-send LLM request payload — kept provider-agnostic on purpose.
+
+**Provider wiring**: `functions/src/generateAppreciation.ts` is a Cloud Function that calls this prompt builder and supports **both** Anthropic and OpenAI — only one needs a real API key configured. It tries a primary provider (Anthropic by default, see `PRIMARY_PROVIDER` in that file) and falls back to the other if the primary's key is missing or its call fails, via the pure, unit-tested `orderAvailableProviders()` in `src/engine/llmProvider.ts`. The client calls it through `src/firebase/appreciationClient.ts`, used in `app/payoff.tsx`'s "First Win" moment — that screen always renders a static fallback line instantly (this is the Aha Moment, it must never wait on a network call) and silently swaps in the real generated line if the Cloud Function call succeeds; any failure (not deployed, no provider key, network error) just leaves the fallback in place, no error shown to the user.
+
+Setting up the API keys: see `docs/06-firebase-provisioning.md`.
 
 ## 2. Retention that doesn't nag
 

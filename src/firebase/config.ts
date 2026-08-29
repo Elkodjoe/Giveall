@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getFunctions } from 'firebase/functions';
 
 // Values come from Expo public env vars (EXPO_PUBLIC_* is inlined at build
 // time and safe to ship client-side — see https://docs.expo.dev/guides/environment-variables/).
@@ -23,3 +24,7 @@ export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey);
 
 export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(firebaseApp);
+// Guarded the same way as auth.ts's initializeAuth — getFunctions() with an
+// empty apiKey has caused synchronous crashes elsewhere in this codebase
+// before, so don't risk it again without a project configured.
+export const functions = isFirebaseConfigured ? getFunctions(firebaseApp) : null;

@@ -1,32 +1,59 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { tallyAttachment, tallyLoveLanguage, buildPayoffSummary } from '../src/engine/onboardingScoring';
+import { isFirebaseConfigured } from '../src/firebase/config';
+import { generateAppreciation } from '../src/firebase/appreciationClient';
 import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 
-// Screen 5 — The Payoff Preview. The Aha Moment: value delivered before any ask.
-// "First Win" copy here is a static placeholder for the demo; production
-// wires this through buildAppreciationPrompt() (src/engine/appreciationGenerator.ts)
-// to an LLM call once a provider is chosen.
-const FIRST_WIN = "I love how you think out loud when you're solving something - you don't hide the messy part.";
+// Screen 5 — The Payoff Preview. The Aha Moment: value delivered before any
+// ask. Renders FIRST_WIN_FALLBACK instantly (this screen must never feel
+// like it's waiting on a network call) and, if Firebase + a Cloud Function
+// provider are available, kicks off a background call to
+// generateAppreciation() (functions/src/generateAppreciation.ts, which
+// wraps buildAppreciationPrompt() from src/engine/appreciationGenerator.ts)
+// and silently swaps in the real result if it arrives — no loading spinner,
+// no error shown if it fails, just stays on the fallback.
+const FIRST_WIN_FALLBACK = "I love how you think out loud when you're solving something - you don't hide the messy part.";
+const GENERIC_SEED_COMPLIMENT = 'You are wonderful.';
 
 export default function PayoffScreen() {
   const router = useRouter();
   const { attachmentAnswers, loveLanguagePicks } = useOnboarding();
+  const [firstWin, setFirstWin] = useState(FIRST_WIN_FALLBACK);
 
-  const summary = useMemo(() => {
+  const { summary, receivesVia } = useMemo(() => {
     const { primary, spike } = tallyAttachment(attachmentAnswers);
     const { primary: receivesVia, secondary: givesVia } = tallyLoveLanguage(loveLanguagePicks);
-    return buildPayoffSummary({
-      primaryAttachment: primary,
-      spikeAttachment: spike,
+    return {
       receivesVia,
-      givesVia,
-    });
+      summary: buildPayoffSummary({
+        primaryAttachment: primary,
+        spikeAttachment: spike,
+        receivesVia,
+        givesVia,
+      }),
+    };
   }, [attachmentAnswers, loveLanguagePicks]);
+
+  useEffect(() => {
+    if (!isFirebaseConfigured) return;
+    let cancelled = false;
+    generateAppreciation({ genericCompliment: GENERIC_SEED_COMPLIMENT, loveLanguage: receivesVia })
+      .then((result) => {
+        if (!cancelled) setFirstWin(result.text);
+      })
+      .catch(() => {
+        // Cloud Function not deployed yet, no provider configured, or a
+        // network error — stays on FIRST_WIN_FALLBACK, no error surfaced.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [receivesVia]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -36,7 +63,7 @@ export default function PayoffScreen() {
       <View style={styles.winCard}>
         <Text style={styles.winLabel}>Your First Win</Text>
         <Text style={styles.winSubLabel}>Your Unsolicited Appreciation</Text>
-        <Text style={styles.winText}>"{FIRST_WIN}"</Text>
+        <Text style={styles.winText}>"{firstWin}"</Text>
       </View>
 
       <View style={styles.ctaRow}>

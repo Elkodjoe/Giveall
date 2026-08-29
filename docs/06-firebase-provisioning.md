@@ -4,7 +4,7 @@
 
 Project `giveall-app` is live under `emmakodjoe1@gmail.com`. Done: project created, Firestore database created (region `nam5`), security rules + indexes deployed, Anonymous Auth enabled, seed data loaded (`suggested_actions`, `curiosity_cards`), a web app registered and its config copied into `.env`. Verified end-to-end against the real project (browser-driven test through onboarding → check-in → bids → curiosity cards, confirmed real Firestore writes, then cleaned up).
 
-**Not deployed: Cloud Functions** (`nightlyRecalculateWeights`, `activatePartnership`, `validateProfile`). These require the Blaze (pay-as-you-go) plan, which needs a payment method on file — skipped for now by choice. The app works fully without them; they're background maintenance (nightly recalibration, server-side validation), not something the running app depends on synchronously. To deploy later:
+**Not deployed: Cloud Functions** (`nightlyRecalculateWeights`, `activatePartnership`, `validateProfile`, `generateAppreciation`). These require the Blaze (pay-as-you-go) plan, which needs a payment method on file — skipped for now by choice. The app works fully without them for everything except the Appreciation Generator's live LLM call (see `docs/03-power-ups.md`), which just falls back to a static example line — no error, no broken UI. To deploy later:
 
 ```
 cd functions && npm install && cd ..
@@ -12,6 +12,17 @@ firebase deploy --only functions --project=giveall-app
 ```
 
 (after upgrading to Blaze at https://console.firebase.google.com/project/giveall-app/usage/details)
+
+#### generateAppreciation's API keys
+
+Before deploying, set at least one of these (both are declared as secrets, but only one needs a real value — see `functions/src/generateAppreciation.ts`):
+
+```
+firebase functions:secrets:set ANTHROPIC_API_KEY --project=giveall-app
+firebase functions:secrets:set OPENAI_API_KEY --project=giveall-app
+```
+
+Each prompts for the key value interactively. If you only want one provider, you still need *some* value stored for the other (Secret Manager requires the secret to exist for the function to deploy, even if empty) — an empty string is fine; the function treats an empty key as "not configured" and skips to the other provider.
 
 ## Steps, for reference / re-provisioning elsewhere
 
