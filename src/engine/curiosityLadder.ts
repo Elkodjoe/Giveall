@@ -32,6 +32,17 @@ export function tierForWeek(weeksSinceStart: number): CuriosityTier {
   return 'vulnerability_repair';
 }
 
+const LEVEL_FOR_TIER: Record<CuriosityTier, 1 | 2 | 3> = {
+  gratitude_joy: 1,
+  values_dreams: 2,
+  vulnerability_repair: 3,
+};
+
+/** Maps a tier to the numeric `level` scripts/seed/curiosity_cards.json / CuriosityCardDoc uses, for querying the live catalog. */
+export function levelForTier(tier: CuriosityTier): 1 | 2 | 3 {
+  return LEVEL_FOR_TIER[tier];
+}
+
 export function weeksSinceStart(startDate: string, asOfDate: Date = new Date()): number {
   const start = new Date(startDate);
   const msPerWeek = 7 * 24 * 60 * 60 * 1000;

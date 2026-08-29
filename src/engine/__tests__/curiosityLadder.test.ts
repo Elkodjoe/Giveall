@@ -1,4 +1,4 @@
-import { tierForWeek, cardsForWeek } from '../curiosityLadder';
+import { tierForWeek, cardsForWeek, levelForTier } from '../curiosityLadder';
 
 describe('curiosity ladder', () => {
   it('stays on gratitude_joy for weeks 1-4', () => {
@@ -18,5 +18,13 @@ describe('curiosity ladder', () => {
   it('never returns cards from a later tier early', () => {
     const cards = cardsForWeek(2);
     expect(cards.every((c) => c.tier === 'gratitude_joy')).toBe(true);
+  });
+});
+
+describe('levelForTier', () => {
+  it('maps each tier to its curiosity_cards.json level', () => {
+    expect(levelForTier('gratitude_joy')).toBe(1);
+    expect(levelForTier('values_dreams')).toBe(2);
+    expect(levelForTier('vulnerability_repair')).toBe(3);
   });
 });

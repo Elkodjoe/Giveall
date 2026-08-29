@@ -3,9 +3,14 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../src/state/AuthContext';
-import { nextCard, tierForWeek, weeksSinceStart as computeWeeksSinceStart } from '../src/engine/curiosityLadder';
+import { nextCard, tierForWeek, levelForTier, weeksSinceStart as computeWeeksSinceStart } from '../src/engine/curiosityLadder';
 import { isFirebaseConfigured } from '../src/firebase/config';
-import { getCompletedCuriosityCardIds, markCuriosityCardCompleted, getUser } from '../src/firebase/collections';
+import {
+  getCompletedCuriosityCardIds,
+  markCuriosityCardCompleted,
+  getUser,
+  getCuriosityCardsForLevel,
+} from '../src/firebase/collections';
 import { colors, card, button, fontFamily } from '../src/theme/tokens';
 
 // Curiosity Card — one conversation prompt at a time, gated by the
@@ -21,6 +26,7 @@ export default function CuriosityScreen() {
   const [weeks, setWeeks] = useState(0);
   const [justCompleted, setJustCompleted] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [catalogQuestions, setCatalogQuestions] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!isFirebaseConfigured || !uid) return;
@@ -39,7 +45,23 @@ export default function CuriosityScreen() {
   }, [uid]);
 
   const tier = tierForWeek(weeks);
+
+  // curiosity_cards is the content-managed catalog (same role as
+  // suggested_actions — see docs/04-firebase-schema.md) that was seeded
+  // and typed but never fetched: prompts always came from CARDS, the
+  // engine's hardcoded local copy. Not user-scoped, so this only needs to
+  // re-run when the tier (derived from weeks) changes.
+  useEffect(() => {
+    if (!isFirebaseConfigured) return;
+    getCuriosityCardsForLevel(levelForTier(tier))
+      .then((docs) => setCatalogQuestions(Object.fromEntries(docs.map((d) => [d.id, d.question]))))
+      .catch(() => {
+        // best-effort; falls back to CARDS' hardcoded prompt text
+      });
+  }, [tier]);
+
   const currentCard = nextCard(weeks, completedIds);
+  const displayedPrompt = currentCard ? catalogQuestions[currentCard.id] ?? currentCard.prompt : undefined;
 
   const markDone = async () => {
     if (!currentCard) return;
@@ -64,7 +86,7 @@ export default function CuriosityScreen() {
 
         {currentCard ? (
           <View style={styles.promptCard}>
-            <Text style={styles.promptText}>{currentCard.prompt}</Text>
+            <Text style={styles.promptText}>{displayedPrompt}</Text>
           </View>
         ) : (
           <View style={styles.promptCard}>
