@@ -1,13 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Share } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
+import { useAuth } from '../src/state/AuthContext';
 import { tallyAttachment, tallyLoveLanguage, buildPayoffSummary } from '../src/engine/onboardingScoring';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { generateAppreciation } from '../src/firebase/appreciationClient';
 import { generateAppreciationViaOllama } from '../src/llm/ollamaClient';
+import { logAction } from '../src/firebase/collections';
 import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 
 // Screen 5 — The Payoff Preview. The Aha Moment: value delivered before any
@@ -27,6 +29,7 @@ const GENERIC_SEED_COMPLIMENT = 'You are wonderful.';
 export default function PayoffScreen() {
   const router = useRouter();
   const { attachmentAnswers, loveLanguagePicks } = useOnboarding();
+  const { uid } = useAuth();
   const [firstWin, setFirstWin] = useState(FIRST_WIN_FALLBACK);
 
   const { summary, receivesVia } = useMemo(() => {
@@ -67,6 +70,42 @@ export default function PayoffScreen() {
     };
   }, [receivesVia]);
 
+  // Both CTAs persist the shown line to action_logs — docs/01-onboarding-flow.md
+  // Screen 5 calls this "instant value delivered before any ask", but until
+  // now neither button did anything besides navigate on, discarding the
+  // generated (or fallback) appreciation the moment the user left the screen.
+  const persistFirstWin = async () => {
+    if (!isFirebaseConfigured || !uid) return;
+    try {
+      await logAction({
+        userId: uid,
+        actionId: 'payoff_first_win',
+        loveLanguageType: receivesVia,
+        partnerMoodDelta: 0, // no reaction data exists yet at this point in the funnel
+        wasCompleted: true,
+        context: firstWin,
+      });
+    } catch {
+      // best-effort; never blocks onboarding from continuing
+    }
+  };
+
+  const handleSave = async () => {
+    await persistFirstWin();
+    router.push('/ritual-time');
+  };
+
+  const handleSend = async () => {
+    try {
+      await Share.share({ message: firstWin });
+    } catch {
+      // user cancelled, or Share is unsupported on this platform (e.g. web
+      // without navigator.share) — the line is still saved below either way
+    }
+    await persistFirstWin();
+    router.push('/ritual-time');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ProgressBar step={4} total={4} />
@@ -79,10 +118,10 @@ export default function PayoffScreen() {
       </View>
 
       <View style={styles.ctaRow}>
-        <Pressable style={styles.ctaSecondary} onPress={() => router.push('/ritual-time')}>
+        <Pressable style={styles.ctaSecondary} onPress={handleSave}>
           <Text style={styles.ctaSecondaryLabel}>Save it</Text>
         </Pressable>
-        <Pressable style={styles.ctaPrimary} onPress={() => router.push('/ritual-time')}>
+        <Pressable style={styles.ctaPrimary} onPress={handleSend}>
           <Text style={styles.ctaPrimaryLabel}>Send it</Text>
         </Pressable>
       </View>

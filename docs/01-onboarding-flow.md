@@ -61,6 +61,8 @@ Then instantly generate **Your First Win** using the Appreciation Generator (see
 
 - **CTA:** "Save it" or "Send it" — instant value delivered before any ask is made.
 
+**Implementation** (`app/payoff.tsx`): both CTAs used to just `router.push('/ritual-time')` with no persistence — the generated (or fallback) line was discarded the instant the user navigated on, despite the doc's "instant value delivered" framing. Both now log an `action_logs` entry (`actionId: 'payoff_first_win'`, `loveLanguageType` from the tallied primary language, `context` holding the shown text) before navigating — best-effort, never blocking. "Send it" additionally calls RN's native `Share.share()` so the user can actually send the line to their partner via whatever app they choose; a cancelled or unsupported share (e.g. no `navigator.share` on some web browsers) is caught silently and the line is still saved.
+
 ## Screen 6 — Soft Permission + Ritual Time
 
 > "When should we do your 90-sec check-in? Most people pick after dinner."
