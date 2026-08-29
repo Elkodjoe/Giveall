@@ -8,6 +8,7 @@ import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { createUserIfNeeded } from '../src/firebase/collections';
 import { modeToOnboardingPersona } from '../src/firebase/types';
+import { scheduleCheckinReminder } from '../src/notifications/checkinReminder';
 import { colors, radius, fontFamily } from '../src/theme/tokens';
 
 // Screen 6 — Soft Permission + Ritual Time.
@@ -40,8 +41,13 @@ export default function RitualTimeScreen() {
   const choose = async (time: string) => {
     setSelected(time);
     setRitualTime(time);
+    const time24h = NOTIFICATION_TIME_24H[time] ?? '19:00';
     try {
       await Notifications.requestPermissionsAsync();
+      // No real data yet (first-ever reminder) — falls back to the neutral
+      // "Ready for today's 90-second check-in?" line. Each check-in
+      // completion reschedules tomorrow's with real context instead.
+      await scheduleCheckinReminder(time24h);
     } catch {
       // permission prompt unavailable (e.g. web/simulator) — non-fatal
     }
@@ -54,7 +60,7 @@ export default function RitualTimeScreen() {
         await createUserIfNeeded({
           uid,
           onboardingPersona: modeToOnboardingPersona(mode ?? 'ltr'),
-          notificationTime: NOTIFICATION_TIME_24H[time] ?? '19:00',
+          notificationTime: time24h,
           subscriptionTier: 'free',
           appName: 'GiveAll',
           timezone: deviceTimezone(),

@@ -8,6 +8,7 @@ import { useAuth } from '../src/state/AuthContext';
 import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScoring';
 import { checkinToAvw } from '../src/engine/scale';
 import { getMicroAttunement } from '../src/engine/decisionMatrix';
+import { summarizeWeek } from '../src/engine/bidTracker';
 import type { UserProfile, MemoryVaultEntry, DesireInventoryEntry } from '../src/engine/types';
 import type { MoodLabel } from '../src/firebase/types';
 import { isFirebaseConfigured } from '../src/firebase/config';
@@ -19,10 +20,13 @@ import {
   markMemoryVaultEntryUsed,
   getUnusedDesireInventoryEntries,
   markDesireInventoryEntryUsed,
+  getBidsLastNDays,
+  getUser,
   type MemoryVaultEntryWithId,
   type DesireInventoryEntryWithId,
 } from '../src/firebase/collections';
 import { buildInitialProfile } from '../src/firebase/profileSeeding';
+import { scheduleCheckinReminder } from '../src/notifications/checkinReminder';
 import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 
 // Daily Check-in — the 90-second core loop screen. Always runs the
@@ -142,6 +146,20 @@ export default function CheckinScreen() {
       } else if (action.axis === 'sought') {
         const used = desireEntries.find((e) => !e.used);
         if (used) await markDesireInventoryEntryUsed(used.id);
+      }
+
+      // Reschedule tomorrow's reminder with real context — only the bid
+      // ratio (not a claim about how the partner felt, which we have no
+      // actual feedback for) — falling back to the neutral line when there
+      // aren't 7 days of bids yet. See src/notifications/checkinReminder.ts.
+      const [user, bids] = await Promise.all([getUser(uid), getBidsLastNDays(uid, 7)]);
+      if (user) {
+        const bidLog = bids.map((b, i) => ({ id: String(i), description: b.bidDescription, response: b.response, date: b.date }));
+        const summary = bidLog.length > 0 ? summarizeWeek(bidLog) : null;
+        await scheduleCheckinReminder(
+          user.notificationTime,
+          summary ? { bidResponseRatioPct: Math.round(summary.towardRatio * 100) } : {},
+        );
       }
     } catch (err) {
       // Non-fatal: the computed action above already rendered regardless.

@@ -42,6 +42,8 @@ Notification copy must reference a specific past win, never guilt about absence.
 
 Rule of thumb: every retention notification must contain either (a) a specific past result the user produced, or (b) a specific near-term payoff — never a bare reminder or streak-loss threat.
 
+**Implementation**: `src/engine/retentionNotifications.ts` builds the copy (pure, unit-tested); `src/notifications/checkinReminder.ts` schedules it via `expo-notifications`, replacing any previously-scheduled reminder (single well-known identifier) rather than stacking duplicates. `src/notifications/nextOccurrence.ts` is the pure "next HH:mm from now" date math, extracted so it's testable without importing `expo-notifications`. Wired in two places: `app/ritual-time.tsx` schedules the first reminder right after the user picks a check-in time during onboarding; `app/checkin.tsx` reschedules tomorrow's reminder after every completed check-in, computing a real `bidResponseRatioPct` from the last 7 days of bids when any exist (falling back to the neutral "Ready for today's 90-second check-in?" line otherwise — no past-result claim is ever fabricated, e.g. there's no mechanism yet to know "how your partner felt", so that copy variant isn't used). No-ops non-fatally on platforms without local notification support (e.g. Expo web).
+
 ## 3. Privacy guardrail
 
 Ship this copy in Settings from day one, unedited by growth/marketing pressure:
