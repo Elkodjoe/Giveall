@@ -1,4 +1,4 @@
-import { getMicroAttunement, lowestAxis } from '../decisionMatrix';
+import { getMicroAttunement, lowestAxis, resolveActionCopy } from '../decisionMatrix';
 import type { UserProfile } from '../types';
 
 function baseProfile(overrides: Partial<UserProfile> = {}): UserProfile {
@@ -70,5 +70,48 @@ describe('getMicroAttunement', () => {
     expect(result.axis).toBe('sought');
     expect(result.action).toContain('being defended in public');
     expect(result.loveLanguageType).toBe('words');
+  });
+});
+
+describe('resolveActionCopy', () => {
+  it('falls back when there is no catalog entry', () => {
+    expect(resolveActionCopy(undefined, 'fallback text', {})).toBe('fallback text');
+  });
+
+  it('uses catalog copy verbatim when it has no placeholders', () => {
+    expect(resolveActionCopy('Ask directly tonight.', 'fallback', {})).toBe('Ask directly tonight.');
+  });
+
+  it('fills the memoryVaultDetail placeholder when available', () => {
+    const result = resolveActionCopy(
+      'Recall detail: Last week they mentioned {{memoryVaultDetail}}. Ask about it today.',
+      'fallback',
+      { memoryVaultDetail: 'their new project at work' },
+    );
+    expect(result).toBe('Recall detail: Last week they mentioned their new project at work. Ask about it today.');
+  });
+
+  it('falls back when memoryVaultDetail is needed but missing', () => {
+    const result = resolveActionCopy(
+      'Recall detail: Last week they mentioned {{memoryVaultDetail}}. Ask about it today.',
+      'fallback text',
+      {},
+    );
+    expect(result).toBe('fallback text');
+  });
+
+  it('fills the interest placeholder when available', () => {
+    const result = resolveActionCopy(
+      "Specific desire: 'I love how you light up when you talk about {{interest}}.'",
+      'fallback',
+      { interest: 'being defended in public' },
+    );
+    expect(result).toBe("Specific desire: 'I love how you light up when you talk about being defended in public.'");
+  });
+
+  it('falls back when interest is needed but missing', () => {
+    expect(
+      resolveActionCopy("Specific desire: '{{interest}}'", 'fallback text', {}),
+    ).toBe('fallback text');
   });
 });

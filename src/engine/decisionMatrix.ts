@@ -107,6 +107,36 @@ export function getMicroAttunement(profile: UserProfile): MicroAttunement {
   };
 }
 
+/**
+ * Joins a MicroAttunement's actionId against the content-managed
+ * suggested_actions catalog (scripts/seed/suggested_actions.json,
+ * fetched via getSuggestedActions() in src/firebase/collections.ts) and
+ * resolves the copy actually shown. Prefers the catalog's `copy` when its
+ * `{{placeholder}}` can be filled with real personalization data;
+ * otherwise falls back to the engine's own hardcoded `fallback` text —
+ * covers offline, Firebase-not-configured, missing seed data, or a
+ * placeholder with nothing to fill it. Pure — takes plain strings, not a
+ * Firestore doc type, so this file stays framework-agnostic; the caller
+ * does the actionId lookup against its fetched catalog.
+ */
+export function resolveActionCopy(
+  catalogCopy: string | undefined,
+  fallback: string,
+  vars: { memoryVaultDetail?: string; interest?: string },
+): string {
+  if (!catalogCopy) return fallback;
+  let text = catalogCopy;
+  if (text.includes('{{memoryVaultDetail}}')) {
+    if (!vars.memoryVaultDetail) return fallback;
+    text = text.split('{{memoryVaultDetail}}').join(vars.memoryVaultDetail);
+  }
+  if (text.includes('{{interest}}')) {
+    if (!vars.interest) return fallback;
+    text = text.split('{{interest}}').join(vars.interest);
+  }
+  return text;
+}
+
 export function markMemoryVaultEntryUsed(
   entries: MemoryVaultEntry[],
   id: string,

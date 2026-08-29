@@ -7,10 +7,11 @@ import { useOnboarding } from '../src/state/OnboardingContext';
 import { useAuth } from '../src/state/AuthContext';
 import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScoring';
 import { checkinToAvw } from '../src/engine/scale';
-import { getMicroAttunement } from '../src/engine/decisionMatrix';
+import { getMicroAttunement, resolveActionCopy } from '../src/engine/decisionMatrix';
 import { summarizeWeek } from '../src/engine/bidTracker';
 import { checkRecalibration, toDailyFeedback } from '../src/engine/recalibration';
 import type { UserProfile, MemoryVaultEntry, DesireInventoryEntry } from '../src/engine/types';
+import type { SuggestedActionDoc } from '../src/firebase/types';
 import type { MoodLabel } from '../src/firebase/types';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import {
@@ -27,6 +28,7 @@ import {
   getActionLogsLastNDays,
   updateProfileLoveLanguageReceive,
   logRecalibrationEvent,
+  getSuggestedActions,
   type MemoryVaultEntryWithId,
   type DesireInventoryEntryWithId,
 } from '../src/firebase/collections';
@@ -68,6 +70,7 @@ export default function CheckinScreen() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [memoryEntries, setMemoryEntries] = useState<MemoryVaultEntryWithId[]>([]);
   const [desireEntries, setDesireEntries] = useState<DesireInventoryEntryWithId[]>([]);
+  const [suggestedActions, setSuggestedActions] = useState<SuggestedActionDoc[]>([]);
 
   useEffect(() => {
     if (!isFirebaseConfigured || !uid) return;
@@ -80,6 +83,16 @@ export default function CheckinScreen() {
       .then(setDesireEntries)
       .catch(() => {
         // best-effort; "Specific Desire + Play" just falls back to a generic prompt
+      });
+    // suggested_actions is the content-managed catalog getMicroAttunement's
+    // hardcoded copy was silently duplicating — see resolveActionCopy() in
+    // decisionMatrix.ts. Not user-scoped; safe to fetch once regardless of
+    // auth state, but gated on isFirebaseConfigured/uid like the rest of
+    // this screen's best-effort reads for consistency.
+    getSuggestedActions()
+      .then(setSuggestedActions)
+      .catch(() => {
+        // best-effort; falls back to decisionMatrix.ts's hardcoded copy
       });
   }, [uid]);
 
@@ -113,6 +126,17 @@ export default function CheckinScreen() {
 
     return getMicroAttunement(profile);
   }, [mode, attachmentAnswers, loveLanguagePicks, seenScore, safeScore, soughtScore, memoryVault, desireInventory]);
+
+  // Prefers the fetched suggested_actions catalog's copy (content-managed,
+  // editable without a code deploy) over decisionMatrix.ts's hardcoded
+  // fallback, joined on actionId — see resolveActionCopy().
+  const displayedActionText = useMemo(() => {
+    const catalogEntry = suggestedActions.find((a) => a.id === action.actionId);
+    return resolveActionCopy(catalogEntry?.copy, action.action, {
+      memoryVaultDetail: memoryEntries.find((e) => !e.usedInGeneration)?.content,
+      interest: desireEntries.find((e) => !e.used)?.desire,
+    });
+  }, [action, suggestedActions, memoryEntries, desireEntries]);
 
   const handleSeeAction = async () => {
     setShowAction(true);
@@ -255,7 +279,7 @@ export default function CheckinScreen() {
           <View style={styles.actionCard}>
             <Text style={styles.actionLabel}>Today's Micro-Action</Text>
             <Text style={styles.actionStrategy}>{action.strategy}</Text>
-            <Text style={styles.actionText}>{action.action}</Text>
+            <Text style={styles.actionText}>{displayedActionText}</Text>
             <Text style={styles.actionMeta}>
               Axis: {action.axis} · Tone: {action.tone}
             </Text>

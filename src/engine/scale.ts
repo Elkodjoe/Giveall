@@ -41,3 +41,36 @@ export function avwToCheckin(avw: AvwScores): { seen_score: number; safe_score: 
     sought_score: toCheckinScore(avw.sought),
   };
 }
+
+export interface WeeklyCheckinAverage {
+  seen_score: number;
+  safe_score: number;
+  sought_score: number;
+  moodScore: number;
+  daysLogged: number;
+}
+
+/** Averages a window of daily_checkins rows (already on the 1-10 raw scale). Returns null for an empty window rather than dividing by zero. */
+export function averageCheckins(
+  checkins: { seen_score: number; safe_score: number; sought_score: number; moodScore: number }[],
+): WeeklyCheckinAverage | null {
+  if (checkins.length === 0) return null;
+  const sum = checkins.reduce(
+    (acc, c) => ({
+      seen_score: acc.seen_score + c.seen_score,
+      safe_score: acc.safe_score + c.safe_score,
+      sought_score: acc.sought_score + c.sought_score,
+      moodScore: acc.moodScore + c.moodScore,
+    }),
+    { seen_score: 0, safe_score: 0, sought_score: 0, moodScore: 0 },
+  );
+  const n = checkins.length;
+  const round1 = (total: number) => Math.round((total / n) * 10) / 10;
+  return {
+    seen_score: round1(sum.seen_score),
+    safe_score: round1(sum.safe_score),
+    sought_score: round1(sum.sought_score),
+    moodScore: round1(sum.moodScore),
+    daysLogged: n,
+  };
+}

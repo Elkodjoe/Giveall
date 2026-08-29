@@ -1,4 +1,4 @@
-import { toAvwScore, toCheckinScore, checkinToAvw, avwToCheckin } from '../scale';
+import { toAvwScore, toCheckinScore, checkinToAvw, avwToCheckin, averageCheckins } from '../scale';
 
 describe('toAvwScore', () => {
   it('maps the scale endpoints', () => {
@@ -40,5 +40,26 @@ describe('checkinToAvw / avwToCheckin', () => {
     const avw = checkinToAvw(checkin);
     expect(avw).toEqual({ seen: toAvwScore(8), safe: toAvwScore(3), sought: toAvwScore(6) });
     expect(avwToCheckin(avw)).toEqual(checkin);
+  });
+});
+
+describe('averageCheckins', () => {
+  it('returns null for an empty window', () => {
+    expect(averageCheckins([])).toBeNull();
+  });
+
+  it('averages each axis and mood, rounded to 1 decimal, with daysLogged', () => {
+    const checkins = [
+      { seen_score: 8, safe_score: 6, sought_score: 4, moodScore: 7 },
+      { seen_score: 7, safe_score: 7, sought_score: 5, moodScore: 6 },
+      { seen_score: 9, safe_score: 8, sought_score: 3, moodScore: 8 },
+    ];
+    expect(averageCheckins(checkins)).toEqual({
+      seen_score: 8,
+      safe_score: 7,
+      sought_score: 4,
+      moodScore: 7,
+      daysLogged: 3,
+    });
   });
 });
