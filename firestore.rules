@@ -11,24 +11,36 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         get(/databases/$(database)/documents/partnerships/$(request.auth.uid + '_' + userId)).data.status == 'active';
     }
+    // NOTE on the create/read-update-delete split below: `resource.data` is
+    // the *existing* document's state — on a create there is no existing
+    // document yet, so `resource.data.userId` is always null and every
+    // create was silently denied ("Missing or insufficient permissions").
+    // Confirmed live against a real project on 2026-08-28, not just a
+    // theoretical gap — `request.resource.data` (the incoming write) is the
+    // one to check on create.
     match /daily_checkins/{docId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
     match /action_logs/{docId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
     match /bids/{docId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
     match /memory_vault/{docId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
     // CuriosityCardProgressDoc (src/firebase/types.ts) referenced this
     // collection but it had no rules of its own — same class of gap as
     // partnerships below. Doc id is "{userId}_{cardId}" for idempotent
     // upserts (see markCuriosityCardCompleted in collections.ts).
     match /curiosity_card_progress/{docId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
     // Double opt-in partner linking: doc id is "{uidA}_{uidB}" (sorted).
     // Not in the original handoff — added so the "active" status the

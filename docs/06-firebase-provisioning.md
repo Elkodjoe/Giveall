@@ -1,8 +1,21 @@
 # Firebase Provisioning — Manual Steps
 
-Nothing is deployed yet. `firebase login` and project creation require your Google account interactively, so these steps are for you to run — not something that can be automated from here.
+## Status: mostly deployed
 
-## 1. Create the project
+Project `giveall-app` is live under `emmakodjoe1@gmail.com`. Done: project created, Firestore database created (region `nam5`), security rules + indexes deployed, Anonymous Auth enabled, seed data loaded (`suggested_actions`, `curiosity_cards`), a web app registered and its config copied into `.env`. Verified end-to-end against the real project (browser-driven test through onboarding → check-in → bids → curiosity cards, confirmed real Firestore writes, then cleaned up).
+
+**Not deployed: Cloud Functions** (`nightlyRecalculateWeights`, `activatePartnership`, `validateProfile`). These require the Blaze (pay-as-you-go) plan, which needs a payment method on file — skipped for now by choice. The app works fully without them; they're background maintenance (nightly recalibration, server-side validation), not something the running app depends on synchronously. To deploy later:
+
+```
+cd functions && npm install && cd ..
+firebase deploy --only functions --project=giveall-app
+```
+
+(after upgrading to Blaze at https://console.firebase.google.com/project/giveall-app/usage/details)
+
+## Steps, for reference / re-provisioning elsewhere
+
+### 1. Create the project
 
 ```
 npm install -g firebase-tools
@@ -11,45 +24,46 @@ firebase projects:create giveall-app --display-name="GiveAll"
 firebase use giveall-app
 ```
 
-(Or via console.firebase.google.com → Add project → `giveall-app`.)
+`firebase login` needs an interactive browser sign-in. On a machine without a browser available to the CLI, it falls back to a device-code flow: it prints a URL + session ID, you open the URL on any device, sign in, and get back a code to complete with `firebase login <code>`.
 
-## 2. Enable services (Firebase Console)
+**Watch for the wrong Google account being active in your browser** — if you're signed into multiple Google accounts, actions can silently apply to the wrong one and fail with confusing permission errors. Check the account switcher (top-right avatar) in any Google/Firebase console page matches the account you ran `firebase login` as.
 
-- **Authentication** → enable Anonymous (the app signs in anonymously by default — see `src/firebase/auth.ts`). Add Email/Password or another provider later if you build the upgrade-from-anonymous flow.
-- **Firestore** → Create database → start in production mode (this repo's `firestore.rules` replaces the defaults, so test mode isn't needed).
-- **Functions** → requires the Blaze (pay-as-you-go) plan — `nightlyRecalculateWeights` is a scheduled function, which Firebase doesn't support on the free Spark plan.
+### 2. Enable services
 
-## 3. Init locally (from the repo root)
+- **Authentication** → Sign-in method → enable **Anonymous** (the app signs in anonymously by default — see `src/firebase/auth.ts`). No CLI command for this; console only. Enabling can take a minute or two to actually propagate — a `signInAnonymously()` call made immediately after can fail with `auth/admin-restricted-operation` even though the console shows "Enabled"; just retry after a short wait.
+- **Firestore** → create the database via CLI:
+  ```
+  firebase firestore:databases:create "(default)" --location=nam5 --project=giveall-app
+  ```
+  This requires the Cloud Firestore API to be enabled first — the command's error message links directly to the enable page if it isn't.
+- **Functions** → requires the Blaze plan (see above) — `nightlyRecalculateWeights` is a scheduled function, unsupported on the free Spark plan.
 
-```
-firebase init
-```
-
-- Select: **Firestore**, **Functions**
-- Use existing project: `giveall-app`
-- Firestore rules: point to `firestore.rules` (already exists — don't overwrite)
-- Firestore indexes: point to `firestore.indexes.json` (already exists)
-- Functions: TypeScript, existing `functions/` directory — don't let the CLI scaffold a new one
-
-## 4. Deploy
+### 3. Deploy rules, indexes, and seed data
 
 ```
-firebase deploy --only firestore:rules,firestore:indexes
-cd functions && npm install && cd ..
-firebase deploy --only functions
-```
-
-## 5. Seed data
-
-```
+firebase deploy --only firestore:rules,firestore:indexes --project=giveall-app
 GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account.json npm run seed
 ```
 
-Get a service account key from Project Settings → Service Accounts → Generate new private key. See `scripts/seed/import-seed-data.ts`.
+Get a service account key: Project Settings → Service Accounts → **Generate new private key**. **Never commit this file** — `.gitignore` covers `*firebase-adminsdk*.json` and a stray `.json/` directory (a browser "save as" dialog can create a literal folder named `.json` if you paste a bare directory path into the filename field — watch for that).
 
-## 6. Client config
+Verify what landed with:
+```
+GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account.json npm run check-firestore
+```
 
-Copy `.env.example` to `.env` and fill in the Firebase web app config (Project Settings → General → Your apps → Web app → SDK setup and configuration).
+### 4. Client config
+
+```
+firebase apps:create WEB "GiveAll" --project=giveall-app
+firebase apps:sdkconfig WEB <appId> --project=giveall-app
+```
+
+Copy the printed `apiKey`/`authDomain`/etc. into `.env` (see `.env.example` for the variable names). On Windows, the CLI may print a harmless `Assertion failed... uv_handle_t` crash *after* printing the config — the data is still valid, ignore it.
+
+## Real bug found and fixed during first deployment
+
+`firestore.rules` originally used `resource.data.userId` to gate both reads *and writes* on `daily_checkins`, `action_logs`, `bids`, `memory_vault`, and `curiosity_card_progress`. This looks reasonable but is wrong for **create**: `resource` is the document's state *before* the write, which doesn't exist yet on create, so `resource.data.userId` is always null and every new-document write was silently denied ("Missing or insufficient permissions") — confirmed live, not theoretical. Fixed by splitting each into a `create` rule (checks `request.resource.data.userId`, the incoming write) and a separate `read, update, delete` rule (checks `resource.data.userId`, the existing doc). Verified fixed by re-running the same end-to-end browser test and confirming real writes landed in each collection.
 
 ## Not yet needed
 

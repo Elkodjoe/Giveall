@@ -9,7 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "seed": "ts-node scripts/seed/import-seed-data.ts"
+    "seed": "ts-node scripts/seed/import-seed-data.ts",
+    "check-firestore": "node scripts/seed/check-firestore.js"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.3",

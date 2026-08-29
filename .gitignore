@@ -7,3 +7,5 @@ web-build/
 .env
 functions/lib/
 firebase-debug.log
+.json/
+*firebase-adminsdk*.json
