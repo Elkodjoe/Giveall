@@ -40,6 +40,23 @@
         { "fieldPath": "userId", "order": "ASCENDING" },
         { "fieldPath": "date", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "desire_inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "rank", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "desire_inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "used", "order": "ASCENDING" },
+        { "fieldPath": "rank", "order": "ASCENDING" }
+      ]
     }
   ]
 }

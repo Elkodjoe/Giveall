@@ -26,6 +26,7 @@ import type {
   CuriosityCardDoc,
   CuriosityCardProgressDoc,
   MemoryVaultDoc,
+  DesireInventoryDoc,
   PartnershipDoc,
 } from './types';
 
@@ -52,6 +53,7 @@ const curiosityCardProgressCol = collection(db, 'curiosity_card_progress').withC
   converter<CuriosityCardProgressDoc>(),
 );
 const memoryVaultCol = collection(db, 'memory_vault').withConverter(converter<MemoryVaultDoc>());
+const desireInventoryCol = collection(db, 'desire_inventory').withConverter(converter<DesireInventoryDoc>());
 const partnershipsCol = collection(db, 'partnerships').withConverter(converter<PartnershipDoc>());
 
 export async function getUser(uid: string): Promise<UserDoc | undefined> {
@@ -207,6 +209,43 @@ export async function deleteMemoryVaultEntry(entryId: string): Promise<void> {
 export async function deleteAllMemoryVaultEntries(userId: string): Promise<void> {
   const entries = await getAllMemoryVaultEntries(userId);
   await Promise.all(entries.map((e) => deleteMemoryVaultEntry(e.id)));
+}
+
+export interface DesireInventoryEntryWithId extends DesireInventoryDoc {
+  id: string;
+}
+
+export async function addDesireInventoryEntry(entry: Omit<DesireInventoryDoc, 'createdAt'>): Promise<void> {
+  await addDoc(collection(db, 'desire_inventory'), { ...entry, createdAt: serverTimestamp() });
+}
+
+export async function getAllDesireInventoryEntries(userId: string): Promise<DesireInventoryEntryWithId[]> {
+  const q = query(desireInventoryCol, where('userId', '==', userId), orderBy('rank', 'asc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+// Ordered by rank so the first result is the most-wanted unused desire —
+// matches decisionMatrix.ts's nextUnused() semantics (first unused wins),
+// but makes "first" actually mean "highest-ranked" instead of insertion
+// order, which is what "1 = most wanted" implies.
+export async function getUnusedDesireInventoryEntries(userId: string): Promise<DesireInventoryEntryWithId[]> {
+  const q = query(
+    desireInventoryCol,
+    where('userId', '==', userId),
+    where('used', '==', false),
+    orderBy('rank', 'asc'),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function markDesireInventoryEntryUsed(entryId: string): Promise<void> {
+  await updateDoc(doc(desireInventoryCol, entryId), { used: true });
+}
+
+export async function deleteDesireInventoryEntry(entryId: string): Promise<void> {
+  await deleteDoc(doc(desireInventoryCol, entryId));
 }
 
 function partnershipId(uidA: string, uidB: string): string {

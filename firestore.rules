@@ -42,6 +42,13 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
+    // DesireInventoryDoc (src/firebase/types.ts) — not in the original
+    // handoff, no rules existed for this at all despite decisionMatrix.ts's
+    // "sought" axis and docs/02-love-os-brain.md #2 depending on it.
+    match /desire_inventory/{docId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
     // Double opt-in partner linking: doc id is "{uidA}_{uidB}" (sorted).
     // Not in the original handoff — added so the "active" status the
     // /profiles rule above checks is actually reachable. Both parties must

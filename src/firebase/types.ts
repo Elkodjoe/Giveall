@@ -200,6 +200,19 @@ export interface MemoryVaultDoc {
   usedInGeneration: boolean;
 }
 
+// Persisted form of src/engine/types.ts's DesireInventoryEntry. Not in the
+// original handoff — no schema/rules/collection helpers existed for this
+// at all despite the engine (decisionMatrix.ts's "sought" axis) and
+// docs/02-love-os-brain.md #2 depending on it; same class of gap as
+// MemoryVaultDoc had before app/memory-vault.tsx was built.
+export interface DesireInventoryDoc {
+  userId: string;
+  desire: string;
+  rank: number; // 1 = most wanted; lower rank surfaces first
+  used: boolean;
+  createdAt: Timestamp;
+}
+
 export interface PartnershipDoc {
   users: [string, string]; // two uids, doc id is "{uidA}_{uidB}" sorted
   optIns: Record<string, boolean>; // uid -> has this participant opted in

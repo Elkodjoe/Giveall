@@ -8,7 +8,7 @@ import { useAuth } from '../src/state/AuthContext';
 import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScoring';
 import { checkinToAvw } from '../src/engine/scale';
 import { getMicroAttunement } from '../src/engine/decisionMatrix';
-import type { UserProfile, MemoryVaultEntry } from '../src/engine/types';
+import type { UserProfile, MemoryVaultEntry, DesireInventoryEntry } from '../src/engine/types';
 import type { MoodLabel } from '../src/firebase/types';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import {
@@ -17,7 +17,10 @@ import {
   addDailyCheckin,
   getUnusedMemoryVaultEntries,
   markMemoryVaultEntryUsed,
+  getUnusedDesireInventoryEntries,
+  markDesireInventoryEntryUsed,
   type MemoryVaultEntryWithId,
+  type DesireInventoryEntryWithId,
 } from '../src/firebase/collections';
 import { buildInitialProfile } from '../src/firebase/profileSeeding';
 import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
@@ -53,6 +56,7 @@ export default function CheckinScreen() {
   const [showAction, setShowAction] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [memoryEntries, setMemoryEntries] = useState<MemoryVaultEntryWithId[]>([]);
+  const [desireEntries, setDesireEntries] = useState<DesireInventoryEntryWithId[]>([]);
 
   useEffect(() => {
     if (!isFirebaseConfigured || !uid) return;
@@ -61,11 +65,21 @@ export default function CheckinScreen() {
       .catch(() => {
         // best-effort; "Recall Detail" just falls back to a generic prompt
       });
+    getUnusedDesireInventoryEntries(uid)
+      .then(setDesireEntries)
+      .catch(() => {
+        // best-effort; "Specific Desire + Play" just falls back to a generic prompt
+      });
   }, [uid]);
 
   const memoryVault = useMemo<MemoryVaultEntry[]>(
     () => memoryEntries.map((e) => ({ id: e.id, detail: e.content, date: e.date, tags: [], used: e.usedInGeneration })),
     [memoryEntries],
+  );
+
+  const desireInventory = useMemo<DesireInventoryEntry[]>(
+    () => desireEntries.map((e) => ({ id: e.id, desire: e.desire, rank: e.rank, used: e.used })),
+    [desireEntries],
   );
 
   const action = useMemo(() => {
@@ -81,13 +95,13 @@ export default function CheckinScreen() {
       loveLanguageSecondary: givesVia,
       avwScores: avw,
       memoryVault,
-      desireInventory: [],
+      desireInventory,
       bidLog: [],
       startDate: new Date().toISOString(),
     };
 
     return getMicroAttunement(profile);
-  }, [mode, attachmentAnswers, loveLanguagePicks, seenScore, safeScore, soughtScore, memoryVault]);
+  }, [mode, attachmentAnswers, loveLanguagePicks, seenScore, safeScore, soughtScore, memoryVault, desireInventory]);
 
   const handleSeeAction = async () => {
     setShowAction(true);
@@ -125,6 +139,9 @@ export default function CheckinScreen() {
       if (action.axis === 'seen') {
         const used = memoryEntries.find((e) => !e.usedInGeneration);
         if (used) await markMemoryVaultEntryUsed(used.id);
+      } else if (action.axis === 'sought') {
+        const used = desireEntries.find((e) => !e.used);
+        if (used) await markDesireInventoryEntryUsed(used.id);
       }
     } catch (err) {
       // Non-fatal: the computed action above already rendered regardless.
@@ -178,6 +195,9 @@ export default function CheckinScreen() {
         </Pressable>
         <Pressable style={styles.link} onPress={() => router.push('/memory-vault')}>
           <Text style={styles.linkText}>Memory Vault →</Text>
+        </Pressable>
+        <Pressable style={styles.link} onPress={() => router.push('/desire-inventory')}>
+          <Text style={styles.linkText}>Desire Inventory →</Text>
         </Pressable>
         <Pressable style={styles.link} onPress={() => router.push('/settings')}>
           <Text style={styles.linkTextSecondary}>Settings</Text>
