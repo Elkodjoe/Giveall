@@ -230,5 +230,14 @@ export async function optInToPartnership(uidA: string, uidB: string, uid: string
   await updateDoc(doc(partnershipsCol, id), { [`optIns.${uid}`]: true });
   // Flipping status to 'active' once both optIns are true is intentionally
   // NOT done here — firestore.rules blocks clients from writing `status`.
-  // That flip belongs in a Cloud Function triggered on partnerships writes.
+  // That flip belongs in a Cloud Function triggered on partnerships writes
+  // (functions/src/activatePartnership.ts) — not deployed yet, so a
+  // partnership can reach "both opted in" and still show 'pending' until
+  // Cloud Functions are live. See docs/06-firebase-provisioning.md.
+}
+
+export async function getPartnership(uidA: string, uidB: string): Promise<PartnershipDoc | undefined> {
+  const id = partnershipId(uidA, uidB);
+  const snap = await getDoc(doc(partnershipsCol, id));
+  return snap.exists() ? snap.data() : undefined;
 }

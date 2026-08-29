@@ -54,6 +54,9 @@ export default function SettingsScreen() {
         <Pressable style={styles.link} onPress={() => router.push('/memory-vault')}>
           <Text style={styles.linkText}>Manage Memory Vault →</Text>
         </Pressable>
+        <Pressable style={styles.link} onPress={() => router.push('/partner')}>
+          <Text style={styles.linkText}>Partner Mode →</Text>
+        </Pressable>
 
         <Pressable style={[styles.dangerButton, confirming && styles.dangerButtonConfirming]} onPress={confirmDelete}>
           <Text style={[styles.dangerButtonLabel, confirming && styles.dangerButtonLabelConfirming]}>

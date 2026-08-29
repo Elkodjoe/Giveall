@@ -49,8 +49,15 @@ service cloud.firestore {
     // that flip must happen server-side (Cloud Function), never by direct
     // client write, so status is not listed as a client-writable field here.
     match /partnerships/{partnershipId} {
+      // resource is null when the doc doesn't exist yet (checking "has my
+      // partner requested?" before either side has written anything) —
+      // resource.data.users would then throw, and Firestore treats any
+      // rule evaluation error as a deny. Short-circuit on resource == null
+      // first. Same class of bug as the create/read split above, this time
+      // on read of a maybe-nonexistent doc rather than create — confirmed
+      // live via a two-browser-context test on 2026-08-28.
       allow read: if request.auth != null &&
-        (request.auth.uid in resource.data.users);
+        (resource == null || request.auth.uid in resource.data.users);
       allow create: if request.auth != null &&
         request.auth.uid in request.resource.data.users &&
         request.resource.data.status == 'pending';
