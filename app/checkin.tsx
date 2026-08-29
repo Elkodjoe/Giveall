@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -8,10 +8,17 @@ import { useAuth } from '../src/state/AuthContext';
 import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScoring';
 import { checkinToAvw } from '../src/engine/scale';
 import { getMicroAttunement } from '../src/engine/decisionMatrix';
-import type { UserProfile } from '../src/engine/types';
+import type { UserProfile, MemoryVaultEntry } from '../src/engine/types';
 import type { MoodLabel } from '../src/firebase/types';
 import { isFirebaseConfigured } from '../src/firebase/config';
-import { getProfile, setProfile, addDailyCheckin } from '../src/firebase/collections';
+import {
+  getProfile,
+  setProfile,
+  addDailyCheckin,
+  getUnusedMemoryVaultEntries,
+  markMemoryVaultEntryUsed,
+  type MemoryVaultEntryWithId,
+} from '../src/firebase/collections';
 import { buildInitialProfile } from '../src/firebase/profileSeeding';
 import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 
@@ -45,6 +52,21 @@ export default function CheckinScreen() {
   const [moodLabel, setMoodLabel] = useState<MoodLabel | null>(null);
   const [showAction, setShowAction] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [memoryEntries, setMemoryEntries] = useState<MemoryVaultEntryWithId[]>([]);
+
+  useEffect(() => {
+    if (!isFirebaseConfigured || !uid) return;
+    getUnusedMemoryVaultEntries(uid)
+      .then(setMemoryEntries)
+      .catch(() => {
+        // best-effort; "Recall Detail" just falls back to a generic prompt
+      });
+  }, [uid]);
+
+  const memoryVault = useMemo<MemoryVaultEntry[]>(
+    () => memoryEntries.map((e) => ({ id: e.id, detail: e.content, date: e.date, tags: [], used: e.usedInGeneration })),
+    [memoryEntries],
+  );
 
   const action = useMemo(() => {
     const { primary: attachmentStyle, spike } = tallyAttachment(attachmentAnswers);
@@ -58,14 +80,14 @@ export default function CheckinScreen() {
       loveLanguagePrimary: receivesVia,
       loveLanguageSecondary: givesVia,
       avwScores: avw,
-      memoryVault: [],
+      memoryVault,
       desireInventory: [],
       bidLog: [],
       startDate: new Date().toISOString(),
     };
 
     return getMicroAttunement(profile);
-  }, [mode, attachmentAnswers, loveLanguagePicks, seenScore, safeScore, soughtScore]);
+  }, [mode, attachmentAnswers, loveLanguagePicks, seenScore, safeScore, soughtScore, memoryVault]);
 
   const handleSeeAction = async () => {
     setShowAction(true);
@@ -96,6 +118,14 @@ export default function CheckinScreen() {
         contextTags: [],
         bid_logged_today: false,
       });
+
+      // Same "first unused" selection decisionMatrix.ts's nextUnused() makes
+      // internally — re-derived here since getMicroAttunement() doesn't
+      // expose which entry it picked, only the resulting action text.
+      if (action.axis === 'seen') {
+        const used = memoryEntries.find((e) => !e.usedInGeneration);
+        if (used) await markMemoryVaultEntryUsed(used.id);
+      }
     } catch (err) {
       // Non-fatal: the computed action above already rendered regardless.
       setSaveError(err instanceof Error ? err.message : 'Could not save check-in.');
@@ -145,6 +175,12 @@ export default function CheckinScreen() {
 
         <Pressable style={styles.link} onPress={() => router.push('/bids')}>
           <Text style={styles.linkText}>Log a bid for connection →</Text>
+        </Pressable>
+        <Pressable style={styles.link} onPress={() => router.push('/memory-vault')}>
+          <Text style={styles.linkText}>Memory Vault →</Text>
+        </Pressable>
+        <Pressable style={styles.link} onPress={() => router.push('/settings')}>
+          <Text style={styles.linkTextSecondary}>Settings</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -199,4 +235,5 @@ const styles = StyleSheet.create({
   errorText: { fontFamily: fontFamily.regular, color: colors.error, fontSize: 13, marginTop: 12, textAlign: 'center' },
   link: { marginTop: 24, alignItems: 'center' },
   linkText: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14 },
+  linkTextSecondary: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13 },
 });

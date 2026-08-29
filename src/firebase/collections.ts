@@ -10,6 +10,7 @@ import {
   setDoc,
   addDoc,
   updateDoc,
+  deleteDoc,
   serverTimestamp,
   type QueryDocumentSnapshot,
   type SnapshotOptions,
@@ -169,7 +170,20 @@ export async function addMemoryVaultEntry(entry: MemoryVaultDoc): Promise<void> 
   await addDoc(memoryVaultCol, entry);
 }
 
-export async function getUnusedMemoryVaultEntries(userId: string): Promise<MemoryVaultDoc[]> {
+// MemoryVaultDoc has no `id` field of its own (Firestore's doc id lives
+// outside the document body) — these list functions attach it, since the
+// UI needs it for mark-used/delete.
+export interface MemoryVaultEntryWithId extends MemoryVaultDoc {
+  id: string;
+}
+
+export async function getAllMemoryVaultEntries(userId: string): Promise<MemoryVaultEntryWithId[]> {
+  const q = query(memoryVaultCol, where('userId', '==', userId), orderBy('date', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function getUnusedMemoryVaultEntries(userId: string): Promise<MemoryVaultEntryWithId[]> {
   const q = query(
     memoryVaultCol,
     where('userId', '==', userId),
@@ -177,7 +191,22 @@ export async function getUnusedMemoryVaultEntries(userId: string): Promise<Memor
     orderBy('date', 'desc'),
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => d.data());
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function markMemoryVaultEntryUsed(entryId: string): Promise<void> {
+  await updateDoc(doc(memoryVaultCol, entryId), { usedInGeneration: true });
+}
+
+export async function deleteMemoryVaultEntry(entryId: string): Promise<void> {
+  await deleteDoc(doc(memoryVaultCol, entryId));
+}
+
+// "You can delete your Memory Vault anytime" — the privacy guardrail
+// promise in docs/03-power-ups.md #3. Used by the Settings screen.
+export async function deleteAllMemoryVaultEntries(userId: string): Promise<void> {
+  const entries = await getAllMemoryVaultEntries(userId);
+  await Promise.all(entries.map((e) => deleteMemoryVaultEntry(e.id)));
 }
 
 function partnershipId(uidA: string, uidB: string): string {

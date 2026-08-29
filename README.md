@@ -8,7 +8,7 @@ A 90-second daily relationship fitness app. See `docs/00-product-overview.md` fo
 - `src/engine/` — the rules engine as plain TypeScript, no React/RN dependency. Unit-tested (`src/engine/__tests__`). This is the reusable "brain" — safe to lift into a backend later if logic needs to move server-side.
 - `src/data/` — onboarding question banks (attachment scenarios, love language forced-choice pairs).
 - `src/components/`, `src/state/` — RN UI pieces for the onboarding flow.
-- `app/` — Expo Router screens: Onboarding Screens 1–6, plus `checkin.tsx` (daily 90-second check-in), `bids.tsx` (Bid Tracker), and `curiosity.tsx` (Curiosity Card).
+- `app/` — Expo Router screens: Onboarding Screens 1–6, plus `checkin.tsx` (daily 90-second check-in), `bids.tsx` (Bid Tracker), `curiosity.tsx` (Curiosity Card), `memory-vault.tsx`, and `settings.tsx`.
 - `src/firebase/` — Firestore document types, security rules-matching collection helpers, and auth. Works without a Firebase project configured — see `docs/06-firebase-provisioning.md`.
 
 ## Getting started
@@ -26,3 +26,5 @@ Onboarding flow (Screens 1–6), daily check-in, Bid Tracker, and Curiosity Card
 The Appreciation Generator (`src/engine/appreciationGenerator.ts`'s prompt, wrapped by `functions/src/generateAppreciation.ts`) supports both Anthropic and OpenAI with automatic fallback — only one API key needs to be configured. `app/payoff.tsx` calls it live and falls back to a static example line if it fails.
 
 **Cloud Functions are written but not deployed** — `nightlyRecalculateWeights`, `activatePartnership`, `validateProfile`, and `generateAppreciation` all need the Blaze billing plan, deliberately deferred (needs a payment method the user isn't ready to add). Nothing in the app breaks without them; the Appreciation Generator just stays on its fallback line.
+
+`app/memory-vault.tsx` is what makes `decisionMatrix.ts`'s "Recall Detail" prescription (triggered when `seen_score` is lowest) actually personal instead of falling back to a generic prompt — `app/checkin.tsx` now fetches real entries and marks one used per the same "first unused" selection the engine's `nextUnused()` makes internally. `app/settings.tsx` ships the privacy guardrail copy from `docs/03-power-ups.md` #3 verbatim, plus a "delete my Memory Vault" action — both were previously unbuilt despite that doc calling the copy "not decorative." All verified end-to-end against the live project; along the way, found and fixed a missing Firestore composite index for the Memory Vault's unfiltered list query (only the `usedInGeneration`-filtered one existed).
