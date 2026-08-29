@@ -173,6 +173,23 @@ export interface ActionLogDoc {
   context?: string;
 }
 
+// Append-only audit trail for docs/02-love-os-brain.md #3's "never silently
+// change loveLanguage" rule. functions/src/recalculateWeights.ts (nightly,
+// not yet deployed) writes 'recalibrated'/'skipped_insufficient_logs' rows
+// for its EMA-blended loveLanguageWeights; app/checkin.tsx writes
+// 'client_recalibrated' rows for the simpler client-side primary-language
+// swap (src/engine/recalibration.ts's checkRecalibration) — same collection,
+// distinguishable by `type`, since both are the same audit concern.
+export interface RecalibrationEventDoc {
+  userId: string;
+  type: 'client_recalibrated';
+  previousLoveLanguageReceive: LoveLanguageKey;
+  newLoveLanguageReceive: LoveLanguageKey;
+  message: string;
+  logCount: number;
+  timestamp: Timestamp;
+}
+
 // Public, read-only catalog of curiosity prompts (seeded, not user-authored).
 export interface CuriosityCardDoc {
   id: string;

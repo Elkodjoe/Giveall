@@ -47,6 +47,29 @@ export function checkRecalibration(
   };
 }
 
+export interface ActionLogEntry {
+  date: string; // "YYYY-MM-DD" — caller converts the Firestore Timestamp
+  loveLanguageType: LoveLanguage;
+  partnerMoodDelta: number;
+}
+
+/**
+ * Reduces raw action_logs entries to the DailyFeedback shape
+ * checkRecalibration expects: one entry per calendar day (most recent
+ * write for that day wins), counting only days where the action actually
+ * landed (partnerMoodDelta > 0) — a rejected action isn't evidence the
+ * user feels loved by that language. Pure, so it's testable without a
+ * Firestore Timestamp in the loop.
+ */
+export function toDailyFeedback(logs: ActionLogEntry[]): DailyFeedback[] {
+  const byDate = new Map<string, LoveLanguage>();
+  for (const log of logs) {
+    if (log.partnerMoodDelta <= 0) continue;
+    if (!byDate.has(log.date)) byDate.set(log.date, log.loveLanguageType);
+  }
+  return Array.from(byDate.entries()).map(([date, loveLanguageObserved]) => ({ date, loveLanguageObserved }));
+}
+
 function labelFor(lang: LoveLanguage): string {
   const labels: Record<LoveLanguage, string> = {
     words: 'Words',

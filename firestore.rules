@@ -26,6 +26,14 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
+    // Append-only audit trail for docs/02-love-os-brain.md #3's "never
+    // silently change loveLanguage" rule — see RecalibrationEventDoc in
+    // src/firebase/types.ts. No update/delete: once written, a
+    // recalibration event is a historical fact.
+    match /recalibration_events/{docId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
     match /bids/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;

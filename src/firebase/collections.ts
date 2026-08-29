@@ -28,6 +28,8 @@ import type {
   MemoryVaultDoc,
   DesireInventoryDoc,
   PartnershipDoc,
+  RecalibrationEventDoc,
+  LoveLanguageKey,
 } from './types';
 
 // Thin, typed wrappers over the raw Firestore SDK, one per collection named
@@ -77,6 +79,17 @@ export async function getProfile(userId: string): Promise<ProfileDoc | undefined
 
 export async function setProfile(userId: string, profile: Omit<ProfileDoc, 'updatedAt'>): Promise<void> {
   await setDoc(doc(collection(db, 'profiles'), userId), { ...profile, updatedAt: serverTimestamp() });
+}
+
+export async function updateProfileLoveLanguageReceive(
+  userId: string,
+  loveLanguageReceive: LoveLanguageKey,
+): Promise<void> {
+  await updateDoc(doc(collection(db, 'profiles'), userId), { loveLanguageReceive, updatedAt: serverTimestamp() });
+}
+
+export async function logRecalibrationEvent(entry: Omit<RecalibrationEventDoc, 'timestamp'>): Promise<void> {
+  await addDoc(collection(db, 'recalibration_events'), { ...entry, timestamp: serverTimestamp() });
 }
 
 export async function getDailyCheckinsLastNDays(userId: string, days: number): Promise<DailyCheckinDoc[]> {

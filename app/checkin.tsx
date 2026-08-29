@@ -9,6 +9,7 @@ import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScor
 import { checkinToAvw } from '../src/engine/scale';
 import { getMicroAttunement } from '../src/engine/decisionMatrix';
 import { summarizeWeek } from '../src/engine/bidTracker';
+import { checkRecalibration, toDailyFeedback } from '../src/engine/recalibration';
 import type { UserProfile, MemoryVaultEntry, DesireInventoryEntry } from '../src/engine/types';
 import type { MoodLabel } from '../src/firebase/types';
 import { isFirebaseConfigured } from '../src/firebase/config';
@@ -23,6 +24,9 @@ import {
   getBidsLastNDays,
   getUser,
   logAction,
+  getActionLogsLastNDays,
+  updateProfileLoveLanguageReceive,
+  logRecalibrationEvent,
   type MemoryVaultEntryWithId,
   type DesireInventoryEntryWithId,
 } from '../src/firebase/collections';
@@ -60,6 +64,7 @@ export default function CheckinScreen() {
   const [moodLabel, setMoodLabel] = useState<MoodLabel | null>(null);
   const [showAction, setShowAction] = useState(false);
   const [landedReport, setLandedReport] = useState<-2 | -1 | 0 | 1 | 2 | null>(null);
+  const [recalibrationMessage, setRecalibrationMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [memoryEntries, setMemoryEntries] = useState<MemoryVaultEntryWithId[]>([]);
   const [desireEntries, setDesireEntries] = useState<DesireInventoryEntryWithId[]>([]);
@@ -112,6 +117,7 @@ export default function CheckinScreen() {
   const handleSeeAction = async () => {
     setShowAction(true);
     setLandedReport(null);
+    setRecalibrationMessage(null);
     setSaveError(null);
 
     if (!isFirebaseConfigured || !uid || !moodLabel) return;
@@ -185,6 +191,33 @@ export default function CheckinScreen() {
         partnerMoodDelta: delta,
         wasCompleted: true,
       });
+
+      // Check for a client-side recalibration (docs/02-love-os-brain.md #3)
+      // now that this write gives toDailyFeedback() one more day of real
+      // signal to work with. Best-effort, non-blocking — the reaction UI
+      // above already reflected the tap regardless of what happens here.
+      const [profile, logs] = await Promise.all([getProfile(uid), getActionLogsLastNDays(uid, 14)]);
+      if (!profile) return;
+      const feedback = toDailyFeedback(
+        logs.map((l) => ({
+          date: l.timestamp.toDate().toISOString().slice(0, 10),
+          loveLanguageType: l.loveLanguageType,
+          partnerMoodDelta: l.partnerMoodDelta,
+        })),
+      );
+      const result = checkRecalibration(profile.loveLanguageReceive, feedback);
+      if (result.shouldRecalibrate && result.newPrimary && result.message) {
+        await updateProfileLoveLanguageReceive(uid, result.newPrimary);
+        await logRecalibrationEvent({
+          userId: uid,
+          type: 'client_recalibrated',
+          previousLoveLanguageReceive: profile.loveLanguageReceive,
+          newLoveLanguageReceive: result.newPrimary,
+          message: result.message,
+          logCount: feedback.length,
+        });
+        setRecalibrationMessage(result.message);
+      }
     } catch {
       // best-effort; the tap already reflected locally
     }
@@ -243,6 +276,12 @@ export default function CheckinScreen() {
             ) : (
               <Text style={styles.landedThanks}>Thanks — logged to help tailor future actions.</Text>
             )}
+          </View>
+        )}
+
+        {recalibrationMessage && (
+          <View style={styles.recalibrationCard}>
+            <Text style={styles.recalibrationText}>{recalibrationMessage}</Text>
           </View>
         )}
 
@@ -333,6 +372,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
+  recalibrationCard: {
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: card.radius,
+    padding: 20,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  recalibrationText: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 15, lineHeight: 22 },
   errorText: { fontFamily: fontFamily.regular, color: colors.error, fontSize: 13, marginTop: 12, textAlign: 'center' },
   link: { marginTop: 24, alignItems: 'center' },
   linkText: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14 },
