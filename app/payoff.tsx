@@ -7,16 +7,20 @@ import { useOnboarding } from '../src/state/OnboardingContext';
 import { tallyAttachment, tallyLoveLanguage, buildPayoffSummary } from '../src/engine/onboardingScoring';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { generateAppreciation } from '../src/firebase/appreciationClient';
+import { generateAppreciationViaOllama } from '../src/llm/ollamaClient';
 import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 
 // Screen 5 — The Payoff Preview. The Aha Moment: value delivered before any
 // ask. Renders FIRST_WIN_FALLBACK instantly (this screen must never feel
-// like it's waiting on a network call) and, if Firebase + a Cloud Function
-// provider are available, kicks off a background call to
-// generateAppreciation() (functions/src/generateAppreciation.ts, which
-// wraps buildAppreciationPrompt() from src/engine/appreciationGenerator.ts)
-// and silently swaps in the real result if it arrives — no loading spinner,
-// no error shown if it fails, just stays on the fallback.
+// like it's waiting on a network call), then tries two live sources in the
+// background and silently swaps in whichever succeeds first — no loading
+// spinner, no error shown if both fail, just stays on the fallback:
+//   1. generateAppreciation() — the Cloud Function (functions/src/generateAppreciation.ts,
+//      Anthropic/OpenAI). Not deployed yet (Blaze plan deferred), so this
+//      currently always fails fast and falls through to (2).
+//   2. generateAppreciationViaOllama() — a locally running Ollama server,
+//      for testing this live without needing Blaze or a paid API key. Only
+//      works when running the app on the same machine as `ollama serve`.
 const FIRST_WIN_FALLBACK = "I love how you think out loud when you're solving something - you don't hide the messy part.";
 const GENERIC_SEED_COMPLIMENT = 'You are wonderful.';
 
@@ -40,16 +44,24 @@ export default function PayoffScreen() {
   }, [attachmentAnswers, loveLanguagePicks]);
 
   useEffect(() => {
-    if (!isFirebaseConfigured) return;
     let cancelled = false;
-    generateAppreciation({ genericCompliment: GENERIC_SEED_COMPLIMENT, loveLanguage: receivesVia })
+    const input = { genericCompliment: GENERIC_SEED_COMPLIMENT, loveLanguage: receivesVia };
+
+    const tryCloudFunction = isFirebaseConfigured
+      ? generateAppreciation(input)
+      : Promise.reject(new Error('Firebase not configured'));
+
+    tryCloudFunction
+      .catch(() => generateAppreciationViaOllama(input))
       .then((result) => {
         if (!cancelled) setFirstWin(result.text);
       })
       .catch(() => {
-        // Cloud Function not deployed yet, no provider configured, or a
-        // network error — stays on FIRST_WIN_FALLBACK, no error surfaced.
+        // Neither source available (Cloud Function not deployed, no
+        // Ollama server reachable, etc.) — stays on FIRST_WIN_FALLBACK,
+        // no error surfaced.
       });
+
     return () => {
       cancelled = true;
     };
