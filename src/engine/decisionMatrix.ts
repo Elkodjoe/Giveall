@@ -3,6 +3,7 @@ import type {
   AvwAxis,
   AvwScores,
   DesireInventoryEntry,
+  LoveLanguage,
   MemoryVaultEntry,
   MicroAttunement,
   UserProfile,
@@ -19,29 +20,42 @@ export function lowestAxis(scores: AvwScores): AvwAxis {
   return tied[0];
 }
 
+// loveLanguageType per branch matches scripts/seed/suggested_actions.json's
+// equivalent trigger (act_words_001, act_space_001, act_vuln_001,
+// act_direct_001) — same prescriptions, kept in sync by hand since this path
+// runs client-side with zero Firestore reads while suggested_actions is the
+// content-managed catalog the same copy was seeded from.
 const SAFE_SCORE_STRATEGY: Record<
   AttachmentStyle,
-  { strategy: string; tone: string; action: string }
+  { strategy: string; tone: string; action: string; loveLanguageType: LoveLanguage; actionId: string }
 > = {
   anxious: {
     strategy: 'Consistency + Reassurance',
     tone: 'warm, predictable',
     action: "Morning voice note, same time daily: 'Thinking of you before your meeting'",
+    loveLanguageType: 'words',
+    actionId: 'act_words_001',
   },
   avoidant: {
     strategy: 'Low-Pressure Space',
     tone: 'light, no demand for reply',
     action: "No-reply-needed check-in: 'Saw this meme and thought of you, no need to reply'",
+    loveLanguageType: 'quality_time',
+    actionId: 'act_space_001',
   },
   fearful: {
     strategy: 'Safe Vulnerability',
     tone: 'small, controlled share',
     action: 'Share one small worry first, then appreciation. Shows it’s safe to be vulnerable.',
+    loveLanguageType: 'words',
+    actionId: 'act_vuln_001',
   },
   secure: {
     strategy: 'Direct Repair',
     tone: 'plain, direct',
     action: "Ask directly: 'I felt a bit distant yesterday, can we reset tonight?'",
+    loveLanguageType: 'words',
+    actionId: 'act_direct_001',
   },
 };
 
@@ -59,8 +73,8 @@ export function getMicroAttunement(profile: UserProfile): MicroAttunement {
   const axis = lowestAxis(profile.avwScores);
 
   if (axis === 'safe') {
-    const { strategy, tone, action } = SAFE_SCORE_STRATEGY[profile.attachmentStyle];
-    return { axis, strategy, tone, action };
+    const { strategy, tone, action, loveLanguageType, actionId } = SAFE_SCORE_STRATEGY[profile.attachmentStyle];
+    return { axis, strategy, tone, action, loveLanguageType, actionId };
   }
 
   if (axis === 'seen') {
@@ -73,6 +87,8 @@ export function getMicroAttunement(profile: UserProfile): MicroAttunement {
       strategy: 'Recall Detail',
       tone: 'curious, attentive',
       action,
+      loveLanguageType: 'quality_time',
+      actionId: 'act_seen_001',
     };
   }
 
@@ -86,6 +102,8 @@ export function getMicroAttunement(profile: UserProfile): MicroAttunement {
     strategy: 'Specific Desire + Play',
     tone: 'playful, intentional',
     action,
+    loveLanguageType: 'words',
+    actionId: 'act_wanted_001',
   };
 }
 

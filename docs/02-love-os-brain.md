@@ -58,6 +58,8 @@ Copy pattern:
 
 Implementation note: recalibration should never silently change `loveLanguage` — always surface the message above the same day it changes, and log the change in an (invisible-to-user) audit trail for debugging/support.
 
+**Implementation status**: the nightly job (`functions/src/recalculateWeights.ts`) that actually reads `action_logs` and blends `loveLanguageWeights` is written but not deployed (Blaze deferred, see `docs/06-firebase-provisioning.md`); `src/engine/recalibration.ts`'s `checkRecalibration` is a pure, unit-tested client-side equivalent, also not yet wired into a screen. Until this pass, `action_logs` was schema-only — every screen that produces a prescribed action never actually logged one, so the collection stayed permanently empty and the nightly job (whenever deployed) would skip every user forever (`skipped_insufficient_logs`). `app/checkin.tsx` now closes that gap: `getMicroAttunement()` (`src/engine/decisionMatrix.ts`) returns a `loveLanguageType` + `actionId` per prescription — matched by hand to the equivalent entry in `scripts/seed/suggested_actions.json` (e.g. the Direct Repair/secure branch maps to `act_direct_001`/`words`) — and a "Did this land?" 5-point reaction (😞🙁😐🙂😍 → `partnerMoodDelta` -2..2) writes it to `action_logs` via `logAction()`. Verified live: a real `action_logs` doc with the correct `actionId`/`loveLanguageType`/`partnerMoodDelta` landed in the `giveall-app` project and was cleaned up after. Surfacing the "We learned..." message client-side (the `checkRecalibration` wiring) is still open — this pass only unblocks it by finally producing real data for it to run against.
+
 ## 4. Bid Tracker logic (Gottman)
 
 User logs a bid for connection made by their partner:

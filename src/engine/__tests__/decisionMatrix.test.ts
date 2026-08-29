@@ -36,6 +36,7 @@ describe('getMicroAttunement', () => {
     const result = getMicroAttunement(profile);
     expect(result.axis).toBe('safe');
     expect(result.strategy).toBe('Consistency + Reassurance');
+    expect(result.loveLanguageType).toBe('words');
   });
 
   it('recommends Low-Pressure Space for low safe_score + avoidant', () => {
@@ -56,6 +57,7 @@ describe('getMicroAttunement', () => {
     expect(result.axis).toBe('seen');
     expect(result.strategy).toBe('Recall Detail');
     expect(result.action).toContain('their new project at work');
+    expect(result.loveLanguageType).toBe('quality_time');
   });
 
   it('recommends Specific Desire + Play for low sought_score regardless of attachment style', () => {
@@ -67,5 +69,6 @@ describe('getMicroAttunement', () => {
     const result = getMicroAttunement(profile);
     expect(result.axis).toBe('sought');
     expect(result.action).toContain('being defended in public');
+    expect(result.loveLanguageType).toBe('words');
   });
 });

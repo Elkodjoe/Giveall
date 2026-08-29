@@ -54,4 +54,12 @@ export interface MicroAttunement {
   strategy: string;
   tone: string;
   action: string;
+  // Which love language this prescribed action expresses, matching
+  // scripts/seed/suggested_actions.json's loveLanguageType for the
+  // equivalent trigger — lets a completed action be logged to
+  // action_logs for functions/src/recalculateWeights.ts to consume.
+  loveLanguageType: LoveLanguage;
+  // The scripts/seed/suggested_actions.json entry this prescription
+  // mirrors (ActionLogDoc.actionId references this catalog by convention).
+  actionId: string;
 }

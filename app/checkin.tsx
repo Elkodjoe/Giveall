@@ -22,6 +22,7 @@ import {
   markDesireInventoryEntryUsed,
   getBidsLastNDays,
   getUser,
+  logAction,
   type MemoryVaultEntryWithId,
   type DesireInventoryEntryWithId,
 } from '../src/firebase/collections';
@@ -58,6 +59,7 @@ export default function CheckinScreen() {
   const [moodScore, setMoodScore] = useState(5);
   const [moodLabel, setMoodLabel] = useState<MoodLabel | null>(null);
   const [showAction, setShowAction] = useState(false);
+  const [landedReport, setLandedReport] = useState<-2 | -1 | 0 | 1 | 2 | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [memoryEntries, setMemoryEntries] = useState<MemoryVaultEntryWithId[]>([]);
   const [desireEntries, setDesireEntries] = useState<DesireInventoryEntryWithId[]>([]);
@@ -109,6 +111,7 @@ export default function CheckinScreen() {
 
   const handleSeeAction = async () => {
     setShowAction(true);
+    setLandedReport(null);
     setSaveError(null);
 
     if (!isFirebaseConfigured || !uid || !moodLabel) return;
@@ -167,6 +170,26 @@ export default function CheckinScreen() {
     }
   };
 
+  // Self-report on today's prescribed action, logged to action_logs — the
+  // input functions/src/recalculateWeights.ts (nightly recalibration, see
+  // docs/02-love-os-brain.md #3) needs but nothing wrote until now. Local
+  // UI state updates instantly regardless of whether the write succeeds.
+  const handleLandedReport = async (delta: -2 | -1 | 0 | 1 | 2) => {
+    setLandedReport(delta);
+    if (!isFirebaseConfigured || !uid) return;
+    try {
+      await logAction({
+        userId: uid,
+        actionId: action.actionId,
+        loveLanguageType: action.loveLanguageType,
+        partnerMoodDelta: delta,
+        wasCompleted: true,
+      });
+    } catch {
+      // best-effort; the tap already reflected locally
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -203,6 +226,23 @@ export default function CheckinScreen() {
             <Text style={styles.actionMeta}>
               Axis: {action.axis} · Tone: {action.tone}
             </Text>
+
+            {landedReport === null ? (
+              <View style={styles.landedRow}>
+                <Text style={styles.landedPrompt}>Did this land?</Text>
+                <View style={styles.landedButtons}>
+                  {([-2, -1, 0, 1, 2] as const).map((delta) => (
+                    <Pressable key={delta} style={styles.landedButton} onPress={() => handleLandedReport(delta)}>
+                      <Text style={styles.landedButtonText}>
+                        {['😞', '🙁', '😐', '🙂', '😍'][delta + 2]}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <Text style={styles.landedThanks}>Thanks — logged to help tailor future actions.</Text>
+            )}
           </View>
         )}
 
@@ -270,6 +310,29 @@ const styles = StyleSheet.create({
   actionStrategy: { fontFamily: fontFamily.bold, color: colors.textPrimary, fontSize: 18, marginBottom: 8 },
   actionText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 16, lineHeight: 24, marginBottom: 12 },
   actionMeta: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13 },
+  landedRow: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.border },
+  landedPrompt: { fontFamily: fontFamily.semiBold, color: colors.textPrimary, fontSize: 14, marginBottom: 8 },
+  landedButtons: { flexDirection: 'row', justifyContent: 'space-between' },
+  landedButton: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.full,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  landedButtonText: { fontSize: 20 },
+  landedThanks: {
+    fontFamily: fontFamily.regular,
+    color: colors.textSecondary,
+    fontSize: 13,
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
   errorText: { fontFamily: fontFamily.regular, color: colors.error, fontSize: 13, marginTop: 12, textAlign: 'center' },
   link: { marginTop: 24, alignItems: 'center' },
   linkText: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14 },
