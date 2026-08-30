@@ -33,9 +33,23 @@
   a { color: var(--primary); }
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
   nav.top { padding: 24px 0; }
-  nav.top .wrap { display: flex; align-items: center; justify-content: space-between; }
+  nav.top .wrap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
   .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
   .logo span { color: var(--primary); }
+
+  .lang-switcher { display: flex; flex-wrap: wrap; gap: 6px; }
+  .lang-btn {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .lang-btn.active { background: var(--primary); border-color: var(--primary); color: var(--text-inverse); }
 
   .hero { padding: 48px 0 40px; text-align: center; }
   .hero h1 {
@@ -170,23 +184,24 @@
 <nav class="top">
   <div class="wrap">
     <div class="logo">Give<span>All</span></div>
+    <div class="lang-switcher" id="lang-switcher"></div>
   </div>
 </nav>
 
 <header class="hero">
   <div class="wrap">
-    <h1>Love is a daily practice.</h1>
-    <p class="lede">90 seconds a day to feel more Attractive, Valued, and Wanted — GiveAll reads your Attachment style and Love Language, then prescribes one small, specific action a day.</p>
+    <h1 data-i18n="heroHeadline">Love is a daily practice.</h1>
+    <p class="lede" data-i18n="heroLede">90 seconds a day to feel more Attractive, Valued, and Wanted — GiveAll reads your Attachment style and Love Language, then prescribes one small, specific action a day.</p>
 
     <div class="avw-row">
-      <span class="avw-pill">Attractive</span>
-      <span class="avw-pill">Valued</span>
-      <span class="avw-pill">Wanted</span>
+      <span class="avw-pill" data-i18n="avwAttractive">Attractive</span>
+      <span class="avw-pill" data-i18n="avwValued">Valued</span>
+      <span class="avw-pill" data-i18n="avwWanted">Wanted</span>
     </div>
 
     <form class="cta-form" id="waitlist-form">
       <input type="email" id="waitlist-email" placeholder="you@example.com" required autocomplete="email" />
-      <button type="submit" id="waitlist-submit">Get early access</button>
+      <button type="submit" id="waitlist-submit" data-i18n="formSubmit">Get early access</button>
     </form>
     <div class="form-status" id="waitlist-status"></div>
   </div>
@@ -196,24 +211,24 @@
   <div class="wrap">
     <div class="feature-grid">
       <div class="feature-card">
-        <div class="kicker">Micro-Attunement</div>
-        <h3>One small action, every day</h3>
-        <p>Not a generic reminder — a specific, attachment-tailored move: a voice note, a recalled detail, a chosen moment. Whatever moves the needle for you today.</p>
+        <div class="kicker" data-i18n="feature1Kicker">Micro-Attunement</div>
+        <h3 data-i18n="feature1Title">One small action, every day</h3>
+        <p data-i18n="feature1Desc">Not a generic reminder — a specific, attachment-tailored move: a voice note, a recalled detail, a chosen moment. Whatever moves the needle for you today.</p>
       </div>
       <div class="feature-card">
-        <div class="kicker">Memory Vault + Desire Inventory</div>
-        <h3>Remembered on purpose</h3>
-        <p>Log the small things they mention in passing. GiveAll brings them back at the right moment — being remembered is how people feel seen.</p>
+        <div class="kicker" data-i18n="feature2Kicker">Memory Vault + Desire Inventory</div>
+        <h3 data-i18n="feature2Title">Remembered on purpose</h3>
+        <p data-i18n="feature2Desc">Log the small things they mention in passing. GiveAll brings them back at the right moment — being remembered is how people feel seen.</p>
       </div>
       <div class="feature-card">
-        <div class="kicker">Bid Tracker</div>
-        <h3>Gottman's bids, made visible</h3>
-        <p>Every small bid for connection — a comment, a touch, a joke — logged and turned toward, so your Bid Response Ratio becomes something you can actually see improve.</p>
+        <div class="kicker" data-i18n="feature3Kicker">Bid Tracker</div>
+        <h3 data-i18n="feature3Title">Gottman's bids, made visible</h3>
+        <p data-i18n="feature3Desc">Every small bid for connection — a comment, a touch, a joke — logged and turned toward, so your Bid Response Ratio becomes something you can actually see improve.</p>
       </div>
       <div class="feature-card">
-        <div class="kicker">Dynamic Recalibration</div>
-        <h3>The app learns, and says so</h3>
-        <p>Static quizzes give one score forever. GiveAll overwrites your onboarding baseline with observed behavior — and always tells you when it happens.</p>
+        <div class="kicker" data-i18n="feature4Kicker">Dynamic Recalibration</div>
+        <h3 data-i18n="feature4Title">The app learns, and says so</h3>
+        <p data-i18n="feature4Desc">Static quizzes give one score forever. GiveAll overwrites your onboarding baseline with observed behavior — and always tells you when it happens.</p>
       </div>
     </div>
   </div>
@@ -222,25 +237,227 @@
 <section class="example">
   <div class="wrap">
     <div class="example-card">
-      <div class="kicker">Your First Win — Unsolicited Appreciation</div>
-      <div class="quote">"I love how you think out loud when you're solving something — you don't hide the messy part."</div>
+      <div class="kicker" data-i18n="exampleKicker">Your First Win — Unsolicited Appreciation</div>
+      <div class="quote" data-i18n="exampleQuote">"I love how you think out loud when you're solving something — you don't hide the messy part."</div>
     </div>
   </div>
 </section>
 
 <section class="privacy">
   <div class="wrap">
-    <div class="privacy-card">
+    <div class="privacy-card" data-i18n="privacyText">
       This is your private sanctuary. No data is ever sold. Partner mode requires explicit double opt-in. You can delete your Memory Vault anytime.
     </div>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">
+  <div class="wrap" data-i18n="footerTagline">
     Give All of your love, daily. Generous, warm, abundant.
   </div>
 </footer>
+
+<script>
+  // Same 7 languages as the mobile app (src/i18n/) — English default, kept
+  // fully independent of that i18next setup since this is a plain static
+  // page with no build step. Marketing copy is distinct wording from the
+  // app, but the privacy line and the example appreciation quote are
+  // verbatim-identical translations to what ships in the app (docs/03-power-ups.md
+  // #3 treats the privacy copy as a product decision, not a copy tweak —
+  // keep both in sync if either changes).
+  var SUPPORTED = [
+    { code: 'en', native: 'English' },
+    { code: 'es', native: 'Español' },
+    { code: 'fr', native: 'Français' },
+    { code: 'de', native: 'Deutsch' },
+    { code: 'pt', native: 'Português' },
+    { code: 'zh', native: '简体中文' },
+    { code: 'ja', native: '日本語' },
+  ];
+
+  var translations = {
+    en: {
+      heroHeadline: 'Love is a daily practice.',
+      heroLede: "90 seconds a day to feel more Attractive, Valued, and Wanted — GiveAll reads your Attachment style and Love Language, then prescribes one small, specific action a day.",
+      avwAttractive: 'Attractive', avwValued: 'Valued', avwWanted: 'Wanted',
+      formSubmit: 'Get early access',
+      formSuccess: "You're on the list — we'll be in touch.",
+      formError: 'Something went wrong — please try again.',
+      feature1Kicker: 'Micro-Attunement', feature1Title: 'One small action, every day',
+      feature1Desc: 'Not a generic reminder — a specific, attachment-tailored move: a voice note, a recalled detail, a chosen moment. Whatever moves the needle for you today.',
+      feature2Kicker: 'Memory Vault + Desire Inventory', feature2Title: 'Remembered on purpose',
+      feature2Desc: 'Log the small things they mention in passing. GiveAll brings them back at the right moment — being remembered is how people feel seen.',
+      feature3Kicker: 'Bid Tracker', feature3Title: "Gottman's bids, made visible",
+      feature3Desc: 'Every small bid for connection — a comment, a touch, a joke — logged and turned toward, so your Bid Response Ratio becomes something you can actually see improve.',
+      feature4Kicker: 'Dynamic Recalibration', feature4Title: 'The app learns, and says so',
+      feature4Desc: 'Static quizzes give one score forever. GiveAll overwrites your onboarding baseline with observed behavior — and always tells you when it happens.',
+      exampleKicker: 'Your First Win — Unsolicited Appreciation',
+      exampleQuote: '"I love how you think out loud when you\'re solving something — you don\'t hide the messy part."',
+      privacyText: 'This is your private sanctuary. No data is ever sold. Partner mode requires explicit double opt-in. You can delete your Memory Vault anytime.',
+      footerTagline: 'Give All of your love, daily. Generous, warm, abundant.',
+    },
+    es: {
+      heroHeadline: 'El amor es una práctica diaria.',
+      heroLede: 'Noventa segundos al día para sentirte más atractivo/a, valorado/a y deseado/a — GiveAll interpreta tu estilo de apego y tu lenguaje del amor, y te prescribe una acción pequeña y específica cada día.',
+      avwAttractive: 'Atractivo/a', avwValued: 'Valorado/a', avwWanted: 'Deseado/a',
+      formSubmit: 'Obtener acceso anticipado',
+      formSuccess: 'Ya estás en la lista — te contactaremos pronto.',
+      formError: 'Algo salió mal — inténtalo de nuevo.',
+      feature1Kicker: 'Micro-Sintonía', feature1Title: 'Una pequeña acción, cada día',
+      feature1Desc: 'No es un recordatorio genérico — es un gesto específico, adaptado a tu apego: una nota de voz, un detalle recordado, un momento elegido. Lo que realmente marque la diferencia hoy.',
+      feature2Kicker: 'Bóveda de Recuerdos + Inventario de Deseos', feature2Title: 'Recordado a propósito',
+      feature2Desc: 'Registra las pequeñas cosas que mencionan de pasada. GiveAll las trae de vuelta en el momento justo — sentirse recordado es sentirse visto.',
+      feature3Kicker: 'Rastreador de Gestos', feature3Title: 'Los gestos de Gottman, hechos visibles',
+      feature3Desc: 'Cada pequeño gesto de conexión — un comentario, un contacto, una broma — se registra y se orienta hacia la cercanía, para que tu Respuesta a Gestos sea algo que realmente puedas ver mejorar.',
+      feature4Kicker: 'Recalibración Dinámica', feature4Title: 'La app aprende, y te lo dice',
+      feature4Desc: 'Los cuestionarios estáticos dan una sola puntuación para siempre. GiveAll reemplaza tu línea base inicial con tu comportamiento real observado — y siempre te avisa cuando ocurre.',
+      exampleKicker: 'Tu Primera Victoria — Aprecio Espontáneo',
+      exampleQuote: '"Me encanta cómo piensas en voz alta cuando resuelves algo, no ocultas la parte desordenada."',
+      privacyText: 'Este es tu santuario privado. Tus datos nunca se venden. El modo pareja requiere doble aceptación explícita. Puedes eliminar tu Bóveda de Recuerdos cuando quieras.',
+      footerTagline: 'Da todo tu amor, cada día. Generoso, cálido, abundante.',
+    },
+    fr: {
+      heroHeadline: "L'amour est une pratique quotidienne.",
+      heroLede: "90 secondes par jour pour vous sentir plus séduisant(e), valorisé(e) et désiré(e) — GiveAll lit votre style d'attachement et votre langage de l'amour, puis vous prescrit une action précise et concrète chaque jour.",
+      avwAttractive: 'Séduisant(e)', avwValued: 'Valorisé(e)', avwWanted: 'Désiré(e)',
+      formSubmit: 'Obtenir un accès anticipé',
+      formSuccess: 'Vous êtes sur la liste — nous vous contacterons bientôt.',
+      formError: "Une erreur s'est produite — veuillez réessayer.",
+      feature1Kicker: 'Micro-Ajustement', feature1Title: 'Une petite action, chaque jour',
+      feature1Desc: "Pas un rappel générique — un geste précis, adapté à votre style d'attachement : un message vocal, un détail retenu, un moment choisi. Ce qui compte vraiment pour vous aujourd'hui.",
+      feature2Kicker: 'Coffre à Souvenirs + Inventaire des Désirs', feature2Title: 'Se souvenir, exprès',
+      feature2Desc: "Notez les petites choses qu'ils mentionnent en passant. GiveAll vous les rappelle au bon moment — être mémorisé(e), c'est se sentir vu(e).",
+      feature3Kicker: 'Suivi des Gestes', feature3Title: 'Les gestes de Gottman, enfin visibles',
+      feature3Desc: "Chaque petit geste de connexion — un commentaire, un contact, une blague — est noté et orienté vers la proximité, pour que votre Réponse aux Gestes devienne quelque chose que vous voyez vraiment s'améliorer.",
+      feature4Kicker: 'Recalibrage Dynamique', feature4Title: "L'application apprend, et vous le dit",
+      feature4Desc: 'Les questionnaires statiques donnent un seul score pour toujours. GiveAll remplace votre base initiale par un comportement réellement observé — et vous en informe toujours.',
+      exampleKicker: 'Votre Première Victoire — Compliment Spontané',
+      exampleQuote: '"J\'adore la façon dont tu réfléchis à voix haute quand tu résous quelque chose, tu ne caches pas le côté imparfait."',
+      privacyText: 'Ceci est votre sanctuaire privé. Vos données ne sont jamais vendues. Le mode partenaire nécessite une double acceptation explicite. Vous pouvez supprimer votre Coffre à Souvenirs à tout moment.',
+      footerTagline: 'Donnez tout votre amour, chaque jour. Généreux, chaleureux, abondant.',
+    },
+    de: {
+      heroHeadline: 'Liebe ist eine tägliche Praxis.',
+      heroLede: 'Neunzig Sekunden am Tag, um dich attraktiver, wertgeschätzter und begehrter zu fühlen — GiveAll liest deinen Bindungsstil und deine Liebessprache und gibt dir jeden Tag eine kleine, konkrete Handlung vor.',
+      avwAttractive: 'Attraktiv', avwValued: 'Wertgeschätzt', avwWanted: 'Begehrt',
+      formSubmit: 'Frühzeitigen Zugang sichern',
+      formSuccess: 'Du stehst auf der Liste — wir melden uns bald.',
+      formError: 'Etwas ist schiefgelaufen — bitte versuche es erneut.',
+      feature1Kicker: 'Mikro-Abstimmung', feature1Title: 'Jeden Tag eine kleine Handlung',
+      feature1Desc: 'Keine generische Erinnerung — eine konkrete, auf deinen Bindungsstil abgestimmte Geste: eine Sprachnachricht, ein erinnertes Detail, ein bewusst gewählter Moment. Was heute wirklich etwas bewirkt.',
+      feature2Kicker: 'Erinnerungstresor + Wunsch-Inventar', feature2Title: 'Bewusst erinnert',
+      feature2Desc: 'Halte die kleinen Dinge fest, die nebenbei erwähnt werden. GiveAll bringt sie im richtigen Moment zurück — sich erinnert zu fühlen bedeutet, gesehen zu werden.',
+      feature3Kicker: 'Gesten-Tracker', feature3Title: 'Gottmans Gesten, endlich sichtbar',
+      feature3Desc: 'Jede kleine Verbindungsgeste — ein Kommentar, eine Berührung, ein Witz — wird festgehalten und zugewandt ausgerichtet, sodass deine Gesten-Reaktion etwas wird, das du wirklich wachsen siehst.',
+      feature4Kicker: 'Dynamische Neukalibrierung', feature4Title: 'Die App lernt dazu — und sagt es dir',
+      feature4Desc: 'Statische Quizze geben für immer nur eine Punktzahl. GiveAll überschreibt deine Ausgangswerte mit beobachtetem Verhalten — und informiert dich immer, wenn das passiert.',
+      exampleKicker: 'Dein erster Erfolg — Unaufgeforderte Wertschätzung',
+      exampleQuote: 'Ich liebe es, wie du laut nachdenkst, wenn du etwas löst — du versteckst die unordentlichen Momente nicht.',
+      privacyText: 'Dies ist dein privates Refugium. Deine Daten werden nie verkauft. Der Partnermodus erfordert die ausdrückliche Zustimmung beider Seiten. Du kannst deinen Erinnerungstresor jederzeit löschen.',
+      footerTagline: 'Gib jeden Tag deine ganze Liebe. Großzügig, warm, überfließend.',
+    },
+    pt: {
+      heroHeadline: 'É amor é uma prática diária.',
+      heroLede: '90 segundos por dia para se sentir mais atraente, valorizado(a) e desejado(a) — o GiveAll interpreta seu estilo de apego e sua linguagem do amor, e prescreve uma ação pequena e específica todos os dias.',
+      avwAttractive: 'Atraente', avwValued: 'Valorizado(a)', avwWanted: 'Desejado(a)',
+      formSubmit: 'Obter acesso antecipado',
+      formSuccess: 'Você está na lista — entraremos em contato em breve.',
+      formError: 'Algo deu errado — tente novamente.',
+      feature1Kicker: 'Micro-Sintonia', feature1Title: 'Uma pequena ação, todos os dias',
+      feature1Desc: 'Não é um lembrete genérico — é um gesto específico, adaptado ao seu apego: um áudio, um detalhe lembrado, um momento escolhido. O que realmente faz diferença hoje.',
+      feature2Kicker: 'Cofre de Memórias + Inventário de Desejos', feature2Title: 'Lembrado de propósito',
+      feature2Desc: 'Registre as pequenas coisas que mencionam de passagem. O GiveAll traz isso de volta na hora certa — ser lembrado é se sentir visto.',
+      feature3Kicker: 'Rastreador de Gestos', feature3Title: 'Os gestos de Gottman, finalmente visíveis',
+      feature3Desc: 'Cada pequeno gesto de conexão — um comentário, um toque, uma piada — é registrado e direcionado para a aproximação, para que sua Resposta a Gestos se torne algo que você realmente vê melhorar.',
+      feature4Kicker: 'Recalibração Dinâmica', feature4Title: 'O app aprende, e te conta',
+      feature4Desc: 'Questionários estáticos dão uma única pontuação para sempre. O GiveAll substitui sua linha de base inicial pelo comportamento realmente observado — e sempre avisa quando isso acontece.',
+      exampleKicker: 'Sua Primeira Vitória — Elogio Espontâneo',
+      exampleQuote: 'Eu adoro como você pensa em voz alta quando está resolvendo algo, você não esconde a parte bagunçada.',
+      privacyText: 'Este é o seu santuário privado. Seus dados nunca são vendidos. O modo parceiro(a) exige aceite duplo e explícito. Você pode excluir seu Cofre de Memórias a qualquer momento.',
+      footerTagline: 'Dê todo o seu amor, todos os dias. Generoso, acolhedor, abundante.',
+    },
+    zh: {
+      heroHeadline: '爱是每天的练习。',
+      heroLede: '每天90秒，让你感觉更有魅力、更被珍视、更被渴望——GiveAll 会解读你的依恋类型和爱的语言，然后为你开出一个每天都能做到的具体小行动。',
+      avwAttractive: '有魅力', avwValued: '被珍视', avwWanted: '被渴望',
+      formSubmit: '获取抢先体验',
+      formSuccess: '你已加入等候名单——我们会尽快联系你。',
+      formError: '出了点问题——请再试一次。',
+      feature1Kicker: '微调谐', feature1Title: '每天一个小行动',
+      feature1Desc: '不是泛泛的提醒，而是根据你的依恋类型量身定制的具体举动：一条语音、一段被记住的细节、一个特意选择的时刻。今天真正能带来改变的那件事。',
+      feature2Kicker: '记忆宝库 + 渴望清单', feature2Title: '有意识地被记住',
+      feature2Desc: '记录下对方随口提到的小事。GiveAll 会在合适的时机把它们带回来——被记住，就是被看见。',
+      feature3Kicker: '连接举动追踪', feature3Title: '把 Gottman 的“连接举动”变得看得见',
+      feature3Desc: '每一个微小的连接举动——一句评论、一次触碰、一个玩笑——都会被记录并引导向靠近，让你的举动回应率真正变成一个能被你看见并提升的数字。',
+      feature4Kicker: '动态自我校准', feature4Title: '这个应用会学习，并且告诉你',
+      feature4Desc: '静态测验只给你一个永远不变的分数。GiveAll 会用真实观察到的行为来更新你最初的基线——并且每次调整都会明确告诉你。',
+      exampleKicker: '你的第一个小成就——主动赞美',
+      exampleQuote: '我喜欢你解决问题时把想法说出来的样子——你从不隐藏那些混乱的部分。',
+      privacyText: '这里是你的私人空间。你的数据绝不会被出售。伴侣模式需要双方明确同意才能开启。你可以随时删除你的记忆宝库。',
+      footerTagline: '每天付出你全部的爱。慷慨、温暖、丰盈。',
+    },
+    ja: {
+      heroHeadline: '愛は毎日の習慣です。',
+      heroLede: '1日90秒で、もっと魅力的で、大切にされ、求められていると感じられるように——GiveAllはあなたの愛着スタイルと love language を読み取り、毎日、小さくて具体的な行動をひとつ提案します。',
+      avwAttractive: '魅力的', avwValued: '大切にされる', avwWanted: '求められる',
+      formSubmit: '早期アクセスを申し込む',
+      formSuccess: 'リストに登録されました——追ってご連絡します。',
+      formError: 'エラーが発生しました——もう一度お試しください。',
+      feature1Kicker: 'マイクロ・アチューメント', feature1Title: '毎日、小さな行動をひとつ',
+      feature1Desc: 'ありきたりのリマインダーではなく、あなたの愛着スタイルに合わせた具体的な行動——ボイスメッセージ、思い出した細部、選び抜かれた瞬間。今日、本当に意味のある一つのことを。',
+      feature2Kicker: 'メモリーボールト＋願望リスト', feature2Title: '意図して、覚えておく',
+      feature2Desc: '相手がふと口にした小さなことを記録しましょう。GiveAllが最適なタイミングでそれを思い出させてくれます——覚えていてもらえることは、見てもらえているということ。',
+      feature3Kicker: '働きかけトラッカー', feature3Title: 'ゴットマンの「働きかけ」を見える化',
+      feature3Desc: 'コメント、スキンシップ、冒談——つながりのための小さな働きかけをすべて記録し、受け入れる方向へ導きます。あなたの働きかけへの反応率が、実際に改善を実感できる数字になります。',
+      feature4Kicker: 'ダイナミック・リキャリブレーション', feature4Title: 'アプリが学び、ちゃんと伝えてくれる',
+      feature4Desc: '静的な診断は、一度きりのスコアを永遠に使い続けます。GiveAllは実際に観察された行動でオンボーディング時の基準を上書きし——それが起きたときは必ずお知らせします。',
+      exampleKicker: '最初の小さな成功——自発的な感謝の言葉',
+      exampleQuote: '何かを解決しようとするとき、あなたが考えを声に出すところが好きです。うまくいかない部分も隠さないから。',
+      privacyText: 'ここはあなただけの安心できる場所です。データが売られることは決してありません。パートナーモードには双方の明確な同意が必要です。メモリーボールトはいつでも削除できます。',
+      footerTagline: '毎日、あなたの愛のすべてを。惜しみなく、温かく、豊かに。',
+    },
+  };
+
+  var STORAGE_KEY = 'giveall_marketing_lang';
+
+  function detectLanguage() {
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if (saved && translations[saved]) return saved;
+    } catch (e) { /* localStorage unavailable — fall through to detection */ }
+    var nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    var code = nav.split('-')[0];
+    return translations[code] ? code : 'en';
+  }
+
+  function applyLanguage(lang) {
+    if (!translations[lang]) lang = 'en';
+    document.documentElement.lang = lang;
+    var dict = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key]) el.textContent = dict[key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+    });
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* best-effort */ }
+    window.__currentLang = lang;
+  }
+
+  var switcher = document.getElementById('lang-switcher');
+  SUPPORTED.forEach(function (l) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'lang-btn';
+    btn.setAttribute('data-lang', l.code);
+    btn.textContent = l.native;
+    btn.addEventListener('click', function () { applyLanguage(l.code); });
+    switcher.appendChild(btn);
+  });
+
+  applyLanguage(detectLanguage());
+</script>
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -265,6 +482,9 @@
   const submitBtn = document.getElementById('waitlist-submit');
   const status = document.getElementById('waitlist-status');
 
+  // Translated success/error strings live in the other <script> block's
+  // `translations` object — read via window.__currentLang (set by
+  // applyLanguage()) rather than duplicating the dictionary here.
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = emailInput.value.trim();
@@ -273,18 +493,20 @@
     submitBtn.disabled = true;
     status.textContent = '';
     status.className = 'form-status';
+    const lang = window.__currentLang || 'en';
 
     try {
       await addDoc(collection(db, 'waitlist_signups'), {
         email,
         timestamp: serverTimestamp(),
         source: 'marketing_landing',
+        language: lang,
       });
-      status.textContent = "You're on the list — we'll be in touch.";
+      status.textContent = window.__marketingTranslations ? window.__marketingTranslations[lang].formSuccess : "You're on the list — we'll be in touch.";
       status.className = 'form-status success';
       form.reset();
     } catch (err) {
-      status.textContent = 'Something went wrong — please try again.';
+      status.textContent = window.__marketingTranslations ? window.__marketingTranslations[lang].formError : 'Something went wrong — please try again.';
       status.className = 'form-status error';
     } finally {
       submitBtn.disabled = false;
