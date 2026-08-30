@@ -39,6 +39,12 @@ The two are meant to compose, not compete:
 
 Neither function is deployed yet — `functions/package.json` has the `deploy` script once a Firebase project is provisioned; see `06-firebase-provisioning.md`.
 
+## A third rules bug: userId reassignment via update
+
+Every user-owned collection (`daily_checkins`, `action_logs`, `bids`, `memory_vault`, `curiosity_card_progress`, `desire_inventory`) authorized `update`/`delete` purely by checking the *existing* doc's `userId` against the caller — but nothing stopped an update from also *changing* `userId`. An attacker could create a doc as themselves (passing the `create` check), then update it to `userId: <victim>`, planting fabricated data into another user's own reads — a fake bid, a fake check-in, a fake memory. `action_logs` was the worst case: it feeds `app/checkin.tsx`'s client-side recalibration, so this could manipulate a victim's stored `loveLanguageReceive`. `curiosity_card_progress` was worse still, since its doc id is `"{userId}_{cardId}"` by convention — an attacker could target the *exact* id a victim's own client reads/writes.
+
+Found and fixed the same way as the two `partnerships` bugs above: tested against the deployed rules with two real (anonymous) client sessions, not the Admin SDK. Fixed with a shared `ownedByMeAndUnchanged()` rules function pinning `userId` across every update; verified live that the hijack write now returns `permission-denied` while the app's actual update pattern (partial field updates that never touch `userId`, e.g. `markMemoryVaultEntryUsed`) still succeeds. `recalibration_events` was already safe (no `update` permission at all — append-only by design); `profiles`/`users` ownership is tied to the document id itself, not a mutable field, so they were never exposed to this.
+
 ## Seeding suggested_actions and curiosity_cards
 
 `scripts/seed/suggested_actions.json` and `scripts/seed/curiosity_cards.json` now hold the actual seed content from the handoff (an earlier pass had to invent placeholder content because no real seed JSON had come through yet). `curiosity_cards` ids intentionally match the hardcoded `CARDS` array in `src/engine/curiosityLadder.ts` — edit both if you change one.

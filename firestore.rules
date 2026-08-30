@@ -24,6 +24,22 @@ service cloud.firestore {
       return users[0] == me ? users[1] : users[0];
     }
 
+    // Every user-owned collection below authorizes update/delete purely by
+    // "does the EXISTING doc's userId match me" — but nothing stopped an
+    // update from also changing userId. A user could create a doc as
+    // themselves (passing the create check), then update it to
+    // request.resource.data.userId = <victim>, planting fabricated data
+    // (a fake bid, check-in, memory, action_log — action_logs feed the
+    // recalibration logic in app/checkin.tsx, so this could even manipulate
+    // a victim's stored love language) into another user's own reads.
+    // curiosity_card_progress is worse: its doc id is "{userId}_{cardId}"
+    // by convention, so an attacker could target the exact id the victim's
+    // own client would read/write. Pin userId across every update.
+    function ownedByMeAndUnchanged() {
+      return request.auth.uid == resource.data.userId &&
+        request.resource.data.userId == resource.data.userId;
+    }
+
     // Users can only read/write their own data
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -43,11 +59,13 @@ service cloud.firestore {
     // one to check on create.
     match /daily_checkins/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null && ownedByMeAndUnchanged();
     }
     match /action_logs/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null && ownedByMeAndUnchanged();
     }
     // Append-only audit trail for docs/02-love-os-brain.md #3's "never
     // silently change loveLanguage" rule — see RecalibrationEventDoc in
@@ -59,11 +77,13 @@ service cloud.firestore {
     }
     match /bids/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null && ownedByMeAndUnchanged();
     }
     match /memory_vault/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null && ownedByMeAndUnchanged();
     }
     // CuriosityCardProgressDoc (src/firebase/types.ts) referenced this
     // collection but it had no rules of its own — same class of gap as
@@ -71,14 +91,16 @@ service cloud.firestore {
     // upserts (see markCuriosityCardCompleted in collections.ts).
     match /curiosity_card_progress/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null && ownedByMeAndUnchanged();
     }
     // DesireInventoryDoc (src/firebase/types.ts) — not in the original
     // handoff, no rules existed for this at all despite decisionMatrix.ts's
     // "sought" axis and docs/02-love-os-brain.md #2 depending on it.
     match /desire_inventory/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null && ownedByMeAndUnchanged();
     }
     // Double opt-in partner linking: doc id is "{uidA}_{uidB}" (sorted).
     // Not in the original handoff — added so the "active" status the
