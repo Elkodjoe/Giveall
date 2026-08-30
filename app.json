@@ -14,12 +14,26 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.giveall.app",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.giveall.app"
     },
-    "plugins": ["expo-router"]
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "07c30b9d-f8e3-457a-9f6e-35fa457bc600"
+      }
+    },
+    "owner": "elkodjoe1"
   }
 }

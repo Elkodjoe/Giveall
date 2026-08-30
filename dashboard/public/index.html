@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GiveAll — Dashboard</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #FF6B5B;
+    --primary-dark: #E85A4A;
+    --background: #FFF8F0;
+    --surface: #FFFFFF;
+    --surface-alt: #FFF1E6;
+    --text-primary: #2D2A26;
+    --text-secondary: #8C7E77;
+    --text-inverse: #FFFFFF;
+    --border: #FFE4E1;
+    --success: #3f7a52;
+    --error: #E85A4A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--background);
+    color: var(--text-primary);
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
+  .sub { color: var(--text-secondary); font-size: 14px; margin: 0 0 32px; }
+
+  #gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+  }
+  #gate button {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-inverse);
+    background: var(--primary);
+    border: none;
+    border-radius: 16px;
+    padding: 14px 28px;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  #gate button:hover { background: var(--primary-dark); }
+  #gate .denied { color: var(--error); font-weight: 600; margin-top: 16px; }
+
+  #dashboard { display: none; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .signout { font-size: 13px; color: var(--text-secondary); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: inherit; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(45, 42, 38, 0.06);
+  }
+  .stat-card .value { font-size: 32px; font-weight: 800; }
+  .stat-card .label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 16px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 14px; }
+  .bar-row .bar-label { width: 90px; flex-shrink: 0; text-transform: capitalize; }
+  .bar-track { flex: 1; background: var(--surface-alt); border-radius: 999px; height: 20px; overflow: hidden; }
+  .bar-fill { background: var(--primary); height: 100%; border-radius: 999px; }
+  .bar-value { width: 48px; text-align: right; flex-shrink: 0; color: var(--text-secondary); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 20px; overflow: hidden; box-shadow: 0 8px 24px rgba(45, 42, 38, 0.06); }
+  th, td { text-align: left; padding: 10px 16px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-secondary); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:last-child td { border-bottom: none; }
+
+  #loading { text-align: center; color: var(--text-secondary); padding: 40px; }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div>
+    <h1>GiveAll Dashboard</h1>
+    <p class="sub">Founder-only. Sign in with the account that owns this project.</p>
+  </div>
+  <button id="signin-btn">Sign in with Google</button>
+  <div class="denied" id="denied" style="display:none;">Signed in, but this account isn't authorized for the dashboard.</div>
+</div>
+
+<div id="dashboard">
+  <div class="wrap">
+    <div class="top-row">
+      <div>
+        <h1>GiveAll Dashboard</h1>
+        <p class="sub">Live from <code>giveall-app</code> Firestore. Refresh to update.</p>
+      </div>
+      <button class="signout" id="signout-btn">Sign out</button>
+    </div>
+
+    <div id="loading">Loading…</div>
+
+    <div id="content" style="display:none;">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="value" id="stat-users">—</div><div class="label">Total users</div></div>
+        <div class="stat-card"><div class="value" id="stat-checkins">—</div><div class="label">Check-ins logged</div></div>
+        <div class="stat-card"><div class="value" id="stat-bids">—</div><div class="label">Bids logged</div></div>
+        <div class="stat-card"><div class="value" id="stat-bid-ratio">—</div><div class="label">Bid Response (toward)</div></div>
+        <div class="stat-card"><div class="value" id="stat-recal">—</div><div class="label">Recalibration events</div></div>
+        <div class="stat-card"><div class="value" id="stat-waitlist">—</div><div class="label">Waitlist signups</div></div>
+      </div>
+
+      <div class="section">
+        <h2>Average AVW scores (all check-ins, 1–10 scale)</h2>
+        <div id="avw-bars"></div>
+      </div>
+
+      <div class="section">
+        <h2>Recent waitlist signups</h2>
+        <table>
+          <thead><tr><th>Email</th><th>Source</th><th>When</th></tr></thead>
+          <tbody id="waitlist-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import {
+    getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import {
+    getFirestore, collection, getDocs, query, orderBy, limit,
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const ADMIN_EMAIL = 'emmakodjoe1@gmail.com';
+
+  const firebaseConfig = {
+    apiKey: 'AIzaSyBFc_usSkJX13RSzSHQ4vFlZvuoK5elNEA',
+    authDomain: 'giveall-app.firebaseapp.com',
+    projectId: 'giveall-app',
+    storageBucket: 'giveall-app.firebasestorage.app',
+    messagingSenderId: '196407114507',
+    appId: '1:196407114507:web:5eb0fa94c91ffa6211400e',
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const gate = document.getElementById('gate');
+  const dashboard = document.getElementById('dashboard');
+  const deniedMsg = document.getElementById('denied');
+
+  document.getElementById('signin-btn').addEventListener('click', () => {
+    signInWithPopup(auth, new GoogleAuthProvider()).catch((e) => {
+      deniedMsg.textContent = 'Sign-in failed: ' + e.message;
+      deniedMsg.style.display = 'block';
+    });
+  });
+  document.getElementById('signout-btn').addEventListener('click', () => signOut(auth));
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      gate.style.display = 'flex';
+      dashboard.style.display = 'none';
+      return;
+    }
+    if (user.email !== ADMIN_EMAIL) {
+      deniedMsg.style.display = 'block';
+      gate.style.display = 'flex';
+      dashboard.style.display = 'none';
+      return;
+    }
+    gate.style.display = 'none';
+    dashboard.style.display = 'block';
+    await loadStats();
+  });
+
+  async function loadStats() {
+    const loading = document.getElementById('loading');
+    const content = document.getElementById('content');
+    try {
+      const [usersSnap, checkinsSnap, bidsSnap, recalSnap, waitlistSnap] = await Promise.all([
+        getDocs(collection(db, 'users')),
+        getDocs(collection(db, 'daily_checkins')),
+        getDocs(collection(db, 'bids')),
+        getDocs(collection(db, 'recalibration_events')),
+        getDocs(query(collection(db, 'waitlist_signups'), orderBy('timestamp', 'desc'), limit(50))),
+      ]);
+
+      document.getElementById('stat-users').textContent = usersSnap.size;
+      document.getElementById('stat-checkins').textContent = checkinsSnap.size;
+      document.getElementById('stat-bids').textContent = bidsSnap.size;
+      document.getElementById('stat-recal').textContent = recalSnap.size;
+      document.getElementById('stat-waitlist').textContent = waitlistSnap.size;
+
+      // Bid Response ratio (toward / total)
+      let toward = 0;
+      bidsSnap.forEach((d) => { if (d.data().response === 'toward') toward++; });
+      const bidRatio = bidsSnap.size > 0 ? Math.round((toward / bidsSnap.size) * 100) : 0;
+      document.getElementById('stat-bid-ratio').textContent = bidsSnap.size > 0 ? bidRatio + '%' : '—';
+
+      // Average AVW scores across all check-ins
+      const sums = { seen_score: 0, safe_score: 0, sought_score: 0, moodScore: 0 };
+      checkinsSnap.forEach((d) => {
+        const c = d.data();
+        sums.seen_score += c.seen_score || 0;
+        sums.safe_score += c.safe_score || 0;
+        sums.sought_score += c.sought_score || 0;
+        sums.moodScore += c.moodScore || 0;
+      });
+      const n = checkinsSnap.size || 1;
+      const avwBars = document.getElementById('avw-bars');
+      const labels = { seen_score: 'Seen', safe_score: 'Safe', sought_score: 'Sought', moodScore: 'Mood' };
+      avwBars.innerHTML = Object.entries(labels).map(([key, label]) => {
+        const avg = checkinsSnap.size > 0 ? (sums[key] / n) : 0;
+        const pct = (avg / 10) * 100;
+        return `<div class="bar-row">
+          <div class="bar-label">${label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <div class="bar-value">${checkinsSnap.size > 0 ? avg.toFixed(1) : '—'}</div>
+        </div>`;
+      }).join('');
+
+      // Recent waitlist signups table
+      const rows = document.getElementById('waitlist-rows');
+      if (waitlistSnap.empty) {
+        rows.innerHTML = '<tr><td colspan="3" style="color:#8C7E77;">No signups yet.</td></tr>';
+      } else {
+        rows.innerHTML = waitlistSnap.docs.map((d) => {
+          const w = d.data();
+          const when = w.timestamp?.toDate ? w.timestamp.toDate().toLocaleString() : '—';
+          return `<tr><td>${escapeHtml(w.email || '—')}</td><td>${escapeHtml(w.source || '—')}</td><td>${when}</td></tr>`;
+        }).join('');
+      }
+
+      loading.style.display = 'none';
+      content.style.display = 'block';
+    } catch (e) {
+      loading.textContent = 'Failed to load: ' + e.message;
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+</script>
+
+</body>
+</html>

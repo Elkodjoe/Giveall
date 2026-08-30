@@ -9,5 +9,17 @@
       "codebase": "default",
       "ignore": ["node_modules", ".git", "lib"]
     }
+  ],
+  "hosting": [
+    {
+      "target": "marketing",
+      "public": "marketing/public",
+      "ignore": ["firebase.json", "**/.*"]
+    },
+    {
+      "target": "dashboard",
+      "public": "dashboard/public",
+      "ignore": ["firebase.json", "**/.*"]
+    }
   ]
 }

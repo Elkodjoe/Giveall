@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GiveAll — Love is a daily practice.</title>
+<meta name="description" content="GiveAll is a 90-second daily fitness app for your relationship — it reads your Attachment style and Love Language, then prescribes one small, specific action a day to help you feel (and make someone feel) Attractive, Valued, and Wanted." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #FF6B5B;
+    --primary-dark: #E85A4A;
+    --secondary: #FFC857;
+    --background: #FFF8F0;
+    --surface: #FFFFFF;
+    --surface-alt: #FFF1E6;
+    --text-primary: #2D2A26;
+    --text-secondary: #8C7E77;
+    --text-inverse: #FFFFFF;
+    --border: #FFE4E1;
+    --sage: #A8D8B9;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--background);
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+  a { color: var(--primary); }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+  nav.top { padding: 24px 0; }
+  nav.top .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+  .logo span { color: var(--primary); }
+
+  .hero { padding: 48px 0 40px; text-align: center; }
+  .hero h1 {
+    font-size: clamp(36px, 7vw, 56px);
+    font-weight: 800;
+    line-height: 1.08;
+    margin: 0 0 16px;
+    letter-spacing: -0.02em;
+  }
+  .hero p.lede {
+    font-size: 19px;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto 32px;
+  }
+  .avw-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+  .avw-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .cta-form {
+    max-width: 420px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .cta-form input[type=email] {
+    flex: 1 1 220px;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+  .cta-form input[type=email]::placeholder { color: var(--text-secondary); }
+  .cta-form button {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-inverse);
+    background: var(--primary);
+    border: none;
+    border-radius: 16px;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .cta-form button:hover { background: var(--primary-dark); }
+  .cta-form button:disabled { opacity: 0.6; cursor: default; }
+  .form-status { margin-top: 12px; font-size: 14px; color: var(--text-secondary); min-height: 20px; }
+  .form-status.success { color: #3f7a52; font-weight: 600; }
+  .form-status.error { color: var(--primary-dark); }
+
+  section.features { padding: 40px 0; }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .feature-card {
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(45, 42, 38, 0.06);
+  }
+  .feature-card .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+  .feature-card h3 { margin: 0 0 8px; font-size: 18px; }
+  .feature-card p { margin: 0; color: var(--text-secondary); font-size: 15px; }
+
+  section.example {
+    padding: 40px 0;
+  }
+  .example-card {
+    background: var(--surface-alt);
+    border-radius: 24px;
+    padding: 28px;
+    text-align: center;
+  }
+  .example-card .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+  .example-card .quote {
+    font-size: 22px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  section.privacy { padding: 24px 0 56px; }
+  .privacy-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px 28px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  footer { padding: 32px 0 48px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+  footer a { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="wrap">
+    <div class="logo">Give<span>All</span></div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Love is a daily practice.</h1>
+    <p class="lede">90 seconds a day to feel more Attractive, Valued, and Wanted — GiveAll reads your Attachment style and Love Language, then prescribes one small, specific action a day.</p>
+
+    <div class="avw-row">
+      <span class="avw-pill">Attractive</span>
+      <span class="avw-pill">Valued</span>
+      <span class="avw-pill">Wanted</span>
+    </div>
+
+    <form class="cta-form" id="waitlist-form">
+      <input type="email" id="waitlist-email" placeholder="you@example.com" required autocomplete="email" />
+      <button type="submit" id="waitlist-submit">Get early access</button>
+    </form>
+    <div class="form-status" id="waitlist-status"></div>
+  </div>
+</header>
+
+<section class="features">
+  <div class="wrap">
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="kicker">Micro-Attunement</div>
+        <h3>One small action, every day</h3>
+        <p>Not a generic reminder — a specific, attachment-tailored move: a voice note, a recalled detail, a chosen moment. Whatever moves the needle for you today.</p>
+      </div>
+      <div class="feature-card">
+        <div class="kicker">Memory Vault + Desire Inventory</div>
+        <h3>Remembered on purpose</h3>
+        <p>Log the small things they mention in passing. GiveAll brings them back at the right moment — being remembered is how people feel seen.</p>
+      </div>
+      <div class="feature-card">
+        <div class="kicker">Bid Tracker</div>
+        <h3>Gottman's bids, made visible</h3>
+        <p>Every small bid for connection — a comment, a touch, a joke — logged and turned toward, so your Bid Response Ratio becomes something you can actually see improve.</p>
+      </div>
+      <div class="feature-card">
+        <div class="kicker">Dynamic Recalibration</div>
+        <h3>The app learns, and says so</h3>
+        <p>Static quizzes give one score forever. GiveAll overwrites your onboarding baseline with observed behavior — and always tells you when it happens.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="example">
+  <div class="wrap">
+    <div class="example-card">
+      <div class="kicker">Your First Win — Unsolicited Appreciation</div>
+      <div class="quote">"I love how you think out loud when you're solving something — you don't hide the messy part."</div>
+    </div>
+  </div>
+</section>
+
+<section class="privacy">
+  <div class="wrap">
+    <div class="privacy-card">
+      This is your private sanctuary. No data is ever sold. Partner mode requires explicit double opt-in. You can delete your Memory Vault anytime.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Give All of your love, daily. Generous, warm, abundant.
+  </div>
+</footer>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  // Same public Firebase Web App config already embedded in the mobile
+  // app's bundle (see .env.example / docs/06-firebase-provisioning.md) —
+  // not a secret, safe to ship in a static page.
+  const firebaseConfig = {
+    apiKey: 'AIzaSyBFc_usSkJX13RSzSHQ4vFlZvuoK5elNEA',
+    authDomain: 'giveall-app.firebaseapp.com',
+    projectId: 'giveall-app',
+    storageBucket: 'giveall-app.firebasestorage.app',
+    messagingSenderId: '196407114507',
+    appId: '1:196407114507:web:5eb0fa94c91ffa6211400e',
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById('waitlist-form');
+  const emailInput = document.getElementById('waitlist-email');
+  const submitBtn = document.getElementById('waitlist-submit');
+  const status = document.getElementById('waitlist-status');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    if (!email) return;
+
+    submitBtn.disabled = true;
+    status.textContent = '';
+    status.className = 'form-status';
+
+    try {
+      await addDoc(collection(db, 'waitlist_signups'), {
+        email,
+        timestamp: serverTimestamp(),
+        source: 'marketing_landing',
+      });
+      status.textContent = "You're on the list — we'll be in touch.";
+      status.className = 'form-status success';
+      form.reset();
+    } catch (err) {
+      status.textContent = 'Something went wrong — please try again.';
+      status.className = 'form-status error';
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>

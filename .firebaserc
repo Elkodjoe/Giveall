@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "giveall-app"
+  },
+  "targets": {
+    "giveall-app": {
+      "hosting": {
+        "marketing": [
+          "giveall-love"
+        ],
+        "dashboard": [
+          "giveall-dashboard"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
