@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
+import * as Clipboard from 'expo-clipboard';
 import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { getPartnership, requestPartnership, optInToPartnership } from '../src/firebase/collections';
@@ -21,6 +22,14 @@ export default function PartnerScreen() {
   const [partnership, setPartnership] = useState<PartnershipDoc | null>(null);
   const [linkedPartnerId, setLinkedPartnerId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyCode = async () => {
+    if (!uid) return;
+    await Clipboard.setStringAsync(uid);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const load = useCallback(() => {
     if (!isFirebaseConfigured || !uid || !linkedPartnerId) return;
@@ -71,6 +80,9 @@ export default function PartnerScreen() {
           <Text selectable style={styles.codeValue}>
             {uid ?? '—'}
           </Text>
+          <Pressable style={styles.copyButton} onPress={copyCode} disabled={!uid}>
+            <Text style={styles.copyButtonLabel}>{copied ? 'Copied ✓' : 'Copy code'}</Text>
+          </Pressable>
           <Text style={styles.codeHint}>Share this with your partner so they can enter it below.</Text>
         </View>
 
@@ -95,10 +107,7 @@ export default function PartnerScreen() {
             {partnership.status === 'active' ? (
               <Text style={styles.statusActive}>Connected ✓</Text>
             ) : bothOptedIn ? (
-              <Text style={styles.statusPending}>
-                Both opted in — waiting on nightly server sync to activate. (Cloud Functions aren't deployed yet;
-                see docs/06-firebase-provisioning.md.)
-              </Text>
+              <Text style={styles.statusPending}>You're both in — just finishing the connection. Check back soon.</Text>
             ) : (
               <Text style={styles.statusPending}>Pending — waiting for your partner to enter your code too.</Text>
             )}
@@ -130,6 +139,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   codeValue: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 14, marginBottom: 8 },
+  copyButton: { alignSelf: 'flex-start', marginBottom: 8 },
+  copyButtonLabel: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 13 },
   codeHint: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13 },
   input: {
     fontFamily: fontFamily.regular,

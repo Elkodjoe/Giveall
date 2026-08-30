@@ -280,9 +280,6 @@ export default function CheckinScreen() {
             <Text style={styles.actionLabel}>Today's Micro-Action</Text>
             <Text style={styles.actionStrategy}>{action.strategy}</Text>
             <Text style={styles.actionText}>{displayedActionText}</Text>
-            <Text style={styles.actionMeta}>
-              Axis: {action.axis} · Tone: {action.tone}
-            </Text>
 
             {landedReport === null ? (
               <View style={styles.landedRow}>
@@ -372,7 +369,6 @@ const styles = StyleSheet.create({
   },
   actionStrategy: { fontFamily: fontFamily.bold, color: colors.textPrimary, fontSize: 18, marginBottom: 8 },
   actionText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 16, lineHeight: 24, marginBottom: 12 },
-  actionMeta: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13 },
   landedRow: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.border },
   landedPrompt: { fontFamily: fontFamily.semiBold, color: colors.textPrimary, fontSize: 14, marginBottom: 8 },
   landedButtons: { flexDirection: 'row', justifyContent: 'space-between' },

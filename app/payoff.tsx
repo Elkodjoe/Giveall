@@ -111,10 +111,12 @@ export default function PayoffScreen() {
       <ProgressBar step={4} total={4} />
       <Text style={styles.summary}>{summary}</Text>
 
-      <View style={styles.winCard}>
-        <Text style={styles.winLabel}>Your First Win</Text>
-        <Text style={styles.winSubLabel}>Your Unsolicited Appreciation</Text>
-        <Text style={styles.winText}>"{firstWin}"</Text>
+      <View style={styles.winCardWrapper}>
+        <View style={styles.winCard}>
+          <Text style={styles.winLabel}>Your First Win</Text>
+          <Text style={styles.winSubLabel}>Your Unsolicited Appreciation</Text>
+          <Text style={styles.winText}>"{firstWin}"</Text>
+        </View>
       </View>
 
       <View style={styles.ctaRow}>
@@ -132,11 +134,15 @@ export default function PayoffScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, padding: 24 },
   summary: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 18, lineHeight: 26, marginBottom: 24 },
+  // Sized to content, not flex:1 — previously stretched to fill all
+  // remaining screen height, leaving a large dead-looking empty gap below
+  // the appreciation text on the "Aha moment" screen. winCardWrapper below
+  // centers it in the space between the summary and the CTA row instead.
+  winCardWrapper: { flex: 1, justifyContent: 'center' },
   winCard: {
     backgroundColor: colors.surfaceAlt,
     borderRadius: card.radius,
     padding: 24,
-    flex: 1,
     ...card.shadow,
   },
   winLabel: {
