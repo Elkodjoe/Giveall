@@ -17,7 +17,8 @@
         "UIBackgroundModes": [
           "remote-notification"
         ],
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleLocalizations": ["en", "es", "fr", "de", "pt", "zh-Hans", "ja"]
       }
     },
     "android": {
