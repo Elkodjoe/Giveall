@@ -1,6 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // partnerships doc ids are the two participant uids, lexicographically
+    // sorted and joined with '_' (see partnershipId() in
+    // src/firebase/collections.ts) — never "reader first". A rule that
+    // builds the id as request.auth.uid + '_' + userId (unsorted) only
+    // finds the doc when the reader's uid happens to sort first, silently
+    // failing partner-read for the other ~50% of uid pairings. Compute the
+    // sorted id here so every caller matches the actual storage convention.
+    function partnershipDocId(a, b) {
+      return a < b ? a + '_' + b : b + '_' + a;
+    }
+
+    // Only "me" (whichever of the two participants is request.auth.uid) may
+    // change my own optIns entry; the other participant's entry must stay
+    // exactly what it already was. Without this, either party could write
+    // BOTH keys of optIns to true in one update/create — spoofing the
+    // partner's consent and defeating "double opt-in" entirely (the exact
+    // trust promise app/settings.tsx's privacy copy makes). Confirmed this
+    // was previously unenforced: affectedKeys().hasOnly(['optIns']) only
+    // restricts which top-level field changes, not which map key inside it.
+    function otherPartner(users, me) {
+      return users[0] == me ? users[1] : users[0];
+    }
+
     // Users can only read/write their own data
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -9,7 +32,7 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
       // Partner can read only after double opt-in
       allow read: if request.auth != null &&
-        get(/databases/$(database)/documents/partnerships/$(request.auth.uid + '_' + userId)).data.status == 'active';
+        get(/databases/$(database)/documents/partnerships/$(partnershipDocId(request.auth.uid, userId))).data.status == 'active';
     }
     // NOTE on the create/read-update-delete split below: `resource.data` is
     // the *existing* document's state — on a create there is no existing
@@ -73,13 +96,19 @@ service cloud.firestore {
       // live via a two-browser-context test on 2026-08-28.
       allow read: if request.auth != null &&
         (resource == null || request.auth.uid in resource.data.users);
+      // The creator's own optIn may start true (requesting = auto opt-in),
+      // but the other participant's must start false — otherwise the
+      // creator could fabricate a fully-consented partnership in one write.
       allow create: if request.auth != null &&
         request.auth.uid in request.resource.data.users &&
-        request.resource.data.status == 'pending';
+        request.resource.data.status == 'pending' &&
+        request.resource.data.optIns[otherPartner(request.resource.data.users, request.auth.uid)] == false;
       allow update: if request.auth != null &&
         request.auth.uid in resource.data.users &&
         request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['optIns']);
+          .hasOnly(['optIns']) &&
+        request.resource.data.optIns[otherPartner(resource.data.users, request.auth.uid)] ==
+          resource.data.optIns[otherPartner(resource.data.users, request.auth.uid)];
     }
     // Public read-only collections
     match /suggested_actions/{docId} {
