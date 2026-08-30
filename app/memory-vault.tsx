@@ -96,11 +96,18 @@ export default function MemoryVaultScreen() {
           value={content}
           onChangeText={setContent}
           multiline
+          accessibilityLabel={t('memoryVault.placeholder')}
         />
 
         <View style={styles.chipRow}>
           {TYPES.map((mvType) => (
-            <Pressable key={mvType} style={[styles.chip, type === mvType && styles.chipSelected]} onPress={() => setType(mvType)}>
+            <Pressable
+              key={mvType}
+              style={[styles.chip, type === mvType && styles.chipSelected]}
+              onPress={() => setType(mvType)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: type === mvType }}
+            >
               <Text style={[styles.chipText, type === mvType && styles.chipTextSelected]}>{t(`memoryVault.types.${mvType}`)}</Text>
             </Pressable>
           ))}
@@ -111,13 +118,15 @@ export default function MemoryVaultScreen() {
               key={s}
               style={[styles.chip, sentiment === s && styles.chipSelected]}
               onPress={() => setSentiment(s)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: sentiment === s }}
             >
               <Text style={[styles.chipText, sentiment === s && styles.chipTextSelected]}>{t(`memoryVault.sentiments.${s}`)}</Text>
             </Pressable>
           ))}
         </View>
 
-        <Pressable style={styles.cta} onPress={addEntry}>
+        <Pressable style={styles.cta} onPress={addEntry} accessibilityRole="button">
           <Text style={styles.ctaLabel}>{t('memoryVault.save')}</Text>
         </Pressable>
 
@@ -134,7 +143,7 @@ export default function MemoryVaultScreen() {
                   {e.usedInGeneration && <Text style={styles.entryUsed}>{t('memoryVault.used')}</Text>}
                 </View>
                 <Text style={styles.entryContent}>{e.content}</Text>
-                <Pressable onPress={() => removeEntry(e.id)}>
+                <Pressable onPress={() => removeEntry(e.id)} accessibilityRole="button">
                   <Text style={styles.deleteLink}>{t('memoryVault.delete')}</Text>
                 </Pressable>
               </View>

@@ -87,9 +87,10 @@ export default function DesireInventoryScreen() {
           placeholderTextColor={colors.textSecondary}
           value={desire}
           onChangeText={setDesire}
+          accessibilityLabel={t('desireInventory.placeholder')}
         />
 
-        <Pressable style={styles.cta} onPress={addEntry}>
+        <Pressable style={styles.cta} onPress={addEntry} accessibilityRole="button">
           <Text style={styles.ctaLabel}>{t('desireInventory.add')}</Text>
         </Pressable>
 
@@ -106,7 +107,7 @@ export default function DesireInventoryScreen() {
                   {e.used && <Text style={styles.entryUsed}>{t('desireInventory.used')}</Text>}
                 </View>
                 <Text style={styles.entryContent}>{e.desire}</Text>
-                <Pressable onPress={() => removeEntry(e.id)}>
+                <Pressable onPress={() => removeEntry(e.id)} accessibilityRole="button">
                   <Text style={styles.deleteLink}>{t('desireInventory.delete')}</Text>
                 </Pressable>
               </View>

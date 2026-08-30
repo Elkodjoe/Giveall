@@ -16,7 +16,7 @@ export default function PromiseScreen() {
         <Text style={styles.headline}>{t('promise.headline')}</Text>
         <Text style={styles.sub}>{t('promise.sub')}</Text>
       </View>
-      <Pressable style={styles.cta} onPress={() => router.push('/who-for')}>
+      <Pressable style={styles.cta} onPress={() => router.push('/who-for')} accessibilityRole="button">
         <Text style={styles.ctaLabel}>{t('promise.cta')}</Text>
       </Pressable>
     </SafeAreaView>

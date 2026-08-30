@@ -106,7 +106,7 @@ export default function CuriosityScreen() {
         )}
 
         {currentCard && !justCompleted && (
-          <Pressable style={styles.cta} onPress={markDone}>
+          <Pressable style={styles.cta} onPress={markDone} accessibilityRole="button">
             <Text style={styles.ctaLabel}>{t('curiosity.weTalkedAboutThis')}</Text>
           </Pressable>
         )}

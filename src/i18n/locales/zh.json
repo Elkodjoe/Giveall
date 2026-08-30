@@ -153,7 +153,14 @@
       "specificDesireWithEntry": "对方说过\"{{desire}}\"会让TA感到被渴望。今天就去做。",
       "specificDesireGeneric": "今天做一件小而具体的事，表明你是有意选择了对方。"
     },
-    "genericSaveError": "无法保存签到。"
+    "genericSaveError": "无法保存签到。",
+    "reactionLabels": {
+      "0": "一般",
+      "1": "效果不错",
+      "2": "效果非常好",
+      "-2": "完全没有效果",
+      "-1": "效果不太好"
+    }
   },
   "bids": {
     "headline": "连接举动追踪",

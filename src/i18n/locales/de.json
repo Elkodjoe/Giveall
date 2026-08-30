@@ -153,7 +153,14 @@
       "specificDesireWithEntry": "\"{{desire}}\" lässt die Person sich begehrt fühlen, wurde gesagt. Mach das heute.",
       "specificDesireGeneric": "Tu heute eine kleine, konkrete Sache, die zeigt, dass du die Person bewusst gewählt hast."
     },
-    "genericSaveError": "Der Check-in konnte nicht gespeichert werden."
+    "genericSaveError": "Der Check-in konnte nicht gespeichert werden.",
+    "reactionLabels": {
+      "0": "Neutral",
+      "1": "Kam gut an",
+      "2": "Kam perfekt an",
+      "-2": "Kam überhaupt nicht gut an",
+      "-1": "Kam nicht so gut an"
+    }
   },
   "bids": {
     "headline": "Gesten-Tracker",

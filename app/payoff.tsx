@@ -128,10 +128,10 @@ export default function PayoffScreen() {
       </View>
 
       <View style={styles.ctaRow}>
-        <Pressable style={styles.ctaSecondary} onPress={handleSave}>
+        <Pressable style={styles.ctaSecondary} onPress={handleSave} accessibilityRole="button">
           <Text style={styles.ctaSecondaryLabel}>{t('payoff.saveIt')}</Text>
         </Pressable>
-        <Pressable style={styles.ctaPrimary} onPress={handleSend}>
+        <Pressable style={styles.ctaPrimary} onPress={handleSend} accessibilityRole="button">
           <Text style={styles.ctaPrimaryLabel}>{t('payoff.sendIt')}</Text>
         </Pressable>
       </View>

@@ -92,6 +92,8 @@ export default function RitualTimeScreen() {
             key={time}
             style={[styles.option, selected === time && styles.optionSelected]}
             onPress={() => choose(time)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: selected === time }}
           >
             <Text style={[styles.optionLabel, selected === time && styles.optionLabelSelected]}>
               {t(`ritualTime.options.${TIME_OPTION_KEYS[time]}`)}

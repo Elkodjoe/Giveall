@@ -102,6 +102,8 @@ export default function SettingsScreen() {
                 key={lang.code}
                 style={[styles.languageChip, i18n.language === lang.code && styles.languageChipSelected]}
                 onPress={() => setLanguage(lang.code as LanguageCode)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: i18n.language === lang.code }}
               >
                 <Text
                   style={[
@@ -116,20 +118,24 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <Pressable style={styles.link} onPress={() => router.push('/memory-vault')}>
+        <Pressable style={styles.link} onPress={() => router.push('/memory-vault')} accessibilityRole="link">
           <Text style={styles.linkText}>{t('settings.manageMemoryVault')}</Text>
         </Pressable>
-        <Pressable style={styles.link} onPress={() => router.push('/partner')}>
+        <Pressable style={styles.link} onPress={() => router.push('/partner')} accessibilityRole="link">
           <Text style={styles.linkText}>{t('settings.partnerMode')}</Text>
         </Pressable>
 
-        <Pressable style={[styles.dangerButton, confirming && styles.dangerButtonConfirming]} onPress={confirmDelete}>
+        <Pressable
+          style={[styles.dangerButton, confirming && styles.dangerButtonConfirming]}
+          onPress={confirmDelete}
+          accessibilityRole="button"
+        >
           <Text style={[styles.dangerButtonLabel, confirming && styles.dangerButtonLabelConfirming]}>
             {confirming ? t('settings.tapAgainToConfirm') : t('settings.deleteMemoryVault')}
           </Text>
         </Pressable>
         {confirming && (
-          <Pressable onPress={() => setConfirming(false)}>
+          <Pressable onPress={() => setConfirming(false)} accessibilityRole="button">
             <Text style={styles.cancelLink}>{t('settings.cancel')}</Text>
           </Pressable>
         )}

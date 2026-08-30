@@ -153,7 +153,14 @@
       "specificDesireWithEntry": "Dijo que \"{{desire}}\" le hace sentir deseado/a. Hazlo hoy.",
       "specificDesireGeneric": "Haz una cosa pequeña y específica que muestre que lo/la elegiste a propósito hoy."
     },
-    "genericSaveError": "No se pudo guardar el check-in."
+    "genericSaveError": "No se pudo guardar el check-in.",
+    "reactionLabels": {
+      "0": "Neutral",
+      "1": "Cayó bien",
+      "2": "Cayó perfectamente",
+      "-2": "No cayó bien en absoluto",
+      "-1": "No cayó del todo bien"
+    }
   },
   "bids": {
     "headline": "Rastreador de Gestos",

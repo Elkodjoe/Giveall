@@ -82,7 +82,7 @@ export default function PartnerScreen() {
           <Text selectable style={styles.codeValue}>
             {uid ?? '—'}
           </Text>
-          <Pressable style={styles.copyButton} onPress={copyCode} disabled={!uid}>
+          <Pressable style={styles.copyButton} onPress={copyCode} disabled={!uid} accessibilityRole="button">
             <Text style={styles.copyButtonLabel}>{copied ? t('partner.copied') : t('partner.copyCode')}</Text>
           </Pressable>
           <Text style={styles.codeHint}>{t('partner.shareHint')}</Text>
@@ -95,9 +95,10 @@ export default function PartnerScreen() {
           value={partnerCode}
           onChangeText={setPartnerCode}
           autoCapitalize="none"
+          accessibilityLabel={t('partner.placeholder')}
         />
 
-        <Pressable style={styles.cta} onPress={connect}>
+        <Pressable style={styles.cta} onPress={connect} accessibilityRole="button">
           <Text style={styles.ctaLabel}>{t('partner.connect')}</Text>
         </Pressable>
 

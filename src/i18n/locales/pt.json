@@ -153,7 +153,14 @@
       "specificDesireWithEntry": "Disseram que \"{{desire}}\" faz a pessoa se sentir desejada. Faça isso hoje.",
       "specificDesireGeneric": "Faça uma coisa pequena e específica que mostre que você escolheu a pessoa de propósito hoje."
     },
-    "genericSaveError": "Não foi possível salvar o check-in."
+    "genericSaveError": "Não foi possível salvar o check-in.",
+    "reactionLabels": {
+      "0": "Neutro",
+      "1": "Caiu bem",
+      "2": "Caiu perfeitamente",
+      "-2": "Não caiu bem de jeito nenhum",
+      "-1": "Não caiu muito bem"
+    }
   },
   "bids": {
     "headline": "Rastreador de Gestos",

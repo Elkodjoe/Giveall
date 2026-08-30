@@ -153,7 +153,14 @@
       "specificDesireWithEntry": "Iel a dit que \"{{desire}}\" le/la fait se sentir désiré(e). Faites-le aujourd'hui.",
       "specificDesireGeneric": "Faites une petite chose spécifique qui montre que vous l'avez choisi(e) exprès aujourd'hui."
     },
-    "genericSaveError": "Impossible d'enregistrer le check-in."
+    "genericSaveError": "Impossible d'enregistrer le check-in.",
+    "reactionLabels": {
+      "0": "Neutre",
+      "1": "A été bien reçu",
+      "2": "A été parfaitement reçu",
+      "-2": "N'a pas du tout été bien reçu",
+      "-1": "N'a pas vraiment été bien reçu"
+    }
   },
   "bids": {
     "headline": "Suivi des Gestes",

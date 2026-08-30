@@ -153,7 +153,14 @@
       "specificDesireWithEntry": "They said \"{{desire}}\" makes them feel wanted. Do that today.",
       "specificDesireGeneric": "Do one small, specific thing that shows you chose them on purpose today."
     },
-    "genericSaveError": "Could not save check-in."
+    "genericSaveError": "Could not save check-in.",
+    "reactionLabels": {
+      "0": "Neutral",
+      "1": "Landed well",
+      "2": "Landed perfectly",
+      "-2": "Didn't land at all",
+      "-1": "Didn't quite land"
+    }
   },
   "bids": {
     "headline": "Bid Tracker",

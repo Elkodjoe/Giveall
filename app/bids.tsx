@@ -94,6 +94,7 @@ export default function BidsScreen() {
           placeholderTextColor={colors.textSecondary}
           value={description}
           onChangeText={setDescription}
+          accessibilityLabel={t('bids.placeholder')}
         />
 
         <View style={styles.chipRow}>
@@ -102,6 +103,8 @@ export default function BidsScreen() {
               key={bt}
               style={[styles.chip, bidType === bt && styles.chipSelected]}
               onPress={() => setBidType(bt)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: bidType === bt }}
             >
               <Text style={[styles.chipText, bidType === bt && styles.chipTextSelected]}>{t(`bids.types.${bt}`)}</Text>
             </Pressable>
@@ -115,6 +118,7 @@ export default function BidsScreen() {
               key={r}
               style={[styles.responseButton, styles[`response_${r}`]]}
               onPress={() => logBid(r)}
+              accessibilityRole="button"
             >
               <Text style={styles.responseLabel}>{t(`bids.responses.${r}`)}</Text>
             </Pressable>
@@ -149,7 +153,7 @@ export default function BidsScreen() {
 
         {saveError && <Text style={styles.errorText}>{t('bids.saveError', { error: saveError })}</Text>}
 
-        <Pressable style={styles.link} onPress={() => router.push('/curiosity')}>
+        <Pressable style={styles.link} onPress={() => router.push('/curiosity')} accessibilityRole="link">
           <Text style={styles.linkText}>{t('bids.curiosityLink')}</Text>
         </Pressable>
       </ScrollView>

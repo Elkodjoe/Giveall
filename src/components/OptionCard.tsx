@@ -10,7 +10,11 @@ export function OptionCard({ label, onPress }: { label: string; onPress: () => v
   };
 
   return (
-    <Pressable style={({ pressed }) => [styles.card, pressed && styles.pressed]} onPress={handlePress}>
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      onPress={handlePress}
+      accessibilityRole="button"
+    >
       <Text style={styles.label}>{label}</Text>
     </Pressable>
   );

@@ -277,6 +277,8 @@ export default function CheckinScreen() {
               key={m}
               style={[styles.moodChip, moodLabel === m && styles.moodChipSelected]}
               onPress={() => setMoodLabel(m)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: moodLabel === m }}
             >
               <Text style={[styles.moodChipText, moodLabel === m && styles.moodChipTextSelected]}>
                 {t(`checkin.moodLabels.${m}`)}
@@ -285,7 +287,7 @@ export default function CheckinScreen() {
           ))}
         </View>
 
-        <Pressable style={styles.cta} onPress={handleSeeAction}>
+        <Pressable style={styles.cta} onPress={handleSeeAction} accessibilityRole="button">
           <Text style={styles.ctaLabel}>{t('checkin.seeAction')}</Text>
         </Pressable>
 
@@ -300,8 +302,14 @@ export default function CheckinScreen() {
                 <Text style={styles.landedPrompt}>{t('checkin.didThisLand')}</Text>
                 <View style={styles.landedButtons}>
                   {([-2, -1, 0, 1, 2] as const).map((delta) => (
-                    <Pressable key={delta} style={styles.landedButton} onPress={() => handleLandedReport(delta)}>
-                      <Text style={styles.landedButtonText}>
+                    <Pressable
+                      key={delta}
+                      style={styles.landedButton}
+                      onPress={() => handleLandedReport(delta)}
+                      accessibilityRole="button"
+                      accessibilityLabel={t(`checkin.reactionLabels.${delta}`)}
+                    >
+                      <Text style={styles.landedButtonText} accessibilityElementsHidden importantForAccessibility="no">
                         {['😞', '🙁', '😐', '🙂', '😍'][delta + 2]}
                       </Text>
                     </Pressable>
@@ -322,16 +330,16 @@ export default function CheckinScreen() {
 
         {saveError && <Text style={styles.errorText}>{t('checkin.saveError', { error: saveError })}</Text>}
 
-        <Pressable style={styles.link} onPress={() => router.push('/bids')}>
+        <Pressable style={styles.link} onPress={() => router.push('/bids')} accessibilityRole="link">
           <Text style={styles.linkText}>{t('checkin.logBidLink')}</Text>
         </Pressable>
-        <Pressable style={styles.link} onPress={() => router.push('/memory-vault')}>
+        <Pressable style={styles.link} onPress={() => router.push('/memory-vault')} accessibilityRole="link">
           <Text style={styles.linkText}>{t('checkin.memoryVaultLink')}</Text>
         </Pressable>
-        <Pressable style={styles.link} onPress={() => router.push('/desire-inventory')}>
+        <Pressable style={styles.link} onPress={() => router.push('/desire-inventory')} accessibilityRole="link">
           <Text style={styles.linkText}>{t('checkin.desireInventoryLink')}</Text>
         </Pressable>
-        <Pressable style={styles.link} onPress={() => router.push('/settings')}>
+        <Pressable style={styles.link} onPress={() => router.push('/settings')} accessibilityRole="link">
           <Text style={styles.linkTextSecondary}>{t('checkin.settingsLink')}</Text>
         </Pressable>
       </ScrollView>
