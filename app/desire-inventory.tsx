@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import {
@@ -21,6 +22,7 @@ import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 // (rank = current count + 1); no drag-to-reorder yet, so "most wanted"
 // currently just means "added first."
 export default function DesireInventoryScreen() {
+  const { t } = useTranslation();
   const { uid } = useAuth();
   const [entries, setEntries] = useState<DesireInventoryEntryWithId[]>([]);
   const [desire, setDesire] = useState('');
@@ -30,8 +32,8 @@ export default function DesireInventoryScreen() {
     if (!isFirebaseConfigured || !uid) return;
     getAllDesireInventoryEntries(uid)
       .then(setEntries)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Could not load Desire Inventory.'));
-  }, [uid]);
+      .catch((err) => setError(err instanceof Error ? err.message : t('desireInventory.genericLoadError')));
+  }, [uid, t]);
 
   useFocusEffect(load);
 
@@ -48,7 +50,7 @@ export default function DesireInventoryScreen() {
       setDesire('');
       load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save that entry.');
+      setError(err instanceof Error ? err.message : t('desireInventory.genericAddError'));
     }
   };
 
@@ -57,7 +59,7 @@ export default function DesireInventoryScreen() {
     try {
       await deleteDesireInventoryEntry(id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not delete that entry.');
+      setError(err instanceof Error ? err.message : t('desireInventory.genericDeleteError'));
       load(); // revert optimistic removal on failure
     }
   };
@@ -66,10 +68,8 @@ export default function DesireInventoryScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
-          <Text style={styles.headline}>Desire Inventory</Text>
-          <Text style={styles.sub}>
-            Needs Firebase configured to store anything real — see docs/06-firebase-provisioning.md.
-          </Text>
+          <Text style={styles.headline}>{t('desireInventory.headline')}</Text>
+          <Text style={styles.sub}>{t('desireInventory.notConfigured')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -78,36 +78,36 @@ export default function DesireInventoryScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.headline}>Desire Inventory</Text>
-        <Text style={styles.sub}>Specific things that make you feel wanted, ranked by how much they matter.</Text>
+        <Text style={styles.headline}>{t('desireInventory.headline')}</Text>
+        <Text style={styles.sub}>{t('desireInventory.sub')}</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="e.g. Being defended in public"
+          placeholder={t('desireInventory.placeholder')}
           placeholderTextColor={colors.textSecondary}
           value={desire}
           onChangeText={setDesire}
         />
 
         <Pressable style={styles.cta} onPress={addEntry}>
-          <Text style={styles.ctaLabel}>Add to Desire Inventory</Text>
+          <Text style={styles.ctaLabel}>{t('desireInventory.add')}</Text>
         </Pressable>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
         <View style={styles.list}>
           {entries.length === 0 ? (
-            <Text style={styles.empty}>Nothing added yet.</Text>
+            <Text style={styles.empty}>{t('desireInventory.nothingAddedYet')}</Text>
           ) : (
             entries.map((e) => (
               <View key={e.id} style={styles.entryCard}>
                 <View style={styles.entryMeta}>
                   <Text style={styles.entryRank}>#{e.rank}</Text>
-                  {e.used && <Text style={styles.entryUsed}>used</Text>}
+                  {e.used && <Text style={styles.entryUsed}>{t('desireInventory.used')}</Text>}
                 </View>
                 <Text style={styles.entryContent}>{e.desire}</Text>
                 <Pressable onPress={() => removeEntry(e.id)}>
-                  <Text style={styles.deleteLink}>Delete</Text>
+                  <Text style={styles.deleteLink}>{t('desireInventory.delete')}</Text>
                 </Pressable>
               </View>
             ))

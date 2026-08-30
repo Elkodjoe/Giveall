@@ -24,7 +24,8 @@
       "package": "com.giveall.app"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-localization"
     ],
     "extra": {
       "router": {

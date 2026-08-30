@@ -9,12 +9,21 @@ export interface RetentionContext {
   bidResponseRatioPct?: number; // e.g. 85
 }
 
-export function buildRetentionNotification(ctx: RetentionContext): string {
+export interface RetentionNotificationContent {
+  // i18next key + params, not display text — this file has no framework/i18n
+  // dependency by design (see README). The caller (src/notifications/checkinReminder.ts)
+  // resolves this via i18next's t() outside React, since a local push
+  // notification's body isn't rendered through a component tree.
+  key: 'retention.lastActionSummary' | 'retention.bidResponse' | 'retention.neutral';
+  params?: Record<string, string | number>;
+}
+
+export function buildRetentionNotification(ctx: RetentionContext): RetentionNotificationContent {
   if (ctx.lastActionSummary) {
-    return `Your partner ${ctx.lastActionSummary}. Keep momentum? 2-min check-in.`;
+    return { key: 'retention.lastActionSummary', params: { summary: ctx.lastActionSummary } };
   }
   if (ctx.bidResponseRatioPct !== undefined) {
-    return `Your Bid Response is at ${ctx.bidResponseRatioPct}% this week — that's Secure Zone. One more check-in locks it in.`;
+    return { key: 'retention.bidResponse', params: { pct: ctx.bidResponseRatioPct } };
   }
-  return "Ready for today's 90-second check-in?";
+  return { key: 'retention.neutral' };
 }

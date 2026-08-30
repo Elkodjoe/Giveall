@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -12,6 +12,7 @@ import {
 import { AuthProvider } from '../src/state/AuthContext';
 import { OnboardingProvider } from '../src/state/OnboardingContext';
 import { colors } from '../src/theme/tokens';
+import { initI18n } from '../src/i18n';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,12 +23,17 @@ export default function RootLayout() {
     Inter_700Bold,
     Inter_800ExtraBold,
   });
+  const [i18nReady, setI18nReady] = useState(false);
 
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded]);
+    initI18n().then(() => setI18nReady(true));
+  }, []);
 
-  if (!fontsLoaded) return null;
+  useEffect(() => {
+    if (fontsLoaded && i18nReady) SplashScreen.hideAsync();
+  }, [fontsLoaded, i18nReady]);
+
+  if (!fontsLoaded || !i18nReady) return null;
 
   return (
     <AuthProvider>

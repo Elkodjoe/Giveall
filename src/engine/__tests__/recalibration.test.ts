@@ -18,7 +18,6 @@ describe('checkRecalibration', () => {
     const result = checkRecalibration('acts', feed);
     expect(result.shouldRecalibrate).toBe(true);
     expect(result.newPrimary).toBe('words');
-    expect(result.message).toContain('Words');
   });
 
   it('does not recalibrate when streak matches current primary', () => {

@@ -46,22 +46,3 @@ export function tallyLoveLanguage(picks: LoveLanguage[]): {
     secondary: ranked[1][0],
   };
 }
-
-/** Copy for the Screen 5 payoff card — see docs/01-onboarding-flow.md. */
-export function buildPayoffSummary(params: {
-  primaryAttachment: AttachmentStyle;
-  spikeAttachment?: AttachmentStyle;
-  receivesVia: LoveLanguage;
-  givesVia: LoveLanguage;
-}): string {
-  const styleLabel = (s: AttachmentStyle) => s[0].toUpperCase() + s.slice(1);
-  const langLabel = (l: LoveLanguage) => (l === 'quality_time' ? 'Quality Time' : l[0].toUpperCase() + l.slice(1));
-
-  const attachmentPhrase = params.spikeAttachment
-    ? `${styleLabel(params.primaryAttachment)}-leaning with ${styleLabel(params.spikeAttachment)} spikes`
-    : `${styleLabel(params.primaryAttachment)}-leaning`;
-
-  return `Got it. You're ${attachmentPhrase}, and you feel most loved through ${langLabel(
-    params.receivesVia,
-  )}, but you SHOW love through ${langLabel(params.givesVia)}. That's why you feel unseen sometimes. Here's your first micro-adjustment...`;
-}

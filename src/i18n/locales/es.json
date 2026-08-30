@@ -1,0 +1,301 @@
+{
+  "promise": {
+    "headline": "El amor es una práctica diaria.",
+    "sub": "90 segundos al día para sentirte más Atractivo, Valorado y Deseado.",
+    "cta": "Comenzar mi evaluación"
+  },
+  "whoFor": {
+    "headline": "¿Para quién estás aquí?",
+    "options": {
+      "crush": "Me gusta alguien y quiero acercarme",
+      "new": "Saliendo con alguien nuevo (0-6 meses)",
+      "ltr": "En una relación de largo plazo",
+      "healing": "Sanando / Volviéndome magnético para el próximo amor"
+    }
+  },
+  "attachmentQuestions": {
+    "aq-1": {
+      "prompt": "Cuando no te responde por horas, tú...",
+      "options": {
+        "0": "Supones que está ocupado/a, revisas después",
+        "1": "Entras en espiral y quieres escribir de nuevo",
+        "2": "Sientes alivio, necesitas espacio",
+        "3": "Quieres cercanía pero temes molestar"
+      }
+    },
+    "aq-2": {
+      "prompt": "Después de una cita o conversación muy buena, tú...",
+      "options": {
+        "0": "Te sientes bien y esperas la próxima",
+        "1": "Te preocupas de inmediato de que se desvanezca o fuera demasiado bueno para ser verdad",
+        "2": "Sientes un pequeño impulso de alejarte y evaluar",
+        "3": "Te sientes feliz pero te preparas para que algo salga mal"
+      }
+    },
+    "aq-3": {
+      "prompt": "Cuando surge un conflicto, tú...",
+      "options": {
+        "0": "Lo abordas directamente y esperas que se resuelva",
+        "1": "Sientes pánico y necesitas que se resuelva de inmediato",
+        "2": "Quieres retirarte hasta que las cosas se calmen",
+        "3": "Quieres arreglarlo pero te bloqueas o no dices nada"
+      }
+    },
+    "aq-4": {
+      "prompt": "Tu pareja quiere un fin de semana para sí misma. Tú...",
+      "options": {
+        "0": "Estás bien con eso, planeas tu propio tiempo",
+        "1": "Te preguntas si algo anda mal entre ustedes",
+        "2": "Sientes alivio de tener el espacio también",
+        "3": "Quieres decir que está bien pero te sientes inquieto/a"
+      }
+    },
+    "aq-5": {
+      "prompt": "Que tu pareja te diga \"te necesito\" te hace sentir...",
+      "options": {
+        "0": "Bien — la cercanía se siente natural",
+        "1": "Aliviado/a — es lo que querías escuchar",
+        "2": "Un poco acorralado/a o presionado/a",
+        "3": "Cálido/a pero también con miedo de decepcionar"
+      }
+    },
+    "aq-6": {
+      "prompt": "Cuando imaginas tu nivel ideal de cercanía, es...",
+      "options": {
+        "0": "Cercano pero con espacio para independencia, y eso se siente fácil",
+        "1": "Lo más cercano posible, lo más seguido posible",
+        "2": "Independencia primero, cercanía en tus propios términos",
+        "3": "Lo quieres profundamente pero también te asusta"
+      }
+    }
+  },
+  "loveLanguagePairs": {
+    "prompt": "¿Qué te haría sentir MÁS amado/a después de un día difícil?",
+    "ll-1": {
+      "0": "Me encargué de ese trámite por ti",
+      "1": "Significas mucho para mí, estoy orgulloso/a de ti"
+    },
+    "ll-2": {
+      "0": "Un pequeño regalo que muestre que pensaron en ti",
+      "1": "Veinte minutos de su atención completa, sin distracciones"
+    },
+    "ll-3": {
+      "0": "Un abrazo largo, sin necesidad de palabras",
+      "1": "Una lista de mensajes con lo que aprecian de ti"
+    },
+    "ll-4": {
+      "0": "Se encargaron discretamente de algo de tu lista",
+      "1": "Se sentaron contigo mientras te desahogabas, sin teléfonos"
+    }
+  },
+  "payoff": {
+    "summary": "Entendido. Eres {{attachmentPhrase}}, y te sientes más amado/a a través de {{receivesVia}}, pero MUESTRAS amor a través de {{givesVia}}. Por eso a veces te sientes invisible. Aquí está tu primer micro-ajuste…",
+    "attachmentSpike": "con tendencia {{primary}} y picos de {{spike}}",
+    "attachmentNoSpike": "con tendencia {{primary}}",
+    "firstWinLabel": "Tu Primera Victoria",
+    "firstWinSubLabel": "Tu Aprecio Espontáneo",
+    "saveIt": "Guardar",
+    "sendIt": "Enviar",
+    "firstWinFallback": "Me encanta cómo piensas en voz alta cuando resuelves algo, no ocultas la parte desordenada."
+  },
+  "ritualTime": {
+    "headline": "¿Cuándo hacemos tu check-in de 90 segundos?",
+    "sub": "La mayoría elige después de cenar.",
+    "options": {
+      "7pm": "19h",
+      "9pm": "21h",
+      "custom": "Personalizado"
+    }
+  },
+  "checkin": {
+    "headline": "Micro-Sintonía de 90 segundos",
+    "sub": "¿Cómo se sienten las cosas ahora mismo?",
+    "seen": "Visto/a",
+    "safe": "Seguro/a",
+    "sought": "Deseado/a",
+    "mood": "Ánimo",
+    "inOneWord": "En una palabra",
+    "moodLabels": {
+      "hopeful": "esperanzado/a",
+      "joyful": "alegre",
+      "calm": "tranquilo/a",
+      "neutral": "neutral",
+      "anxious": "ansioso/a",
+      "lonely": "solo/a",
+      "disconnected": "desconectado/a",
+      "triggered": "afectado/a",
+      "loved": "amado/a"
+    },
+    "seeAction": "Ver la acción de hoy",
+    "todaysMicroAction": "Tu micro-acción de hoy",
+    "didThisLand": "¿Cómo te cayó esto?",
+    "thanksLogged": "Gracias — lo registramos para ajustar futuras acciones.",
+    "saveError": "No se pudo guardar tu check-in: {{error}}",
+    "logBidLink": "Registrar un gesto de conexión →",
+    "memoryVaultLink": "Bóveda de Recuerdos →",
+    "desireInventoryLink": "Inventario de Deseos →",
+    "settingsLink": "Ajustes",
+    "strategy": {
+      "consistencyReassurance": "Consistencia + Reafirmación",
+      "lowPressureSpace": "Espacio sin presión",
+      "safeVulnerability": "Vulnerabilidad segura",
+      "directRepair": "Reparación directa",
+      "recallDetail": "Recordar un detalle",
+      "specificDesirePlay": "Deseo específico + Juego"
+    },
+    "action": {
+      "consistencyReassurance": "Nota de voz por la mañana, a la misma hora todos los días: 'Pensando en ti antes de tu reunión'",
+      "lowPressureSpace": "Mensaje sin necesidad de respuesta: 'Vi este meme y pensé en ti, no hace falta responder'",
+      "safeVulnerability": "Comparte primero una pequeña preocupación, luego aprecio. Muestra que es seguro ser vulnerable.",
+      "directRepair": "Pregunta directamente: '¿Sentí algo de distancia ayer, podemos reconectar esta noche?'",
+      "recallDetailWithEntry": "La última vez mencionó \"{{detail}}\". Pregúntale sobre eso hoy.",
+      "recallDetailGeneric": "Haz una pregunta abierta sobre algo que le importa, y escucha bien un detalle para recordar.",
+      "specificDesireWithEntry": "Dijo que \"{{desire}}\" le hace sentir deseado/a. Hazlo hoy.",
+      "specificDesireGeneric": "Haz una cosa pequeña y específica que muestre que lo/la elegiste a propósito hoy."
+    },
+    "genericSaveError": "No se pudo guardar el check-in."
+  },
+  "bids": {
+    "headline": "Rastreador de Gestos",
+    "sub": "Registra un pequeño momento y di cómo lo tomaron.",
+    "placeholder": "ej. Mi pareja hizo una broma mientras estaba en mi teléfono",
+    "types": {
+      "comment": "comentario",
+      "touch": "contacto",
+      "joke": "broma",
+      "help": "ayuda"
+    },
+    "didYouTurn": "¿Te volviste...",
+    "responses": {
+      "toward": "Hacia",
+      "away": "Lejos",
+      "against": "En contra"
+    },
+    "thisWeek": "Esta semana",
+    "noBidsYet": "Aún no has registrado gestos esta semana.",
+    "towardPercent": "{{pct}}% hacia",
+    "meta": "{{toward}} hacia · {{away}} lejos · {{against}} en contra",
+    "secureZone": "Respuesta a gestos: {{pct}}% — ¡eso es Zona Segura!",
+    "belowThreshold": "Por debajo del umbral de {{pct}}% de Zona Segura.",
+    "repairQuest": "Prueba una Carta de Curiosidad + un gesto de aprecio hoy para revertir esto.",
+    "saveError": "No se pudo guardar ese gesto: {{error}}",
+    "curiosityLink": "Abrir la Carta de Curiosidad de hoy →",
+    "genericSaveError": "No se pudo guardar el gesto."
+  },
+  "curiosity": {
+    "headline": "Carta de Curiosidad de hoy",
+    "completedAllForStage": "Completaste todas las cartas de esta etapa. Se desbloquean más a medida que continúa tu ritual.",
+    "weTalkedAboutThis": "Ya hablamos de esto",
+    "niceOneMoreShared": "Genial — una cosa más compartida.",
+    "saveError": "No se pudo guardar tu progreso: {{error}}",
+    "tiers": {
+      "gratitude_joy": "gratitud y alegría",
+      "values_dreams": "valores y sueños",
+      "vulnerability_repair": "vulnerabilidad y reparación"
+    },
+    "genericSaveError": "No se pudo guardar tu progreso."
+  },
+  "memoryVault": {
+    "headline": "Bóveda de Recuerdos",
+    "notConfigured": "Necesita Firebase configurado para guardar algo real — ver docs/06-firebase-provisioning.md.",
+    "sub": "Cosas pequeñas y específicas que mencionaron — para ayudarte a recordarlas después.",
+    "placeholder": "ej. Mencionó que quería probar ese nuevo lugar de ramen",
+    "types": {
+      "detail": "detalle",
+      "joke": "broma",
+      "interest": "interés",
+      "photo": "foto"
+    },
+    "sentiments": {
+      "warm": "cálido",
+      "neutral": "neutral",
+      "tense": "tenso"
+    },
+    "save": "Guardar en la Bóveda de Recuerdos",
+    "nothingSavedYet": "Nada guardado todavía.",
+    "used": "usado",
+    "delete": "Eliminar",
+    "genericLoadError": "No se pudo cargar la Bóveda de Recuerdos.",
+    "genericAddError": "No se pudo guardar esa entrada.",
+    "genericDeleteError": "No se pudo eliminar esa entrada."
+  },
+  "desireInventory": {
+    "headline": "Inventario de Deseos",
+    "notConfigured": "Necesita Firebase configurado para guardar algo real — ver docs/06-firebase-provisioning.md.",
+    "sub": "Cosas específicas que te hacen sentir deseado/a, ordenadas por importancia.",
+    "placeholder": "ej. Que me defiendan en público",
+    "add": "Agregar al Inventario de Deseos",
+    "nothingAddedYet": "Nada agregado todavía.",
+    "used": "usado",
+    "delete": "Eliminar",
+    "genericLoadError": "No se pudo cargar el Inventario de Deseos.",
+    "genericAddError": "No se pudo guardar esa entrada.",
+    "genericDeleteError": "No se pudo eliminar esa entrada."
+  },
+  "settings": {
+    "headline": "Ajustes",
+    "yourLast7Days": "Tus últimos 7 días",
+    "seen": "Visto/a",
+    "safe": "Seguro/a",
+    "sought": "Deseado/a",
+    "mood": "Ánimo",
+    "checkinsLoggedThisWeek_one": "{{count}} check-in registrado esta semana",
+    "checkinsLoggedThisWeek_other": "{{count}} check-ins registrados esta semana",
+    "privacyCopy": "Este es tu santuario privado. Tus datos nunca se venden. El modo pareja requiere doble aceptación explícita. Puedes eliminar tu Bóveda de Recuerdos cuando quieras.",
+    "manageMemoryVault": "Gestionar Bóveda de Recuerdos →",
+    "partnerMode": "Modo Pareja →",
+    "deleteMemoryVault": "Eliminar mi Bóveda de Recuerdos",
+    "tapAgainToConfirm": "Toca de nuevo para confirmar la eliminación",
+    "cancel": "Cancelar",
+    "memoryVaultCleared": "Bóveda de Recuerdos eliminada.",
+    "couldNotClear": "No se pudo eliminar la Bóveda de Recuerdos.",
+    "language": "Idioma"
+  },
+  "partner": {
+    "headline": "Modo Pareja",
+    "sub": "Ambas personas aceptan explícitamente — nada se vincula automáticamente.",
+    "yourCode": "Tu código de conexión",
+    "copyCode": "Copiar código",
+    "copied": "Copiado ✓",
+    "shareHint": "Comparte esto con tu pareja para que lo ingrese abajo.",
+    "placeholder": "Ingresa el código de conexión de tu pareja",
+    "connect": "Conectar",
+    "ownCodeError": "Ese es tu propio código — pídele el suyo a tu pareja.",
+    "status": "Estado",
+    "connected": "Conectado ✓",
+    "bothOptedIn": "Ambos aceptaron — finalizando la conexión. Vuelve pronto.",
+    "pending": "Pendiente — esperando a que tu pareja también ingrese tu código.",
+    "genericLoadError": "No se pudo cargar el estado de la conexión.",
+    "genericConnectError": "No se pudo conectar."
+  },
+  "retention": {
+    "lastActionSummary": "Tu pareja {{summary}}. ¿Seguimos con el impulso? Check-in de 2 minutos.",
+    "bidResponse": "Tu Respuesta a Gestos está en {{pct}}% esta semana — eso es Zona Segura. Un check-in más lo asegura.",
+    "neutral": "¿Listo/a para tu check-in de 90 segundos de hoy?"
+  },
+  "recalibration": {
+    "message": "Aprendimos que te sientes más amado/a a través de {{language}} de lo que pensabas. Ajustando tu plan."
+  },
+  "loveLanguages": {
+    "words": "Palabras",
+    "acts": "Actos",
+    "gifts": "Regalos",
+    "quality_time": "Tiempo de Calidad",
+    "touch": "Contacto Físico"
+  },
+  "attachmentStyles": {
+    "secure": "Seguro",
+    "anxious": "Ansioso",
+    "avoidant": "Evitativo",
+    "fearful": "Temeroso"
+  },
+  "curiosityCards": {
+    "cc_l1_01": "¿Qué momento te hizo sentir más orgulloso/a de nosotros esta semana?",
+    "cc_l1_02": "¿Qué pequeña cosa hago que secretamente amas?",
+    "cc_l1_03": "¿Cuándo te sentiste más visto/a por mí recientemente?",
+    "cc_l2_01": "¿Cuál es un sueño secreto que nunca me has contado?",
+    "cc_l2_02": "¿Qué significa sentirte seguro/a en el amor para ti?",
+    "cc_l3_01": "¿Cuándo te sientes más solo/a, incluso cuando estoy aquí?",
+    "cc_l3_02": "¿Cuál es una historia de tu infancia que marcó cómo amas?"
+  }
+}

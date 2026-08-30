@@ -35,7 +35,7 @@ describe('getMicroAttunement', () => {
     });
     const result = getMicroAttunement(profile);
     expect(result.axis).toBe('safe');
-    expect(result.strategy).toBe('Consistency + Reassurance');
+    expect(result.strategyKey).toBe('consistencyReassurance');
     expect(result.loveLanguageType).toBe('words');
   });
 
@@ -44,7 +44,7 @@ describe('getMicroAttunement', () => {
       attachmentStyle: 'avoidant',
       avwScores: { safe: 20, seen: 80, sought: 80 },
     });
-    expect(getMicroAttunement(profile).strategy).toBe('Low-Pressure Space');
+    expect(getMicroAttunement(profile).strategyKey).toBe('lowPressureSpace');
   });
 
   it('recommends Recall Detail for low seen_score regardless of attachment style', () => {
@@ -55,9 +55,20 @@ describe('getMicroAttunement', () => {
     });
     const result = getMicroAttunement(profile);
     expect(result.axis).toBe('seen');
-    expect(result.strategy).toBe('Recall Detail');
-    expect(result.action).toContain('their new project at work');
+    expect(result.strategyKey).toBe('recallDetail');
+    expect(result.actionKey).toBe('recallDetailWithEntry');
+    expect(result.actionParams).toEqual({ detail: 'their new project at work' });
     expect(result.loveLanguageType).toBe('quality_time');
+  });
+
+  it('falls back to the generic recall-detail action when Memory Vault is empty', () => {
+    const profile = baseProfile({
+      attachmentStyle: 'secure',
+      avwScores: { safe: 80, seen: 20, sought: 80 },
+    });
+    const result = getMicroAttunement(profile);
+    expect(result.actionKey).toBe('recallDetailGeneric');
+    expect(result.actionParams).toBeUndefined();
   });
 
   it('recommends Specific Desire + Play for low sought_score regardless of attachment style', () => {
@@ -68,7 +79,9 @@ describe('getMicroAttunement', () => {
     });
     const result = getMicroAttunement(profile);
     expect(result.axis).toBe('sought');
-    expect(result.action).toContain('being defended in public');
+    expect(result.strategyKey).toBe('specificDesirePlay');
+    expect(result.actionKey).toBe('specificDesireWithEntry');
+    expect(result.actionParams).toEqual({ desire: 'being defended in public' });
     expect(result.loveLanguageType).toBe('words');
   });
 });

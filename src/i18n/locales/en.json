@@ -1,0 +1,301 @@
+{
+  "promise": {
+    "headline": "Love is a daily practice.",
+    "sub": "90 seconds a day to feel more Attractive, Valued, and Wanted.",
+    "cta": "Start My Assessment"
+  },
+  "whoFor": {
+    "headline": "Who are you here for?",
+    "options": {
+      "crush": "Got a crush I want to be closer to",
+      "new": "Dating someone new (0-6 months)",
+      "ltr": "In a long-term relationship",
+      "healing": "Healing / Becoming magnetic for next love"
+    }
+  },
+  "attachmentQuestions": {
+    "aq-1": {
+      "prompt": "When they don't text back for hours, you...",
+      "options": {
+        "0": "Assume they're busy, check later",
+        "1": "Spiral and want to double-text",
+        "2": "Feel relieved, need space",
+        "3": "Want closeness but fear bothering them"
+      }
+    },
+    "aq-2": {
+      "prompt": "After a really good date or conversation, you...",
+      "options": {
+        "0": "Feel good and look forward to the next one",
+        "1": "Immediately worry it will fade or was too good to be true",
+        "2": "Feel a small urge to pull back and take stock",
+        "3": "Feel happy but brace for it to go wrong somehow"
+      }
+    },
+    "aq-3": {
+      "prompt": "When a conflict comes up, you...",
+      "options": {
+        "0": "Address it directly and expect it to get resolved",
+        "1": "Feel panicked and need it resolved right away",
+        "2": "Want to withdraw until things cool down",
+        "3": "Want to fix it but freeze or say nothing"
+      }
+    },
+    "aq-4": {
+      "prompt": "Your partner wants a weekend to themselves. You...",
+      "options": {
+        "0": "Are fine with it, plan your own time",
+        "1": "Wonder if something is wrong between you",
+        "2": "Feel relieved to have the space too",
+        "3": "Want to say it is fine but feel unsettled"
+      }
+    },
+    "aq-5": {
+      "prompt": "Being told \"I need you\" by a partner makes you feel...",
+      "options": {
+        "0": "Good — closeness feels natural",
+        "1": "Relieved — this is what you wanted to hear",
+        "2": "A little cornered or pressured",
+        "3": "Warm but also scared of letting them down"
+      }
+    },
+    "aq-6": {
+      "prompt": "When you picture your ideal amount of closeness, it is...",
+      "options": {
+        "0": "Close but with room for independence, and that feels easy",
+        "1": "As close as possible, as often as possible",
+        "2": "Independent first, closeness on your own terms",
+        "3": "You want it deeply but it also scares you"
+      }
+    }
+  },
+  "loveLanguagePairs": {
+    "prompt": "Which would make you feel MORE loved after a hard day?",
+    "ll-1": {
+      "0": "I handled that errand for you",
+      "1": "You mean so much to me, I'm proud of you"
+    },
+    "ll-2": {
+      "0": "A small gift that shows they were thinking of you",
+      "1": "Twenty minutes of their full, undistracted attention"
+    },
+    "ll-3": {
+      "0": "A long hug, no words needed",
+      "1": "A text list of things they appreciate about you"
+    },
+    "ll-4": {
+      "0": "They quietly took something off your plate",
+      "1": "They sat with you while you decompressed, no phones"
+    }
+  },
+  "payoff": {
+    "summary": "Got it. You're {{attachmentPhrase}}, and you feel most loved through {{receivesVia}}, but you SHOW love through {{givesVia}}. That's why you feel unseen sometimes. Here's your first micro-adjustment…",
+    "attachmentSpike": "{{primary}}-leaning with {{spike}} spikes",
+    "attachmentNoSpike": "{{primary}}-leaning",
+    "firstWinLabel": "Your First Win",
+    "firstWinSubLabel": "Your Unsolicited Appreciation",
+    "saveIt": "Save it",
+    "sendIt": "Send it",
+    "firstWinFallback": "I love how you think out loud when you're solving something - you don't hide the messy part."
+  },
+  "ritualTime": {
+    "headline": "When should we do your 90-sec check-in?",
+    "sub": "Most people pick after dinner.",
+    "options": {
+      "7pm": "7pm",
+      "9pm": "9pm",
+      "custom": "Custom"
+    }
+  },
+  "checkin": {
+    "headline": "90-sec Micro-Attunement",
+    "sub": "How are things feeling right now?",
+    "seen": "Seen",
+    "safe": "Safe",
+    "sought": "Sought",
+    "mood": "Mood",
+    "inOneWord": "In one word",
+    "moodLabels": {
+      "hopeful": "hopeful",
+      "joyful": "joyful",
+      "calm": "calm",
+      "neutral": "neutral",
+      "anxious": "anxious",
+      "lonely": "lonely",
+      "disconnected": "disconnected",
+      "triggered": "triggered",
+      "loved": "loved"
+    },
+    "seeAction": "See Today's Action",
+    "todaysMicroAction": "Today's Micro-Action",
+    "didThisLand": "Did this land?",
+    "thanksLogged": "Thanks — logged to help tailor future actions.",
+    "saveError": "Couldn't save your check-in: {{error}}",
+    "logBidLink": "Log a bid for connection →",
+    "memoryVaultLink": "Memory Vault →",
+    "desireInventoryLink": "Desire Inventory →",
+    "settingsLink": "Settings",
+    "strategy": {
+      "consistencyReassurance": "Consistency + Reassurance",
+      "lowPressureSpace": "Low-Pressure Space",
+      "safeVulnerability": "Safe Vulnerability",
+      "directRepair": "Direct Repair",
+      "recallDetail": "Recall Detail",
+      "specificDesirePlay": "Specific Desire + Play"
+    },
+    "action": {
+      "consistencyReassurance": "Morning voice note, same time daily: 'Thinking of you before your meeting'",
+      "lowPressureSpace": "No-reply-needed check-in: 'Saw this meme and thought of you, no need to reply'",
+      "safeVulnerability": "Share one small worry first, then appreciation. Shows it's safe to be vulnerable.",
+      "directRepair": "Ask directly: 'I felt a bit distant yesterday, can we reset tonight?'",
+      "recallDetailWithEntry": "Last time they mentioned \"{{detail}}\". Ask about it today.",
+      "recallDetailGeneric": "Ask an open question about something they care about, and really listen for a detail to remember.",
+      "specificDesireWithEntry": "They said \"{{desire}}\" makes them feel wanted. Do that today.",
+      "specificDesireGeneric": "Do one small, specific thing that shows you chose them on purpose today."
+    },
+    "genericSaveError": "Could not save check-in."
+  },
+  "bids": {
+    "headline": "Bid Tracker",
+    "sub": "Log a small moment, then say how it landed.",
+    "placeholder": "e.g. Partner made a joke while I was on my phone",
+    "types": {
+      "comment": "comment",
+      "touch": "touch",
+      "joke": "joke",
+      "help": "help"
+    },
+    "didYouTurn": "Did you turn...",
+    "responses": {
+      "toward": "Toward",
+      "away": "Away",
+      "against": "Against"
+    },
+    "thisWeek": "This Week",
+    "noBidsYet": "No bids logged yet this week.",
+    "towardPercent": "{{pct}}% toward",
+    "meta": "{{toward}} toward · {{away}} away · {{against}} against",
+    "secureZone": "Bid Response: {{pct}}% — that's Secure Zone!",
+    "belowThreshold": "Below the {{pct}}% Secure Zone threshold.",
+    "repairQuest": "Try a Curiosity Card + Appreciation quest today to help turn this around.",
+    "saveError": "Couldn't save that bid: {{error}}",
+    "curiosityLink": "Open today's Curiosity Card →",
+    "genericSaveError": "Could not save bid."
+  },
+  "curiosity": {
+    "headline": "Today's Curiosity Card",
+    "completedAllForStage": "You've completed every card for this stage. More unlock as your ritual continues.",
+    "weTalkedAboutThis": "We talked about this",
+    "niceOneMoreShared": "Nice — that's one more shared.",
+    "saveError": "Couldn't save your progress: {{error}}",
+    "tiers": {
+      "gratitude_joy": "gratitude & joy",
+      "values_dreams": "values & dreams",
+      "vulnerability_repair": "vulnerability & repair"
+    },
+    "genericSaveError": "Could not save your progress."
+  },
+  "memoryVault": {
+    "headline": "Memory Vault",
+    "notConfigured": "Needs Firebase configured to store anything real — see docs/06-firebase-provisioning.md.",
+    "sub": "Small, specific things they've mentioned — used to help you recall them later.",
+    "placeholder": "e.g. Mentioned wanting to try that new ramen place",
+    "types": {
+      "detail": "detail",
+      "joke": "joke",
+      "interest": "interest",
+      "photo": "photo"
+    },
+    "sentiments": {
+      "warm": "warm",
+      "neutral": "neutral",
+      "tense": "tense"
+    },
+    "save": "Save to Memory Vault",
+    "nothingSavedYet": "Nothing saved yet.",
+    "used": "used",
+    "delete": "Delete",
+    "genericLoadError": "Could not load Memory Vault.",
+    "genericAddError": "Could not save that entry.",
+    "genericDeleteError": "Could not delete that entry."
+  },
+  "desireInventory": {
+    "headline": "Desire Inventory",
+    "notConfigured": "Needs Firebase configured to store anything real — see docs/06-firebase-provisioning.md.",
+    "sub": "Specific things that make you feel wanted, ranked by how much they matter.",
+    "placeholder": "e.g. Being defended in public",
+    "add": "Add to Desire Inventory",
+    "nothingAddedYet": "Nothing added yet.",
+    "used": "used",
+    "delete": "Delete",
+    "genericLoadError": "Could not load Desire Inventory.",
+    "genericAddError": "Could not save that entry.",
+    "genericDeleteError": "Could not delete that entry."
+  },
+  "settings": {
+    "headline": "Settings",
+    "yourLast7Days": "Your Last 7 Days",
+    "seen": "Seen",
+    "safe": "Safe",
+    "sought": "Sought",
+    "mood": "Mood",
+    "checkinsLoggedThisWeek_one": "{{count}} check-in logged this week",
+    "checkinsLoggedThisWeek_other": "{{count}} check-ins logged this week",
+    "privacyCopy": "This is your private sanctuary. No data is ever sold. Partner mode requires explicit double opt-in. You can delete your Memory Vault anytime.",
+    "manageMemoryVault": "Manage Memory Vault →",
+    "partnerMode": "Partner Mode →",
+    "deleteMemoryVault": "Delete my Memory Vault",
+    "tapAgainToConfirm": "Tap again to confirm deletion",
+    "cancel": "Cancel",
+    "memoryVaultCleared": "Memory Vault cleared.",
+    "couldNotClear": "Could not clear Memory Vault.",
+    "language": "Language"
+  },
+  "partner": {
+    "headline": "Partner Mode",
+    "sub": "Both people opt in explicitly — nothing links automatically.",
+    "yourCode": "Your connection code",
+    "copyCode": "Copy code",
+    "copied": "Copied ✓",
+    "shareHint": "Share this with your partner so they can enter it below.",
+    "placeholder": "Enter your partner's connection code",
+    "connect": "Connect",
+    "ownCodeError": "That's your own code — ask your partner for theirs.",
+    "status": "Status",
+    "connected": "Connected ✓",
+    "bothOptedIn": "You're both in — just finishing the connection. Check back soon.",
+    "pending": "Pending — waiting for your partner to enter your code too.",
+    "genericLoadError": "Could not load partnership status.",
+    "genericConnectError": "Could not connect."
+  },
+  "retention": {
+    "lastActionSummary": "Your partner {{summary}}. Keep momentum? 2-min check-in.",
+    "bidResponse": "Your Bid Response is at {{pct}}% this week — that's Secure Zone. One more check-in locks it in.",
+    "neutral": "Ready for today's 90-second check-in?"
+  },
+  "recalibration": {
+    "message": "We learned you feel more loved by {{language}} than you thought. Adjusting your plan."
+  },
+  "loveLanguages": {
+    "words": "Words",
+    "acts": "Acts",
+    "gifts": "Gifts",
+    "quality_time": "Quality Time",
+    "touch": "Touch"
+  },
+  "attachmentStyles": {
+    "secure": "Secure",
+    "anxious": "Anxious",
+    "avoidant": "Avoidant",
+    "fearful": "Fearful"
+  },
+  "curiosityCards": {
+    "cc_l1_01": "What moment made you feel most proud of us this week?",
+    "cc_l1_02": "What's a small thing I do that you secretly love?",
+    "cc_l1_03": "When did you feel most seen by me recently?",
+    "cc_l2_01": "What's a hidden dream you've never told me?",
+    "cc_l2_02": "What does feeling safe mean to you in love?",
+    "cc_l3_01": "When do you feel most alone, even when I'm here?",
+    "cc_l3_02": "What's a story from your childhood that shaped how you love?"
+  }
+}

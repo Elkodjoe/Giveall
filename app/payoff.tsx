@@ -2,10 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Share } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { useAuth } from '../src/state/AuthContext';
-import { tallyAttachment, tallyLoveLanguage, buildPayoffSummary } from '../src/engine/onboardingScoring';
+import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScoring';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { generateAppreciation } from '../src/firebase/appreciationClient';
 import { generateAppreciationViaOllama } from '../src/llm/ollamaClient';
@@ -13,38 +14,45 @@ import { logAction } from '../src/firebase/collections';
 import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 
 // Screen 5 — The Payoff Preview. The Aha Moment: value delivered before any
-// ask. Renders FIRST_WIN_FALLBACK instantly (this screen must never feel
-// like it's waiting on a network call), then tries two live sources in the
-// background and silently swaps in whichever succeeds first — no loading
-// spinner, no error shown if both fail, just stays on the fallback:
+// ask. Renders the translated fallback instantly (this screen must never
+// feel like it's waiting on a network call), then tries two live sources in
+// the background and silently swaps in whichever succeeds first — no
+// loading spinner, no error shown if both fail, just stays on the fallback:
 //   1. generateAppreciation() — the Cloud Function (functions/src/generateAppreciation.ts,
 //      Anthropic/OpenAI). Not deployed yet (Blaze plan deferred), so this
 //      currently always fails fast and falls through to (2).
 //   2. generateAppreciationViaOllama() — a locally running Ollama server,
 //      for testing this live without needing Blaze or a paid API key. Only
 //      works when running the app on the same machine as `ollama serve`.
-const FIRST_WIN_FALLBACK = "I love how you think out loud when you're solving something - you don't hide the messy part.";
+// generatedFirstWin stays null (falling back to the translated line, which
+// reacts live to language switches) until a real LLM result lands — once
+// generated in whatever language the prompt produced, it doesn't retroactively
+// re-translate itself just because the user changes the app's language.
 const GENERIC_SEED_COMPLIMENT = 'You are wonderful.';
 
 export default function PayoffScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { attachmentAnswers, loveLanguagePicks } = useOnboarding();
   const { uid } = useAuth();
-  const [firstWin, setFirstWin] = useState(FIRST_WIN_FALLBACK);
+  const [generatedFirstWin, setGeneratedFirstWin] = useState<string | null>(null);
+  const firstWin = generatedFirstWin ?? t('payoff.firstWinFallback');
 
   const { summary, receivesVia } = useMemo(() => {
     const { primary, spike } = tallyAttachment(attachmentAnswers);
     const { primary: receivesVia, secondary: givesVia } = tallyLoveLanguage(loveLanguagePicks);
+    const attachmentPhrase = spike
+      ? t('payoff.attachmentSpike', { primary: t(`attachmentStyles.${primary}`), spike: t(`attachmentStyles.${spike}`) })
+      : t('payoff.attachmentNoSpike', { primary: t(`attachmentStyles.${primary}`) });
     return {
       receivesVia,
-      summary: buildPayoffSummary({
-        primaryAttachment: primary,
-        spikeAttachment: spike,
-        receivesVia,
-        givesVia,
+      summary: t('payoff.summary', {
+        attachmentPhrase,
+        receivesVia: t(`loveLanguages.${receivesVia}`),
+        givesVia: t(`loveLanguages.${givesVia}`),
       }),
     };
-  }, [attachmentAnswers, loveLanguagePicks]);
+  }, [attachmentAnswers, loveLanguagePicks, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,7 +65,7 @@ export default function PayoffScreen() {
     tryCloudFunction
       .catch(() => generateAppreciationViaOllama(input))
       .then((result) => {
-        if (!cancelled) setFirstWin(result.text);
+        if (!cancelled) setGeneratedFirstWin(result.text);
       })
       .catch(() => {
         // Neither source available (Cloud Function not deployed, no
@@ -113,18 +121,18 @@ export default function PayoffScreen() {
 
       <View style={styles.winCardWrapper}>
         <View style={styles.winCard}>
-          <Text style={styles.winLabel}>Your First Win</Text>
-          <Text style={styles.winSubLabel}>Your Unsolicited Appreciation</Text>
+          <Text style={styles.winLabel}>{t('payoff.firstWinLabel')}</Text>
+          <Text style={styles.winSubLabel}>{t('payoff.firstWinSubLabel')}</Text>
           <Text style={styles.winText}>"{firstWin}"</Text>
         </View>
       </View>
 
       <View style={styles.ctaRow}>
         <Pressable style={styles.ctaSecondary} onPress={handleSave}>
-          <Text style={styles.ctaSecondaryLabel}>Save it</Text>
+          <Text style={styles.ctaSecondaryLabel}>{t('payoff.saveIt')}</Text>
         </Pressable>
         <Pressable style={styles.ctaPrimary} onPress={handleSend}>
-          <Text style={styles.ctaPrimaryLabel}>Send it</Text>
+          <Text style={styles.ctaPrimaryLabel}>{t('payoff.sendIt')}</Text>
         </Pressable>
       </View>
     </SafeAreaView>

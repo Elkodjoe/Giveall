@@ -24,36 +24,33 @@ export function lowestAxis(scores: AvwScores): AvwAxis {
 // equivalent trigger (act_words_001, act_space_001, act_vuln_001,
 // act_direct_001) — same prescriptions, kept in sync by hand since this path
 // runs client-side with zero Firestore reads while suggested_actions is the
-// content-managed catalog the same copy was seeded from.
+// content-managed catalog the same copy was seeded from. strategyKey/actionKey
+// resolve into src/i18n/locales/*.json's checkin.strategy/checkin.action.
 const SAFE_SCORE_STRATEGY: Record<
   AttachmentStyle,
-  { strategy: string; tone: string; action: string; loveLanguageType: LoveLanguage; actionId: string }
+  { strategyKey: string; actionKey: string; loveLanguageType: LoveLanguage; actionId: string }
 > = {
   anxious: {
-    strategy: 'Consistency + Reassurance',
-    tone: 'warm, predictable',
-    action: "Morning voice note, same time daily: 'Thinking of you before your meeting'",
+    strategyKey: 'consistencyReassurance',
+    actionKey: 'consistencyReassurance',
     loveLanguageType: 'words',
     actionId: 'act_words_001',
   },
   avoidant: {
-    strategy: 'Low-Pressure Space',
-    tone: 'light, no demand for reply',
-    action: "No-reply-needed check-in: 'Saw this meme and thought of you, no need to reply'",
+    strategyKey: 'lowPressureSpace',
+    actionKey: 'lowPressureSpace',
     loveLanguageType: 'quality_time',
     actionId: 'act_space_001',
   },
   fearful: {
-    strategy: 'Safe Vulnerability',
-    tone: 'small, controlled share',
-    action: 'Share one small worry first, then appreciation. Shows it’s safe to be vulnerable.',
+    strategyKey: 'safeVulnerability',
+    actionKey: 'safeVulnerability',
     loveLanguageType: 'words',
     actionId: 'act_vuln_001',
   },
   secure: {
-    strategy: 'Direct Repair',
-    tone: 'plain, direct',
-    action: "Ask directly: 'I felt a bit distant yesterday, can we reset tonight?'",
+    strategyKey: 'directRepair',
+    actionKey: 'directRepair',
     loveLanguageType: 'words',
     actionId: 'act_direct_001',
   },
@@ -73,20 +70,17 @@ export function getMicroAttunement(profile: UserProfile): MicroAttunement {
   const axis = lowestAxis(profile.avwScores);
 
   if (axis === 'safe') {
-    const { strategy, tone, action, loveLanguageType, actionId } = SAFE_SCORE_STRATEGY[profile.attachmentStyle];
-    return { axis, strategy, tone, action, loveLanguageType, actionId };
+    const { strategyKey, actionKey, loveLanguageType, actionId } = SAFE_SCORE_STRATEGY[profile.attachmentStyle];
+    return { axis, strategyKey, actionKey, loveLanguageType, actionId };
   }
 
   if (axis === 'seen') {
     const entry = nextUnused(profile.memoryVault);
-    const action = entry
-      ? `Last time they mentioned "${entry.detail}". Ask about it today.`
-      : 'Ask an open question about something they care about, and really listen for a detail to remember.';
     return {
       axis,
-      strategy: 'Recall Detail',
-      tone: 'curious, attentive',
-      action,
+      strategyKey: 'recallDetail',
+      actionKey: entry ? 'recallDetailWithEntry' : 'recallDetailGeneric',
+      actionParams: entry ? { detail: entry.detail } : undefined,
       loveLanguageType: 'quality_time',
       actionId: 'act_seen_001',
     };
@@ -94,14 +88,11 @@ export function getMicroAttunement(profile: UserProfile): MicroAttunement {
 
   // axis === 'sought'
   const entry = nextUnused(profile.desireInventory);
-  const action = entry
-    ? `They said "${entry.desire}" makes them feel wanted. Do that today.`
-    : 'Do one small, specific thing that shows you chose them on purpose today.';
   return {
     axis,
-    strategy: 'Specific Desire + Play',
-    tone: 'playful, intentional',
-    action,
+    strategyKey: 'specificDesirePlay',
+    actionKey: entry ? 'specificDesireWithEntry' : 'specificDesireGeneric',
+    actionParams: entry ? { desire: entry.desire } : undefined,
     loveLanguageType: 'words',
     actionId: 'act_wanted_001',
   };

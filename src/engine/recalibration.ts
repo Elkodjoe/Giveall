@@ -13,7 +13,6 @@ const RECALIBRATION_STREAK_THRESHOLD = 5;
 export interface RecalibrationResult {
   shouldRecalibrate: boolean;
   newPrimary?: LoveLanguage;
-  message?: string;
 }
 
 /**
@@ -40,11 +39,7 @@ export function checkRecalibration(
     return { shouldRecalibrate: false };
   }
 
-  return {
-    shouldRecalibrate: true,
-    newPrimary: candidate,
-    message: `We learned you feel more loved by ${labelFor(candidate)} than you thought. Adjusting your plan.`,
-  };
+  return { shouldRecalibrate: true, newPrimary: candidate };
 }
 
 export interface ActionLogEntry {
@@ -68,15 +63,4 @@ export function toDailyFeedback(logs: ActionLogEntry[]): DailyFeedback[] {
     if (!byDate.has(log.date)) byDate.set(log.date, log.loveLanguageType);
   }
   return Array.from(byDate.entries()).map(([date, loveLanguageObserved]) => ({ date, loveLanguageObserved }));
-}
-
-function labelFor(lang: LoveLanguage): string {
-  const labels: Record<LoveLanguage, string> = {
-    words: 'Words',
-    acts: 'Acts',
-    gifts: 'Gifts',
-    quality_time: 'Quality Time',
-    touch: 'Touch',
-  };
-  return labels[lang];
 }

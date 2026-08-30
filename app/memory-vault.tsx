@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import {
@@ -24,6 +25,7 @@ const TYPES: MemoryVaultDoc['type'][] = ['detail', 'joke', 'interest', 'photo'];
 const SENTIMENTS: MemoryVaultDoc['sentiment'][] = ['warm', 'neutral', 'tense'];
 
 export default function MemoryVaultScreen() {
+  const { t } = useTranslation();
   const { uid } = useAuth();
   const [entries, setEntries] = useState<MemoryVaultEntryWithId[]>([]);
   const [content, setContent] = useState('');
@@ -35,8 +37,8 @@ export default function MemoryVaultScreen() {
     if (!isFirebaseConfigured || !uid) return;
     getAllMemoryVaultEntries(uid)
       .then(setEntries)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Could not load Memory Vault.'));
-  }, [uid]);
+      .catch((err) => setError(err instanceof Error ? err.message : t('memoryVault.genericLoadError')));
+  }, [uid, t]);
 
   useEffect(load, [load]);
   useFocusEffect(load); // refresh when navigating back after deleting/adding
@@ -56,7 +58,7 @@ export default function MemoryVaultScreen() {
       setContent('');
       load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save that entry.');
+      setError(err instanceof Error ? err.message : t('memoryVault.genericAddError'));
     }
   };
 
@@ -65,7 +67,7 @@ export default function MemoryVaultScreen() {
     try {
       await deleteMemoryVaultEntry(id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not delete that entry.');
+      setError(err instanceof Error ? err.message : t('memoryVault.genericDeleteError'));
       load(); // revert optimistic removal on failure
     }
   };
@@ -74,10 +76,8 @@ export default function MemoryVaultScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
-          <Text style={styles.headline}>Memory Vault</Text>
-          <Text style={styles.sub}>
-            Needs Firebase configured to store anything real — see docs/06-firebase-provisioning.md.
-          </Text>
+          <Text style={styles.headline}>{t('memoryVault.headline')}</Text>
+          <Text style={styles.sub}>{t('memoryVault.notConfigured')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -86,12 +86,12 @@ export default function MemoryVaultScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.headline}>Memory Vault</Text>
-        <Text style={styles.sub}>Small, specific things they've mentioned — used to help you recall them later.</Text>
+        <Text style={styles.headline}>{t('memoryVault.headline')}</Text>
+        <Text style={styles.sub}>{t('memoryVault.sub')}</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="e.g. Mentioned wanting to try that new ramen place"
+          placeholder={t('memoryVault.placeholder')}
           placeholderTextColor={colors.textSecondary}
           value={content}
           onChangeText={setContent}
@@ -99,9 +99,9 @@ export default function MemoryVaultScreen() {
         />
 
         <View style={styles.chipRow}>
-          {TYPES.map((t) => (
-            <Pressable key={t} style={[styles.chip, type === t && styles.chipSelected]} onPress={() => setType(t)}>
-              <Text style={[styles.chipText, type === t && styles.chipTextSelected]}>{t}</Text>
+          {TYPES.map((mvType) => (
+            <Pressable key={mvType} style={[styles.chip, type === mvType && styles.chipSelected]} onPress={() => setType(mvType)}>
+              <Text style={[styles.chipText, type === mvType && styles.chipTextSelected]}>{t(`memoryVault.types.${mvType}`)}</Text>
             </Pressable>
           ))}
         </View>
@@ -112,30 +112,30 @@ export default function MemoryVaultScreen() {
               style={[styles.chip, sentiment === s && styles.chipSelected]}
               onPress={() => setSentiment(s)}
             >
-              <Text style={[styles.chipText, sentiment === s && styles.chipTextSelected]}>{s}</Text>
+              <Text style={[styles.chipText, sentiment === s && styles.chipTextSelected]}>{t(`memoryVault.sentiments.${s}`)}</Text>
             </Pressable>
           ))}
         </View>
 
         <Pressable style={styles.cta} onPress={addEntry}>
-          <Text style={styles.ctaLabel}>Save to Memory Vault</Text>
+          <Text style={styles.ctaLabel}>{t('memoryVault.save')}</Text>
         </Pressable>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
         <View style={styles.list}>
           {entries.length === 0 ? (
-            <Text style={styles.empty}>Nothing saved yet.</Text>
+            <Text style={styles.empty}>{t('memoryVault.nothingSavedYet')}</Text>
           ) : (
             entries.map((e) => (
               <View key={e.id} style={styles.entryCard}>
                 <View style={styles.entryMeta}>
-                  <Text style={styles.entryType}>{e.type}</Text>
-                  {e.usedInGeneration && <Text style={styles.entryUsed}>used</Text>}
+                  <Text style={styles.entryType}>{t(`memoryVault.types.${e.type}`)}</Text>
+                  {e.usedInGeneration && <Text style={styles.entryUsed}>{t('memoryVault.used')}</Text>}
                 </View>
                 <Text style={styles.entryContent}>{e.content}</Text>
                 <Pressable onPress={() => removeEntry(e.id)}>
-                  <Text style={styles.deleteLink}>Delete</Text>
+                  <Text style={styles.deleteLink}>{t('memoryVault.delete')}</Text>
                 </Pressable>
               </View>
             ))

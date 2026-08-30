@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { OptionCard } from '../src/components/OptionCard';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
@@ -9,15 +10,11 @@ import type { Mode } from '../src/engine/types';
 import { colors, fontFamily } from '../src/theme/tokens';
 
 // Screen 2 — Who Are You Here For? Branches `mode` for the whole algorithm.
-const OPTIONS: { label: string; mode: Mode }[] = [
-  { label: 'Got a crush I want to be closer to', mode: 'crush' },
-  { label: 'Dating someone new (0-6 months)', mode: 'new' },
-  { label: 'In a long-term relationship', mode: 'ltr' },
-  { label: 'Healing / Becoming magnetic for next love', mode: 'healing' },
-];
+const MODES: Mode[] = ['crush', 'new', 'ltr', 'healing'];
 
 export default function WhoForScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { setMode } = useOnboarding();
 
   const choose = (mode: Mode) => {
@@ -28,10 +25,10 @@ export default function WhoForScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ProgressBar step={1} total={4} />
-      <Text style={styles.headline}>Who are you here for?</Text>
+      <Text style={styles.headline}>{t('whoFor.headline')}</Text>
       <View style={styles.options}>
-        {OPTIONS.map((opt) => (
-          <OptionCard key={opt.mode} label={opt.label} onPress={() => choose(opt.mode)} />
+        {MODES.map((mode) => (
+          <OptionCard key={mode} label={t(`whoFor.options.${mode}`)} onPress={() => choose(mode)} />
         ))}
       </View>
     </SafeAreaView>

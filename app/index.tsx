@@ -2,22 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { colors, radius, button, fontFamily } from '../src/theme/tokens';
 
 // Screen 1 — The Promise. See docs/01-onboarding-flow.md.
 export default function PromiseScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.headline}>Love is a daily practice.</Text>
-        <Text style={styles.sub}>
-          90 seconds a day to feel more Attractive, Valued, and Wanted.
-        </Text>
+        <Text style={styles.headline}>{t('promise.headline')}</Text>
+        <Text style={styles.sub}>{t('promise.sub')}</Text>
       </View>
       <Pressable style={styles.cta} onPress={() => router.push('/who-for')}>
-        <Text style={styles.ctaLabel}>Start My Assessment</Text>
+        <Text style={styles.ctaLabel}>{t('promise.cta')}</Text>
       </Pressable>
     </SafeAreaView>
   );

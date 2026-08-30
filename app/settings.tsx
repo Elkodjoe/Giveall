@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { deleteAllMemoryVaultEntries, getDailyCheckinsLastNDays } from '../src/firebase/collections';
 import { averageCheckins, type WeeklyCheckinAverage } from '../src/engine/scale';
+import { SUPPORTED_LANGUAGES, setLanguage, type LanguageCode } from '../src/i18n';
 import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 
 // Settings — ships the exact privacy guardrail copy from docs/03-power-ups.md
@@ -13,9 +15,11 @@ import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 // Partner mode requires explicit double opt-in. You can delete your
 // Memory Vault anytime." That doc is explicit this copy is not decorative
 // and changes to it are a product decision, not a copy tweak — don't edit
-// it here without updating that doc too.
+// it here without updating that doc too (or its translations in
+// src/i18n/locales/*.json's settings.privacyCopy).
 export default function SettingsScreen() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   const { uid } = useAuth();
   const [confirming, setConfirming] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -46,9 +50,9 @@ export default function SettingsScreen() {
     }
     try {
       await deleteAllMemoryVaultEntries(uid);
-      setStatus('Memory Vault cleared.');
+      setStatus(t('settings.memoryVaultCleared'));
     } catch (err) {
-      setStatus(err instanceof Error ? err.message : 'Could not clear Memory Vault.');
+      setStatus(err instanceof Error ? err.message : t('settings.couldNotClear'));
     } finally {
       setConfirming(false);
     }
@@ -57,57 +61,76 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.headline}>Settings</Text>
+        <Text style={styles.headline}>{t('settings.headline')}</Text>
 
         {weekAvg && (
           <View style={styles.trendCard}>
-            <Text style={styles.trendLabel}>Your Last 7 Days</Text>
+            <Text style={styles.trendLabel}>{t('settings.yourLast7Days')}</Text>
             <View style={styles.trendRow}>
               <View style={styles.trendStat}>
                 <Text style={styles.trendValue}>{weekAvg.seen_score}</Text>
-                <Text style={styles.trendStatLabel}>Seen</Text>
+                <Text style={styles.trendStatLabel}>{t('settings.seen')}</Text>
               </View>
               <View style={styles.trendStat}>
                 <Text style={styles.trendValue}>{weekAvg.safe_score}</Text>
-                <Text style={styles.trendStatLabel}>Safe</Text>
+                <Text style={styles.trendStatLabel}>{t('settings.safe')}</Text>
               </View>
               <View style={styles.trendStat}>
                 <Text style={styles.trendValue}>{weekAvg.sought_score}</Text>
-                <Text style={styles.trendStatLabel}>Sought</Text>
+                <Text style={styles.trendStatLabel}>{t('settings.sought')}</Text>
               </View>
               <View style={styles.trendStat}>
                 <Text style={styles.trendValue}>{weekAvg.moodScore}</Text>
-                <Text style={styles.trendStatLabel}>Mood</Text>
+                <Text style={styles.trendStatLabel}>{t('settings.mood')}</Text>
               </View>
             </View>
             <Text style={styles.trendMeta}>
-              {weekAvg.daysLogged} check-in{weekAvg.daysLogged === 1 ? '' : 's'} logged this week
+              {t('settings.checkinsLoggedThisWeek', { count: weekAvg.daysLogged })}
             </Text>
           </View>
         )}
 
         <View style={styles.privacyCard}>
-          <Text style={styles.privacyText}>
-            This is your private sanctuary. No data is ever sold. Partner mode requires explicit double opt-in. You
-            can delete your Memory Vault anytime.
-          </Text>
+          <Text style={styles.privacyText}>{t('settings.privacyCopy')}</Text>
+        </View>
+
+        <View style={styles.languageCard}>
+          <Text style={styles.languageLabel}>{t('settings.language')}</Text>
+          <View style={styles.languageGrid}>
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <Pressable
+                key={lang.code}
+                style={[styles.languageChip, i18n.language === lang.code && styles.languageChipSelected]}
+                onPress={() => setLanguage(lang.code as LanguageCode)}
+              >
+                <Text
+                  style={[
+                    styles.languageChipText,
+                    i18n.language === lang.code && styles.languageChipTextSelected,
+                  ]}
+                >
+                  {lang.nativeLabel}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
 
         <Pressable style={styles.link} onPress={() => router.push('/memory-vault')}>
-          <Text style={styles.linkText}>Manage Memory Vault →</Text>
+          <Text style={styles.linkText}>{t('settings.manageMemoryVault')}</Text>
         </Pressable>
         <Pressable style={styles.link} onPress={() => router.push('/partner')}>
-          <Text style={styles.linkText}>Partner Mode →</Text>
+          <Text style={styles.linkText}>{t('settings.partnerMode')}</Text>
         </Pressable>
 
         <Pressable style={[styles.dangerButton, confirming && styles.dangerButtonConfirming]} onPress={confirmDelete}>
           <Text style={[styles.dangerButtonLabel, confirming && styles.dangerButtonLabelConfirming]}>
-            {confirming ? 'Tap again to confirm deletion' : 'Delete my Memory Vault'}
+            {confirming ? t('settings.tapAgainToConfirm') : t('settings.deleteMemoryVault')}
           </Text>
         </Pressable>
         {confirming && (
           <Pressable onPress={() => setConfirming(false)}>
-            <Text style={styles.cancelLink}>Cancel</Text>
+            <Text style={styles.cancelLink}>{t('settings.cancel')}</Text>
           </Pressable>
         )}
 
@@ -149,6 +172,34 @@ const styles = StyleSheet.create({
   trendValue: { fontFamily: fontFamily.bold, color: colors.textPrimary, fontSize: 22 },
   trendStatLabel: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 12, marginTop: 4 },
   trendMeta: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 12, marginTop: 12, textAlign: 'center' },
+  languageCard: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: card.radius,
+    padding: 20,
+    marginBottom: 24,
+  },
+  languageLabel: {
+    fontFamily: fontFamily.semiBold,
+    color: colors.primary,
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 12,
+  },
+  languageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  languageChip: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.full,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  languageChipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  languageChipText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 14 },
+  languageChipTextSelected: { color: colors.textInverse },
   link: { marginBottom: 32 },
   linkText: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 15 },
   dangerButton: {

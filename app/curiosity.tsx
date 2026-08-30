@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../src/state/AuthContext';
 import { nextCard, tierForWeek, levelForTier, weeksSinceStart as computeWeeksSinceStart } from '../src/engine/curiosityLadder';
 import { isFirebaseConfigured } from '../src/firebase/config';
@@ -21,6 +22,7 @@ import { colors, card, button, fontFamily } from '../src/theme/tokens';
 // gratitude/joy tier) — the same graceful-degradation pattern as the other
 // screens, not a real substitute for tracking time.
 export default function CuriosityScreen() {
+  const { t, i18n } = useTranslation();
   const { uid } = useAuth();
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [weeks, setWeeks] = useState(0);
@@ -52,16 +54,25 @@ export default function CuriosityScreen() {
   // engine's hardcoded local copy. Not user-scoped, so this only needs to
   // re-run when the tier (derived from weeks) changes.
   useEffect(() => {
-    if (!isFirebaseConfigured) return;
+    // curiosity_cards catalog content is English-only for this i18n pass
+    // (see docs/07-internationalization.md) — only fetch/prefer it when the
+    // app's active language is English, same rule app/checkin.tsx applies
+    // to suggested_actions, so a card never mixes languages on one card.
+    if (!isFirebaseConfigured || i18n.language !== 'en') {
+      setCatalogQuestions({});
+      return;
+    }
     getCuriosityCardsForLevel(levelForTier(tier))
       .then((docs) => setCatalogQuestions(Object.fromEntries(docs.map((d) => [d.id, d.question]))))
       .catch(() => {
         // best-effort; falls back to CARDS' hardcoded prompt text
       });
-  }, [tier]);
+  }, [tier, i18n.language]);
 
   const currentCard = nextCard(weeks, completedIds);
-  const displayedPrompt = currentCard ? catalogQuestions[currentCard.id] ?? currentCard.prompt : undefined;
+  const displayedPrompt = currentCard
+    ? catalogQuestions[currentCard.id] ?? t(`curiosityCards.${currentCard.id}`)
+    : undefined;
 
   const markDone = async () => {
     if (!currentCard) return;
@@ -74,15 +85,15 @@ export default function CuriosityScreen() {
     try {
       await markCuriosityCardCompleted(uid, currentCard.id);
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Could not save your progress.');
+      setSaveError(err instanceof Error ? err.message : t('curiosity.genericSaveError'));
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.tierLabel}>{tier.replace('_', ' & ')}</Text>
-        <Text style={styles.headline}>Today's Curiosity Card</Text>
+        <Text style={styles.tierLabel}>{t(`curiosity.tiers.${tier}`)}</Text>
+        <Text style={styles.headline}>{t('curiosity.headline')}</Text>
 
         {currentCard ? (
           <View style={styles.promptCard}>
@@ -90,18 +101,18 @@ export default function CuriosityScreen() {
           </View>
         ) : (
           <View style={styles.promptCard}>
-            <Text style={styles.promptText}>You've completed every card for this stage. More unlock as your ritual continues.</Text>
+            <Text style={styles.promptText}>{t('curiosity.completedAllForStage')}</Text>
           </View>
         )}
 
         {currentCard && !justCompleted && (
           <Pressable style={styles.cta} onPress={markDone}>
-            <Text style={styles.ctaLabel}>We talked about this</Text>
+            <Text style={styles.ctaLabel}>{t('curiosity.weTalkedAboutThis')}</Text>
           </Pressable>
         )}
 
-        {justCompleted && <Text style={styles.doneText}>Nice — that's one more shared.</Text>}
-        {saveError && <Text style={styles.errorText}>Couldn't save your progress: {saveError}</Text>}
+        {justCompleted && <Text style={styles.doneText}>{t('curiosity.niceOneMoreShared')}</Text>}
+        {saveError && <Text style={styles.errorText}>{t('curiosity.saveError', { error: saveError })}</Text>}
       </View>
     </SafeAreaView>
   );

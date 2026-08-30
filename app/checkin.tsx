@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ScoreSelector } from '../src/components/ScoreSelector';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { useAuth } from '../src/state/AuthContext';
@@ -57,6 +58,7 @@ const MOOD_LABELS: MoodLabel[] = [
 
 export default function CheckinScreen() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   const { mode, attachmentAnswers, loveLanguagePicks, ritualTime } = useOnboarding();
   const { uid } = useAuth();
   const [seenScore, setSeenScore] = useState(5);
@@ -129,14 +131,20 @@ export default function CheckinScreen() {
 
   // Prefers the fetched suggested_actions catalog's copy (content-managed,
   // editable without a code deploy) over decisionMatrix.ts's hardcoded
-  // fallback, joined on actionId — see resolveActionCopy().
+  // fallback, joined on actionId — see resolveActionCopy(). The catalog is
+  // English-only content (out of scope for this i18n pass — see
+  // docs/07-internationalization.md), so it's only preferred when the app's
+  // active language is English; every other language always uses the
+  // translated fallback rather than mixing languages on one card.
+  const translatedFallback = t(`checkin.action.${action.actionKey}`, action.actionParams);
   const displayedActionText = useMemo(() => {
+    if (i18n.language !== 'en') return translatedFallback;
     const catalogEntry = suggestedActions.find((a) => a.id === action.actionId);
-    return resolveActionCopy(catalogEntry?.copy, action.action, {
+    return resolveActionCopy(catalogEntry?.copy, translatedFallback, {
       memoryVaultDetail: memoryEntries.find((e) => !e.usedInGeneration)?.content,
       interest: desireEntries.find((e) => !e.used)?.desire,
     });
-  }, [action, suggestedActions, memoryEntries, desireEntries]);
+  }, [action, suggestedActions, memoryEntries, desireEntries, i18n.language, translatedFallback]);
 
   const handleSeeAction = async () => {
     setShowAction(true);
@@ -196,7 +204,7 @@ export default function CheckinScreen() {
       }
     } catch (err) {
       // Non-fatal: the computed action above already rendered regardless.
-      setSaveError(err instanceof Error ? err.message : 'Could not save check-in.');
+      setSaveError(err instanceof Error ? err.message : t('checkin.genericSaveError'));
     }
   };
 
@@ -230,17 +238,21 @@ export default function CheckinScreen() {
         })),
       );
       const result = checkRecalibration(profile.loveLanguageReceive, feedback);
-      if (result.shouldRecalibrate && result.newPrimary && result.message) {
+      if (result.shouldRecalibrate && result.newPrimary) {
+        const displayMessage = t('recalibration.message', { language: t(`loveLanguages.${result.newPrimary}`) });
         await updateProfileLoveLanguageReceive(uid, result.newPrimary);
         await logRecalibrationEvent({
           userId: uid,
           type: 'client_recalibrated',
           previousLoveLanguageReceive: profile.loveLanguageReceive,
           newLoveLanguageReceive: result.newPrimary,
-          message: result.message,
+          // Audit trail stays English regardless of the app's active
+          // language — it's an internal record (dashboard/support), not
+          // user-facing copy; displayMessage below is what the user sees.
+          message: `We learned the user feels more loved by ${result.newPrimary} than the onboarding baseline suggested.`,
           logCount: feedback.length,
         });
-        setRecalibrationMessage(result.message);
+        setRecalibrationMessage(displayMessage);
       }
     } catch {
       // best-effort; the tap already reflected locally
@@ -250,15 +262,15 @@ export default function CheckinScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.headline}>90-sec Micro-Attunement</Text>
-        <Text style={styles.sub}>How are things feeling right now?</Text>
+        <Text style={styles.headline}>{t('checkin.headline')}</Text>
+        <Text style={styles.sub}>{t('checkin.sub')}</Text>
 
-        <ScoreSelector label="Seen" value={seenScore} onChange={setSeenScore} />
-        <ScoreSelector label="Safe" value={safeScore} onChange={setSafeScore} />
-        <ScoreSelector label="Sought" value={soughtScore} onChange={setSoughtScore} />
-        <ScoreSelector label="Mood" value={moodScore} onChange={setMoodScore} />
+        <ScoreSelector label={t('checkin.seen')} value={seenScore} onChange={setSeenScore} />
+        <ScoreSelector label={t('checkin.safe')} value={safeScore} onChange={setSafeScore} />
+        <ScoreSelector label={t('checkin.sought')} value={soughtScore} onChange={setSoughtScore} />
+        <ScoreSelector label={t('checkin.mood')} value={moodScore} onChange={setMoodScore} />
 
-        <Text style={styles.moodLabel}>In one word</Text>
+        <Text style={styles.moodLabel}>{t('checkin.inOneWord')}</Text>
         <View style={styles.moodGrid}>
           {MOOD_LABELS.map((m) => (
             <Pressable
@@ -266,24 +278,26 @@ export default function CheckinScreen() {
               style={[styles.moodChip, moodLabel === m && styles.moodChipSelected]}
               onPress={() => setMoodLabel(m)}
             >
-              <Text style={[styles.moodChipText, moodLabel === m && styles.moodChipTextSelected]}>{m}</Text>
+              <Text style={[styles.moodChipText, moodLabel === m && styles.moodChipTextSelected]}>
+                {t(`checkin.moodLabels.${m}`)}
+              </Text>
             </Pressable>
           ))}
         </View>
 
         <Pressable style={styles.cta} onPress={handleSeeAction}>
-          <Text style={styles.ctaLabel}>See Today's Action</Text>
+          <Text style={styles.ctaLabel}>{t('checkin.seeAction')}</Text>
         </Pressable>
 
         {showAction && (
           <View style={styles.actionCard}>
-            <Text style={styles.actionLabel}>Today's Micro-Action</Text>
-            <Text style={styles.actionStrategy}>{action.strategy}</Text>
+            <Text style={styles.actionLabel}>{t('checkin.todaysMicroAction')}</Text>
+            <Text style={styles.actionStrategy}>{t(`checkin.strategy.${action.strategyKey}`)}</Text>
             <Text style={styles.actionText}>{displayedActionText}</Text>
 
             {landedReport === null ? (
               <View style={styles.landedRow}>
-                <Text style={styles.landedPrompt}>Did this land?</Text>
+                <Text style={styles.landedPrompt}>{t('checkin.didThisLand')}</Text>
                 <View style={styles.landedButtons}>
                   {([-2, -1, 0, 1, 2] as const).map((delta) => (
                     <Pressable key={delta} style={styles.landedButton} onPress={() => handleLandedReport(delta)}>
@@ -295,7 +309,7 @@ export default function CheckinScreen() {
                 </View>
               </View>
             ) : (
-              <Text style={styles.landedThanks}>Thanks — logged to help tailor future actions.</Text>
+              <Text style={styles.landedThanks}>{t('checkin.thanksLogged')}</Text>
             )}
           </View>
         )}
@@ -306,19 +320,19 @@ export default function CheckinScreen() {
           </View>
         )}
 
-        {saveError && <Text style={styles.errorText}>Couldn't save your check-in: {saveError}</Text>}
+        {saveError && <Text style={styles.errorText}>{t('checkin.saveError', { error: saveError })}</Text>}
 
         <Pressable style={styles.link} onPress={() => router.push('/bids')}>
-          <Text style={styles.linkText}>Log a bid for connection →</Text>
+          <Text style={styles.linkText}>{t('checkin.logBidLink')}</Text>
         </Pressable>
         <Pressable style={styles.link} onPress={() => router.push('/memory-vault')}>
-          <Text style={styles.linkText}>Memory Vault →</Text>
+          <Text style={styles.linkText}>{t('checkin.memoryVaultLink')}</Text>
         </Pressable>
         <Pressable style={styles.link} onPress={() => router.push('/desire-inventory')}>
-          <Text style={styles.linkText}>Desire Inventory →</Text>
+          <Text style={styles.linkText}>{t('checkin.desireInventoryLink')}</Text>
         </Pressable>
         <Pressable style={styles.link} onPress={() => router.push('/settings')}>
-          <Text style={styles.linkTextSecondary}>Settings</Text>
+          <Text style={styles.linkTextSecondary}>{t('checkin.settingsLink')}</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

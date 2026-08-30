@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView, TextInput } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../src/state/AuthContext';
 import { summarizeWeek, shouldTriggerRepairQuest, SECURE_ZONE_THRESHOLD } from '../src/engine/bidTracker';
 import type { BidLogEntry, BidResponse } from '../src/engine/types';
@@ -18,14 +19,11 @@ import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 // Firestore's last 7 days when configured (best-effort, same graceful
 // degradation pattern as checkin.tsx).
 const BID_TYPES: BidType[] = ['comment', 'touch', 'joke', 'help'];
-const RESPONSES: { value: BidResponse; label: string }[] = [
-  { value: 'toward', label: 'Toward' },
-  { value: 'away', label: 'Away' },
-  { value: 'against', label: 'Against' },
-];
+const RESPONSES: BidResponse[] = ['toward', 'away', 'against'];
 
 export default function BidsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { uid } = useAuth();
   const [bidLog, setBidLog] = useState<BidLogEntry[]>([]);
   const [description, setDescription] = useState('');
@@ -78,7 +76,7 @@ export default function BidsScreen() {
         ratioWeekly: nextRatio,
       });
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Could not save bid.');
+      setSaveError(err instanceof Error ? err.message : t('bids.genericSaveError'));
     }
   };
 
@@ -87,74 +85,72 @@ export default function BidsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.headline}>Bid Tracker</Text>
-        <Text style={styles.sub}>Log a small moment, then say how it landed.</Text>
+        <Text style={styles.headline}>{t('bids.headline')}</Text>
+        <Text style={styles.sub}>{t('bids.sub')}</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="e.g. Partner made a joke while I was on my phone"
+          placeholder={t('bids.placeholder')}
           placeholderTextColor={colors.textSecondary}
           value={description}
           onChangeText={setDescription}
         />
 
         <View style={styles.chipRow}>
-          {BID_TYPES.map((t) => (
+          {BID_TYPES.map((bt) => (
             <Pressable
-              key={t}
-              style={[styles.chip, bidType === t && styles.chipSelected]}
-              onPress={() => setBidType(t)}
+              key={bt}
+              style={[styles.chip, bidType === bt && styles.chipSelected]}
+              onPress={() => setBidType(bt)}
             >
-              <Text style={[styles.chipText, bidType === t && styles.chipTextSelected]}>{t}</Text>
+              <Text style={[styles.chipText, bidType === bt && styles.chipTextSelected]}>{t(`bids.types.${bt}`)}</Text>
             </Pressable>
           ))}
         </View>
 
-        <Text style={styles.question}>Did you turn...</Text>
+        <Text style={styles.question}>{t('bids.didYouTurn')}</Text>
         <View style={styles.responseRow}>
           {RESPONSES.map((r) => (
             <Pressable
-              key={r.value}
-              style={[styles.responseButton, styles[`response_${r.value}`]]}
-              onPress={() => logBid(r.value)}
+              key={r}
+              style={[styles.responseButton, styles[`response_${r}`]]}
+              onPress={() => logBid(r)}
             >
-              <Text style={styles.responseLabel}>{r.label}</Text>
+              <Text style={styles.responseLabel}>{t(`bids.responses.${r}`)}</Text>
             </Pressable>
           ))}
         </View>
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>This Week</Text>
+          <Text style={styles.summaryLabel}>{t('bids.thisWeek')}</Text>
           {summary.total === 0 ? (
-            <Text style={styles.summaryEmpty}>No bids logged yet this week.</Text>
+            <Text style={styles.summaryEmpty}>{t('bids.noBidsYet')}</Text>
           ) : (
             <>
-              <Text style={styles.summaryRatio}>{Math.round(summary.towardRatio * 100)}% toward</Text>
+              <Text style={styles.summaryRatio}>{t('bids.towardPercent', { pct: Math.round(summary.towardRatio * 100) })}</Text>
               <Text style={styles.summaryMeta}>
-                {summary.towardCount} toward · {summary.awayCount} away · {summary.againstCount} against
+                {t('bids.meta', { toward: summary.towardCount, away: summary.awayCount, against: summary.againstCount })}
               </Text>
               {summary.isSecureZone ? (
                 <Text style={styles.badgeSuccess}>
-                  Bid Response: {Math.round(summary.towardRatio * 100)}% — that's Secure Zone!
+                  {t('bids.secureZone', { pct: Math.round(summary.towardRatio * 100) })}
                 </Text>
               ) : (
                 <Text style={styles.badgeWarning}>
-                  Below the {Math.round(SECURE_ZONE_THRESHOLD * 100)}% Secure Zone threshold.
+                  {t('bids.belowThreshold', { pct: Math.round(SECURE_ZONE_THRESHOLD * 100) })}
                 </Text>
               )}
               {triggerRepairQuest && (
-                <Text style={styles.repairQuest}>
-                  Try a Curiosity Card + Appreciation quest today to help turn this around.
-                </Text>
+                <Text style={styles.repairQuest}>{t('bids.repairQuest')}</Text>
               )}
             </>
           )}
         </View>
 
-        {saveError && <Text style={styles.errorText}>Couldn't save that bid: {saveError}</Text>}
+        {saveError && <Text style={styles.errorText}>{t('bids.saveError', { error: saveError })}</Text>}
 
         <Pressable style={styles.link} onPress={() => router.push('/curiosity')}>
-          <Text style={styles.linkText}>Open today's Curiosity Card →</Text>
+          <Text style={styles.linkText}>{t('bids.curiosityLink')}</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
+import { useTranslation } from 'react-i18next';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
@@ -14,7 +15,10 @@ import { colors, radius, fontFamily } from '../src/theme/tokens';
 // Screen 6 — Soft Permission + Ritual Time.
 // Notification permission is requested AFTER the time choice, never before —
 // this ordering is load-bearing for conversion, see docs/01-onboarding-flow.md.
+// Internal keys stay 'Custom' etc. (matched against NOTIFICATION_TIME_24H
+// below); the displayed label is translated via ritualTime.options.<key>.
 const TIME_OPTIONS = ['7pm', '9pm', 'Custom'];
+const TIME_OPTION_KEYS: Record<string, string> = { '7pm': '7pm', '9pm': '9pm', Custom: 'custom' };
 
 // UserDoc.notificationTime wants "HH:mm" 24h; there's no actual custom-time
 // picker built yet, so "Custom" falls back to the same default as "7pm".
@@ -34,6 +38,7 @@ function deviceTimezone(): string {
 
 export default function RitualTimeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { mode, setRitualTime } = useOnboarding();
   const { uid } = useAuth();
   const [selected, setSelected] = useState<string | null>(null);
@@ -78,8 +83,8 @@ export default function RitualTimeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.headline}>When should we do your 90-sec check-in?</Text>
-      <Text style={styles.sub}>Most people pick after dinner.</Text>
+      <Text style={styles.headline}>{t('ritualTime.headline')}</Text>
+      <Text style={styles.sub}>{t('ritualTime.sub')}</Text>
 
       <View style={styles.options}>
         {TIME_OPTIONS.map((time) => (
@@ -88,7 +93,9 @@ export default function RitualTimeScreen() {
             style={[styles.option, selected === time && styles.optionSelected]}
             onPress={() => choose(time)}
           >
-            <Text style={[styles.optionLabel, selected === time && styles.optionLabelSelected]}>{time}</Text>
+            <Text style={[styles.optionLabel, selected === time && styles.optionLabelSelected]}>
+              {t(`ritualTime.options.${TIME_OPTION_KEYS[time]}`)}
+            </Text>
           </Pressable>
         ))}
       </View>

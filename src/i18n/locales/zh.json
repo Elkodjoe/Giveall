@@ -1,0 +1,300 @@
+{
+  "promise": {
+    "headline": "爱是每天的练习。",
+    "sub": "每天90秒，让你感觉更有魅力、更被珍视、更被渴望。",
+    "cta": "开始我的测评"
+  },
+  "whoFor": {
+    "headline": "你是为谁而来？",
+    "options": {
+      "crush": "有一个心动的人，想更亲近TA",
+      "new": "正在和新认识的人约会（0-6个月）",
+      "ltr": "处于一段长期关系中",
+      "healing": "正在疗愈 / 为下一段爱做好准备"
+    }
+  },
+  "attachmentQuestions": {
+    "aq-1": {
+      "prompt": "当对方几个小时不回消息时，你会...",
+      "options": {
+        "0": "认为对方在忙，晚点再看",
+        "1": "开始焦虑，很想再发一条消息",
+        "2": "感到松了一口气，需要空间",
+        "3": "想要亲近，但又怕打扰对方"
+      }
+    },
+    "aq-2": {
+      "prompt": "一次非常愉快的约会或对话之后，你会...",
+      "options": {
+        "0": "感觉很好，期待下一次",
+        "1": "立刻担心这种感觉会消退，或者觉得太美好而不真实",
+        "2": "有点想后退一步、重新审视一下",
+        "3": "感到开心，但也做好心理准备事情可能会出错"
+      }
+    },
+    "aq-3": {
+      "prompt": "出现矛盾冲突时，你会...",
+      "options": {
+        "0": "直接面对，并相信问题会得到解决",
+        "1": "感到恐慌，急需立刻解决",
+        "2": "想先退一步，等情绪平复再说",
+        "3": "想解决，却僵住或什么都说不出来"
+      }
+    },
+    "aq-4": {
+      "prompt": "你的伴侣想要一个人独自度过周末。你会...",
+      "options": {
+        "0": "觉得没问题，安排自己的时间",
+        "1": "怀疑你们之间是不是出了什么问题",
+        "2": "也感到松了一口气，有了自己的空间",
+        "3": "嘴上说没关系，心里却感到不安"
+      }
+    },
+    "aq-5": {
+      "prompt": "当伴侣对你说\"我需要你\"时，你会感到...",
+      "options": {
+        "0": "很好——亲近感很自然",
+        "1": "松了一口气——这正是你想听到的",
+        "2": "有点被逼迫或有压力",
+        "3": "心里温暖，但也害怕让对方失望"
+      }
+    },
+    "aq-6": {
+      "prompt": "当你想象理想的亲密程度时，那是...",
+      "options": {
+        "0": "亲密，但也留有独立的空间，这感觉很轻松",
+        "1": "越亲密越好，越频繁越好",
+        "2": "先要独立，亲密要按自己的节奏来",
+        "3": "内心深深渴望，但也让你害怕"
+      }
+    }
+  },
+  "loveLanguagePairs": {
+    "prompt": "在辛苦的一天结束后，哪一种会让你感觉更被爱？",
+    "ll-1": {
+      "0": "我帮你把那件事办好了",
+      "1": "你对我来说意义重大，我为你感到骄傲"
+    },
+    "ll-2": {
+      "0": "一份小礼物，表示对方想着你",
+      "1": "对方专注陪伴你二十分钟，不分心"
+    },
+    "ll-3": {
+      "0": "一个长长的拥抱，什么都不用说",
+      "1": "一条列出他们欣赏你的地方的消息"
+    },
+    "ll-4": {
+      "0": "对方悄悄帮你分担了一件待办事项",
+      "1": "对方放下手机，陪你安静地放松"
+    }
+  },
+  "payoff": {
+    "summary": "明白了。你的依恋倾向偏{{attachmentPhrase}}，你通过{{receivesVia}}感受到最多的爱，但你却是通过{{givesVia}}来表达爱的。这就是为什么你有时会觉得不被看见。这是你的第一个微调整…",
+    "attachmentSpike": "{{primary}}型，并带有{{spike}}的波动",
+    "attachmentNoSpike": "偏{{primary}}型",
+    "firstWinLabel": "你的第一个小成就",
+    "firstWinSubLabel": "你的主动赞美",
+    "saveIt": "保存",
+    "sendIt": "发送",
+    "firstWinFallback": "我喜欢你解决问题时把想法说出来的样子——你从不隐藏那些混乱的部分。"
+  },
+  "ritualTime": {
+    "headline": "我们该在什么时候做你的90秒签到？",
+    "sub": "大多数人选择晚饭后。",
+    "options": {
+      "7pm": "晚上7点",
+      "9pm": "晚上9点",
+      "custom": "自定义"
+    }
+  },
+  "checkin": {
+    "headline": "90秒微调谐",
+    "sub": "现在感觉怎么样？",
+    "seen": "被看见",
+    "safe": "安全感",
+    "sought": "被渴望",
+    "mood": "心情",
+    "inOneWord": "用一个词形容",
+    "moodLabels": {
+      "hopeful": "充满希望",
+      "joyful": "喜悦",
+      "calm": "平静",
+      "neutral": "一般",
+      "anxious": "焦虑",
+      "lonely": "孤独",
+      "disconnected": "疏离",
+      "triggered": "情绪被触发",
+      "loved": "被爱"
+    },
+    "seeAction": "查看今日行动",
+    "todaysMicroAction": "今日微行动",
+    "didThisLand": "这个行动效果如何？",
+    "thanksLogged": "谢谢——已记录，用于调整未来的行动。",
+    "saveError": "无法保存你的签到：{{error}}",
+    "logBidLink": "记录一次连接的小举动 →",
+    "memoryVaultLink": "记忆宝库 →",
+    "desireInventoryLink": "渴望清单 →",
+    "settingsLink": "设置",
+    "strategy": {
+      "consistencyReassurance": "持续 + 安抚",
+      "lowPressureSpace": "无压力空间",
+      "safeVulnerability": "安全的脆弱表达",
+      "directRepair": "直接修复",
+      "recallDetail": "回忆细节",
+      "specificDesirePlay": "具体渴望 + 情趣互动"
+    },
+    "action": {
+      "consistencyReassurance": "每天固定时间发一条语音消息：'开会前想到了你'",
+      "lowPressureSpace": "无需回复的问候：'看到这个梗图想到了你，不用回复'",
+      "safeVulnerability": "先分享一个小小的担忧，再表达欣赏。这展示了脆弱是安全的。",
+      "directRepair": "直接问对方：'昨天我感觉有点疏远，今晚我们能重新连接一下吗？'",
+      "recallDetailWithEntry": "对方上次提到过\"{{detail}}\"。今天问问这件事。",
+      "recallDetailGeneric": "就对方在意的事情问一个开放式的问题，认真倾听并记住一个细节。",
+      "specificDesireWithEntry": "对方说过\"{{desire}}\"会让TA感到被渴望。今天就去做。",
+      "specificDesireGeneric": "今天做一件小而具体的事，表明你是有意选择了对方。"
+    },
+    "genericSaveError": "无法保存签到。"
+  },
+  "bids": {
+    "headline": "连接举动追踪",
+    "sub": "记录一个小瞬间，然后说说它的反馈如何。",
+    "placeholder": "例如：我在玩手机时，伴侣开了个玩笑",
+    "types": {
+      "comment": "评论",
+      "touch": "触碰",
+      "joke": "玩笑",
+      "help": "帮助"
+    },
+    "didYouTurn": "你的反应是...",
+    "responses": {
+      "toward": "回应靠近",
+      "away": "回避",
+      "against": "抵触"
+    },
+    "thisWeek": "本周",
+    "noBidsYet": "本周还没有记录任何连接举动。",
+    "towardPercent": "{{pct}}% 回应靠近",
+    "meta": "{{toward}} 靠近 · {{away}} 回避 · {{against}} 抵触",
+    "secureZone": "举动回应率：{{pct}}%——这是安全区！",
+    "belowThreshold": "低于{{pct}}%的安全区阈值。",
+    "repairQuest": "今天试试一张好奇心卡片 + 一次欣赏表达，来扭转这个局面。",
+    "saveError": "无法保存这个举动：{{error}}",
+    "curiosityLink": "打开今日的好奇心卡片 →",
+    "genericSaveError": "无法保存这个举动。"
+  },
+  "curiosity": {
+    "headline": "今日好奇心卡片",
+    "completedAllForStage": "你已完成这个阶段的所有卡片。随着你继续这个仪式，会解锁更多。",
+    "weTalkedAboutThis": "我们已经聊过这个了",
+    "niceOneMoreShared": "很好——又分享了一件事。",
+    "saveError": "无法保存你的进度：{{error}}",
+    "tiers": {
+      "gratitude_joy": "感恩与喜悦",
+      "values_dreams": "价值观与梦想",
+      "vulnerability_repair": "脆弱与修复"
+    },
+    "genericSaveError": "无法保存你的进度。"
+  },
+  "memoryVault": {
+    "headline": "记忆宝库",
+    "notConfigured": "需要配置 Firebase 才能保存真实数据——见 docs/06-firebase-provisioning.md。",
+    "sub": "对方提到过的一些具体小事——帮助你之后想起来。",
+    "placeholder": "例如：提到过想尝试那家新开的拉面店",
+    "types": {
+      "detail": "细节",
+      "joke": "玩笑",
+      "interest": "兴趣",
+      "photo": "照片"
+    },
+    "sentiments": {
+      "warm": "温暖",
+      "neutral": "中性",
+      "tense": "紧张"
+    },
+    "save": "保存到记忆宝库",
+    "nothingSavedYet": "还没有保存任何内容。",
+    "used": "已使用",
+    "delete": "删除",
+    "genericLoadError": "无法加载记忆宝库。",
+    "genericAddError": "无法保存该条目。",
+    "genericDeleteError": "无法删除该条目。"
+  },
+  "desireInventory": {
+    "headline": "渴望清单",
+    "notConfigured": "需要配置 Firebase 才能保存真实数据——见 docs/06-firebase-provisioning.md。",
+    "sub": "让你感到被渴望的具体事情，按重要程度排序。",
+    "placeholder": "例如：在公众场合被维护",
+    "add": "添加到渴望清单",
+    "nothingAddedYet": "还没有添加任何内容。",
+    "used": "已使用",
+    "delete": "删除",
+    "genericLoadError": "无法加载渴望清单。",
+    "genericAddError": "无法保存该条目。",
+    "genericDeleteError": "无法删除该条目。"
+  },
+  "settings": {
+    "headline": "设置",
+    "yourLast7Days": "你最近7天",
+    "seen": "被看见",
+    "safe": "安全感",
+    "sought": "被渴望",
+    "mood": "心情",
+    "checkinsLoggedThisWeek_other": "本周已记录 {{count}} 次签到",
+    "privacyCopy": "这里是你的私人空间。你的数据绝不会被出售。伴侣模式需要双方明确同意才能开启。你可以随时删除你的记忆宝库。",
+    "manageMemoryVault": "管理记忆宝库 →",
+    "partnerMode": "伴侣模式 →",
+    "deleteMemoryVault": "删除我的记忆宝库",
+    "tapAgainToConfirm": "再次点击以确认删除",
+    "cancel": "取消",
+    "memoryVaultCleared": "记忆宝库已清空。",
+    "couldNotClear": "无法清空记忆宝库。",
+    "language": "语言"
+  },
+  "partner": {
+    "headline": "伴侣模式",
+    "sub": "双方都需要明确同意——不会自动关联。",
+    "yourCode": "你的连接码",
+    "copyCode": "复制连接码",
+    "copied": "已复制 ✓",
+    "shareHint": "把这个分享给你的伴侣，让TA在下面输入。",
+    "placeholder": "输入你伴侣的连接码",
+    "connect": "连接",
+    "ownCodeError": "这是你自己的连接码——请向你的伴侣索要TA的连接码。",
+    "status": "状态",
+    "connected": "已连接 ✓",
+    "bothOptedIn": "你们都已同意——正在完成连接，请稍后再来查看。",
+    "pending": "待处理——正在等待你的伴侣也输入你的连接码。",
+    "genericLoadError": "无法加载连接状态。",
+    "genericConnectError": "无法连接。"
+  },
+  "retention": {
+    "lastActionSummary": "你的伴侣{{summary}}。要保持这个势头吗？2分钟签到。",
+    "bidResponse": "你本周的举动回应率是{{pct}}%——这是安全区。再签到一次就能锁定它。",
+    "neutral": "准备好今天的90秒签到了吗？"
+  },
+  "recalibration": {
+    "message": "我们发现，你通过{{language}}感受到的爱，比你想的要多。正在调整你的方案。"
+  },
+  "loveLanguages": {
+    "words": "肯定的言语",
+    "acts": "服务的行动",
+    "gifts": "礼物",
+    "quality_time": "高质量陪伴",
+    "touch": "身体接触"
+  },
+  "attachmentStyles": {
+    "secure": "安全型",
+    "anxious": "焦虑型",
+    "avoidant": "回避型",
+    "fearful": "恐惧型"
+  },
+  "curiosityCards": {
+    "cc_l1_01": "这周有哪个瞬间让你对我们感到最自豪？",
+    "cc_l1_02": "我做的哪件小事是你偷偷喜欢的？",
+    "cc_l1_03": "最近你什么时候感觉最被我看见？",
+    "cc_l2_01": "有什么隐藏的梦想是你从未告诉过我的？",
+    "cc_l2_02": "在爱情中感到安全对你来说意味着什么？",
+    "cc_l3_01": "即使我在你身边，你什么时候会感到最孤独？",
+    "cc_l3_02": "童年的哪个故事塑造了你爱人的方式？"
+  }
+}

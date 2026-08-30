@@ -10,6 +10,7 @@ A 90-second daily relationship fitness app. See `docs/00-product-overview.md` fo
 - `src/components/`, `src/state/` — RN UI pieces for the onboarding flow.
 - `app/` — Expo Router screens: Onboarding Screens 1–6, plus `checkin.tsx` (daily 90-second check-in), `bids.tsx` (Bid Tracker), `curiosity.tsx` (Curiosity Card), `memory-vault.tsx`, `desire-inventory.tsx`, `settings.tsx`, and `partner.tsx` (double opt-in Partner Mode).
 - `src/firebase/` — Firestore document types, security rules-matching collection helpers, and auth. Works without a Firebase project configured — see `docs/06-firebase-provisioning.md`.
+- `src/i18n/` — 7-language i18next setup (`locales/*.json`); see `docs/07-internationalization.md`.
 
 ## Getting started
 
@@ -62,3 +63,7 @@ Three new pieces, live on the real `giveall-app` Firebase project via multi-site
 - **Native app builds**: `eas.json` + `app.json`'s `extra.eas.projectId` set up for EAS Build (project `elkodjoe1/giveall` on Expo's servers — logged in as `kodjoefamily@gmail.com`, a different account than the Firebase project owner; flagged for confirmation given past account mix-ups on this project, not yet corrected either way). A `preview` profile builds an installable Android APK (no Google Play account needed) and an iOS **simulator** build (no Apple Developer account needed — a real-device iOS build requires one, for code signing). Both kicked off live via `eas build --non-interactive --no-wait`; check status at the URLs `eas build:list` returns or on expo.dev.
 
 None of these needed Blaze — Hosting and Auth are both free-tier Firebase features, and EAS Build is a separate (also has a free tier) Expo service.
+
+## Internationalization
+
+The app now supports 7 languages — English (default), Spanish, French, German, Portuguese, Chinese (Simplified), Japanese — via `i18next`/`react-i18next`/`expo-localization`. Device locale picks the initial language (falling back to English); a switcher in `app/settings.tsx` lets the user override it, persisted across launches. Every screen's static UI copy, the onboarding question banks, and the engine's dynamic prescriptions (`decisionMatrix.ts`, `retentionNotifications.ts`, `recalibration.ts` — all restructured to return i18next keys instead of English strings, keeping the engine framework-agnostic) are fully translated. See `docs/07-internationalization.md` for the full design, what's deliberately still English-only (the LLM-generated appreciation text, the two Firestore content catalogs, the marketing site, the admin dashboard), and a real bug this pass found and fixed: Spanish's ritual-time options ("7pm"/"9pm") were accidentally left untranslated while every other language correctly localized them to "19h"/"21h" — caught by diffing all 7 locale files against English rather than only spot-checking screens by hand. Verified live: language switching, persistence across reload, non-Latin script rendering (Japanese), and a full onboarding-through-check-in flow driven entirely in Spanish, all via Playwright against the real deployed engine logic — zero new console errors.

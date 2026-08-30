@@ -51,9 +51,14 @@ export type AvwAxis = 'safe' | 'seen' | 'sought';
 
 export interface MicroAttunement {
   axis: AvwAxis;
-  strategy: string;
-  tone: string;
-  action: string;
+  // i18next keys, not display text — this file has no framework/i18n
+  // dependency by design (see README), so the caller (a React component)
+  // resolves these via useTranslation()'s t(). See
+  // src/i18n/locales/en.json's checkin.strategy/checkin.action for the
+  // English source of truth these keys map into.
+  strategyKey: string;
+  actionKey: string;
+  actionParams?: Record<string, string>;
   // Which love language this prescribed action expresses, matching
   // scripts/seed/suggested_actions.json's loveLanguageType for the
   // equivalent trigger — lets a completed action be logged to

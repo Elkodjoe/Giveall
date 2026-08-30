@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, TextInput, ScrollView } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { getPartnership, requestPartnership, optInToPartnership } from '../src/firebase/collections';
@@ -17,6 +18,7 @@ import { colors, radius, card, button, fontFamily } from '../src/theme/tokens';
 // — see docs/06-firebase-provisioning.md), so this screen can reach "both
 // opted in" and correctly keep showing Pending until that's deployed.
 export default function PartnerScreen() {
+  const { t } = useTranslation();
   const { uid } = useAuth();
   const [partnerCode, setPartnerCode] = useState('');
   const [partnership, setPartnership] = useState<PartnershipDoc | null>(null);
@@ -35,8 +37,8 @@ export default function PartnerScreen() {
     if (!isFirebaseConfigured || !uid || !linkedPartnerId) return;
     getPartnership(uid, linkedPartnerId)
       .then((p) => setPartnership(p ?? null))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Could not load partnership status.'));
-  }, [uid, linkedPartnerId]);
+      .catch((err) => setError(err instanceof Error ? err.message : t('partner.genericLoadError')));
+  }, [uid, linkedPartnerId, t]);
 
   useFocusEffect(load);
 
@@ -44,7 +46,7 @@ export default function PartnerScreen() {
     const partnerUid = partnerCode.trim();
     if (!partnerUid || !isFirebaseConfigured || !uid) return;
     if (partnerUid === uid) {
-      setError("That's your own code — ask your partner for theirs.");
+      setError(t('partner.ownCodeError'));
       return;
     }
     setError(null);
@@ -63,7 +65,7 @@ export default function PartnerScreen() {
       const updated = await getPartnership(uid, partnerUid);
       setPartnership(updated ?? null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not connect.');
+      setError(err instanceof Error ? err.message : t('partner.genericConnectError'));
     }
   };
 
@@ -72,23 +74,23 @@ export default function PartnerScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.headline}>Partner Mode</Text>
-        <Text style={styles.sub}>Both people opt in explicitly — nothing links automatically.</Text>
+        <Text style={styles.headline}>{t('partner.headline')}</Text>
+        <Text style={styles.sub}>{t('partner.sub')}</Text>
 
         <View style={styles.codeCard}>
-          <Text style={styles.codeLabel}>Your connection code</Text>
+          <Text style={styles.codeLabel}>{t('partner.yourCode')}</Text>
           <Text selectable style={styles.codeValue}>
             {uid ?? '—'}
           </Text>
           <Pressable style={styles.copyButton} onPress={copyCode} disabled={!uid}>
-            <Text style={styles.copyButtonLabel}>{copied ? 'Copied ✓' : 'Copy code'}</Text>
+            <Text style={styles.copyButtonLabel}>{copied ? t('partner.copied') : t('partner.copyCode')}</Text>
           </Pressable>
-          <Text style={styles.codeHint}>Share this with your partner so they can enter it below.</Text>
+          <Text style={styles.codeHint}>{t('partner.shareHint')}</Text>
         </View>
 
         <TextInput
           style={styles.input}
-          placeholder="Enter your partner's connection code"
+          placeholder={t('partner.placeholder')}
           placeholderTextColor={colors.textSecondary}
           value={partnerCode}
           onChangeText={setPartnerCode}
@@ -96,20 +98,20 @@ export default function PartnerScreen() {
         />
 
         <Pressable style={styles.cta} onPress={connect}>
-          <Text style={styles.ctaLabel}>Connect</Text>
+          <Text style={styles.ctaLabel}>{t('partner.connect')}</Text>
         </Pressable>
 
         {error && <Text style={styles.errorText}>{error}</Text>}
 
         {partnership && (
           <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Status</Text>
+            <Text style={styles.statusLabel}>{t('partner.status')}</Text>
             {partnership.status === 'active' ? (
-              <Text style={styles.statusActive}>Connected ✓</Text>
+              <Text style={styles.statusActive}>{t('partner.connected')}</Text>
             ) : bothOptedIn ? (
-              <Text style={styles.statusPending}>You're both in — just finishing the connection. Check back soon.</Text>
+              <Text style={styles.statusPending}>{t('partner.bothOptedIn')}</Text>
             ) : (
-              <Text style={styles.statusPending}>Pending — waiting for your partner to enter your code too.</Text>
+              <Text style={styles.statusPending}>{t('partner.pending')}</Text>
             )}
           </View>
         )}

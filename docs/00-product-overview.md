@@ -32,6 +32,7 @@ Scores are 0–100 in the client-side engine (`src/engine/types.ts`'s `AvwScores
 4. `04-firebase-schema.md` — Firestore collections, the locked schema decisions, and known gaps.
 5. `05-design-tokens.md` — the GiveAll color/typography/spacing tokens and where they're applied.
 6. `06-firebase-provisioning.md` — manual steps to create and deploy the Firebase project (needs your Google account).
+7. `07-internationalization.md` — how the 7-language i18n setup works, what stays English-only, and why.
 
 ## Code scaffold
 
