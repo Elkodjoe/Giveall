@@ -255,7 +255,8 @@
     "cancel": "キャンセル",
     "memoryVaultCleared": "メモリーボールトを削除しました。",
     "couldNotClear": "メモリーボールトを削除できませんでした。",
-    "language": "言語"
+    "language": "言語",
+    "account": "アカウント →"
   },
   "partner": {
     "headline": "パートナーモード",
@@ -303,5 +304,30 @@
     "cc_l2_02": "あなたにとって、愛の中で安心を感じるとはどういうことですか？",
     "cc_l3_01": "私がそばにいても、いちばん孤独を感じるのはどんなときですか？",
     "cc_l3_02": "あなたの愛し方を形づくった、子供時代のエピソードはありますか？"
+  },
+  "account": {
+    "headline": "アカウント",
+    "anonBlurb": "現在、データはこの端末にのみ保存されています。メールアドレスとパスワードを追加すると、機種変更後も再度ログインできます。",
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "パスワード",
+    "passwordPlaceholder": "6文字以上",
+    "saveAccount": "アカウントを保存",
+    "saving": "保存中…",
+    "signIn": "ログイン",
+    "savedToast": "アカウントを保存しました。どの端末でもログインできます。",
+    "linkedHeadline": "アカウントが保存されました",
+    "linkedBlurb": "{{email}} でログイン中です。このメールアドレスとパスワードで他の端末からログインできます。",
+    "signOut": "ログアウト",
+    "haveAccount": "他の端末ですでにアカウントを保存しましたか？",
+    "signInCta": "ログイン",
+    "backToSignUp": "新しくアカウントを作成",
+    "errInvalidEmail": "有効なメールアドレスではないようです。",
+    "errWeakPassword": "パスワードは6文字以上にしてください。",
+    "errEmailInUse": "そのメールアドレスは既に別のアカウントで使用されています。ログインをお試しください。",
+    "errWrongPassword": "メールアドレスまたはパスワードが正しくありません。",
+    "errRequiresRecentLogin": "セキュリティのため、この変更の前に再度ログインしてください。",
+    "errNotConfigured": "このビルドではアカウント機能は利用できません。",
+    "errGeneric": "問題が発生しました。もう一度お試しください。"
   }
 }

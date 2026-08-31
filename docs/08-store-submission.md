@@ -62,7 +62,33 @@ Getting these right took two failed attempts worth knowing about if regenerating
 
 ## Age rating
 
-Not yet filled out — both stores' content questionnaires ask about romantic/relationship and mild intimacy themes (the app discusses attachment style, love languages, and a "Desire Inventory" concept). Worth a deliberate answer rather than a default guess; likely lands at Apple's 12+ or Google's Teen tier given no explicit content, but this is a content-policy judgment call for whoever holds the account, not something to pre-fill here.
+Both stores' content questionnaires ask about romantic/relationship and mild intimacy themes (the app discusses attachment style, love languages, and a "Desire Inventory" concept). Draft answers below — checked against what the app actually does — for whoever holds the account to confirm and submit; the final call is theirs, but these shouldn't need changing.
+
+**Apple App Store (App Store Connect → Age Rating questionnaire):**
+
+| Question | Answer | Why |
+| --- | --- | --- |
+| Cartoon or Fantasy Violence | None | — |
+| Realistic Violence | None | — |
+| Sexual Content or Nudity | None | The "Desire Inventory" is about non-sexual acts of connection (a recalled detail, a chosen moment); no sexual descriptions, imagery, or explicit prompts anywhere. |
+| Profanity or Crude Humor | None | — |
+| Alcohol, Tobacco, or Drug Use | None | — |
+| Mature/Suggestive Themes | **Infrequent/Mild** | The app frames itself around romantic relationships and intimacy-of-connection; nothing graphic, but not a children's topic. |
+| Horror/Fear, Gambling, Contests | None | — |
+| Unrestricted Web Access | No | No in-app browser; the only outbound link is the privacy policy. |
+| Medical/Treatment Information | No | It's explicitly framed as "relationship fitness," not therapy or medical advice. |
+
+Expected result: **12+**.
+
+**Google Play (Play Console → Content rating questionnaire, IARC):**
+
+- Category: **Reference, News, or Educational** (or "Social Networking" only if Partner Mode is considered social — it's a private 1:1 double-opt-in link with no feed, no discovery, no messaging, so Reference/Educational is the better fit).
+- Violence / Sexuality / Language / Controlled substances: **No** to all.
+- "Does the app contain any content that could be considered sexually suggestive or refer to sexual activity?" → **No** (see the Apple note above — connection acts, not sexual content).
+- User-generated content shared with other users: **Yes, limited** — Memory Vault / Desire Inventory notes are visible to a linked partner after mutual opt-in. Not publicly broadcast. Declare it; it does not by itself raise the rating.
+- Data collection: point to `https://giveall-love.web.app/privacy`.
+
+Expected result: **Teen** (or **Everyone 10+** depending on how the suggestive-themes question is weighted — either is acceptable; don't overstate to Mature).
 
 ## Category
 

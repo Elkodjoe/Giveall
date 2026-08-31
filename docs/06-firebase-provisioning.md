@@ -42,6 +42,7 @@ firebase use giveall-app
 ### 2. Enable services
 
 - **Authentication** → Sign-in method → enable **Anonymous** (the app signs in anonymously by default — see `src/firebase/auth.ts`). No CLI command for this; console only. Enabling can take a minute or two to actually propagate — a `signInAnonymously()` call made immediately after can fail with `auth/admin-restricted-operation` even though the console shows "Enabled"; just retry after a short wait.
+- **Authentication** → Sign-in method → also enable **Email/Password** (a free toggle, no extra config). This backs the anonymous → permanent-account upgrade on `app/account.tsx` (`linkEmailPassword` / `signInWithEmail` in `src/firebase/auth.ts`). Until it's enabled the Account screen still renders but every save/sign-in attempt returns `auth/operation-not-allowed`, which the app maps to a clean "accounts aren't available in this build" message rather than a raw error — so this is a real feature-completeness gap, not a crash.
 - **Firestore** → create the database via CLI:
   ```
   firebase firestore:databases:create "(default)" --location=nam5 --project=giveall-app

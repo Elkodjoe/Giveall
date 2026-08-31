@@ -256,7 +256,8 @@
     "cancel": "Cancel",
     "memoryVaultCleared": "Memory Vault cleared.",
     "couldNotClear": "Could not clear Memory Vault.",
-    "language": "Language"
+    "language": "Language",
+    "account": "Account →"
   },
   "partner": {
     "headline": "Partner Mode",
@@ -304,5 +305,30 @@
     "cc_l2_02": "What does feeling safe mean to you in love?",
     "cc_l3_01": "When do you feel most alone, even when I'm here?",
     "cc_l3_02": "What's a story from your childhood that shaped how you love?"
+  },
+  "account": {
+    "headline": "Account",
+    "anonBlurb": "Right now your data lives only on this device. Add an email and password so you can sign back in if you get a new phone.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 6 characters",
+    "saveAccount": "Save my account",
+    "saving": "Saving…",
+    "signIn": "Sign in",
+    "savedToast": "Account saved. You can now sign in on any device.",
+    "linkedHeadline": "Your account is saved",
+    "linkedBlurb": "Signed in as {{email}}. Use this email and password to sign in on another device.",
+    "signOut": "Sign out",
+    "haveAccount": "Already saved an account on another device?",
+    "signInCta": "Sign in instead",
+    "backToSignUp": "Create an account instead",
+    "errInvalidEmail": "That doesn't look like a valid email address.",
+    "errWeakPassword": "Use at least 6 characters for your password.",
+    "errEmailInUse": "That email is already tied to another account. Try signing in instead.",
+    "errWrongPassword": "Email or password isn't right.",
+    "errRequiresRecentLogin": "For security, please sign in again before making this change.",
+    "errNotConfigured": "Accounts aren't available in this build.",
+    "errGeneric": "Something went wrong. Please try again."
   }
 }

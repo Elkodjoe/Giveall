@@ -256,7 +256,8 @@
     "cancel": "Annuler",
     "memoryVaultCleared": "Coffre à Souvenirs supprimé.",
     "couldNotClear": "Impossible de supprimer le Coffre à Souvenirs.",
-    "language": "Langue"
+    "language": "Langue",
+    "account": "Compte →"
   },
   "partner": {
     "headline": "Mode Partenaire",
@@ -304,5 +305,30 @@
     "cc_l2_02": "Que signifie se sentir en sécurité en amour pour vous ?",
     "cc_l3_01": "Quand vous sentez-vous le plus seul(e), même quand je suis là ?",
     "cc_l3_02": "Quelle histoire de votre enfance a façonné votre façon d’aimer ?"
+  },
+  "account": {
+    "headline": "Compte",
+    "anonBlurb": "Pour l'instant, vos données ne sont enregistrées que sur cet appareil. Ajoutez un e-mail et un mot de passe pour pouvoir vous reconnecter si vous changez de téléphone.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "vous@exemple.com",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Au moins 6 caractères",
+    "saveAccount": "Enregistrer mon compte",
+    "saving": "Enregistrement…",
+    "signIn": "Se connecter",
+    "savedToast": "Compte enregistré. Vous pouvez maintenant vous connecter sur n'importe quel appareil.",
+    "linkedHeadline": "Votre compte est enregistré",
+    "linkedBlurb": "Connecté en tant que {{email}}. Utilisez cet e-mail et ce mot de passe pour vous connecter sur un autre appareil.",
+    "signOut": "Se déconnecter",
+    "haveAccount": "Vous avez déjà enregistré un compte sur un autre appareil ?",
+    "signInCta": "Se connecter",
+    "backToSignUp": "Créer un compte",
+    "errInvalidEmail": "Cet e-mail ne semble pas valide.",
+    "errWeakPassword": "Utilisez au moins 6 caractères pour votre mot de passe.",
+    "errEmailInUse": "Cet e-mail est déjà lié à un autre compte. Essayez plutôt de vous connecter.",
+    "errWrongPassword": "L'e-mail ou le mot de passe est incorrect.",
+    "errRequiresRecentLogin": "Pour des raisons de sécurité, reconnectez-vous avant d'effectuer cette modification.",
+    "errNotConfigured": "Les comptes ne sont pas disponibles dans cette version.",
+    "errGeneric": "Une erreur s'est produite. Veuillez réessayer."
   }
 }

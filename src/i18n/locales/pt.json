@@ -256,7 +256,8 @@
     "cancel": "Cancelar",
     "memoryVaultCleared": "Cofre de Memórias excluído.",
     "couldNotClear": "Não foi possível excluir o Cofre de Memórias.",
-    "language": "Idioma"
+    "language": "Idioma",
+    "account": "Conta →"
   },
   "partner": {
     "headline": "Modo Parceiro(a)",
@@ -304,5 +305,30 @@
     "cc_l2_02": "O que significa se sentir seguro(a) no amor para você?",
     "cc_l3_01": "Quando você se sente mais sozinho(a), mesmo quando estou aqui?",
     "cc_l3_02": "Qual é uma história da sua infância que moldou como você ama?"
+  },
+  "account": {
+    "headline": "Conta",
+    "anonBlurb": "No momento, os seus dados ficam apenas neste dispositivo. Adicione um e-mail e uma palavra-passe para poder entrar novamente se trocar de telemóvel.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "voce@exemplo.com",
+    "passwordLabel": "Palavra-passe",
+    "passwordPlaceholder": "Pelo menos 6 caracteres",
+    "saveAccount": "Guardar a minha conta",
+    "saving": "A guardar…",
+    "signIn": "Iniciar sessão",
+    "savedToast": "Conta guardada. Já pode iniciar sessão em qualquer dispositivo.",
+    "linkedHeadline": "A sua conta está guardada",
+    "linkedBlurb": "Sessão iniciada como {{email}}. Use este e-mail e palavra-passe para iniciar sessão noutro dispositivo.",
+    "signOut": "Terminar sessão",
+    "haveAccount": "Já guardou uma conta noutro dispositivo?",
+    "signInCta": "Iniciar sessão",
+    "backToSignUp": "Criar uma conta",
+    "errInvalidEmail": "Isto não parece um e-mail válido.",
+    "errWeakPassword": "Use pelo menos 6 caracteres na palavra-passe.",
+    "errEmailInUse": "Esse e-mail já está associado a outra conta. Tente iniciar sessão.",
+    "errWrongPassword": "O e-mail ou a palavra-passe estão incorretos.",
+    "errRequiresRecentLogin": "Por segurança, inicie sessão novamente antes de fazer esta alteração.",
+    "errNotConfigured": "As contas não estão disponíveis nesta versão.",
+    "errGeneric": "Algo correu mal. Tente novamente."
   }
 }

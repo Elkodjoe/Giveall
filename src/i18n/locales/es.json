@@ -256,7 +256,8 @@
     "cancel": "Cancelar",
     "memoryVaultCleared": "Bóveda de Recuerdos eliminada.",
     "couldNotClear": "No se pudo eliminar la Bóveda de Recuerdos.",
-    "language": "Idioma"
+    "language": "Idioma",
+    "account": "Cuenta →"
   },
   "partner": {
     "headline": "Modo Pareja",
@@ -304,5 +305,30 @@
     "cc_l2_02": "¿Qué significa sentirte seguro/a en el amor para ti?",
     "cc_l3_01": "¿Cuándo te sientes más solo/a, incluso cuando estoy aquí?",
     "cc_l3_02": "¿Cuál es una historia de tu infancia que marcó cómo amas?"
+  },
+  "account": {
+    "headline": "Cuenta",
+    "anonBlurb": "Ahora mismo tus datos solo están en este dispositivo. Añade un correo y una contraseña para poder volver a iniciar sesión si cambias de teléfono.",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Al menos 6 caracteres",
+    "saveAccount": "Guardar mi cuenta",
+    "saving": "Guardando…",
+    "signIn": "Iniciar sesión",
+    "savedToast": "Cuenta guardada. Ya puedes iniciar sesión en cualquier dispositivo.",
+    "linkedHeadline": "Tu cuenta está guardada",
+    "linkedBlurb": "Sesión iniciada como {{email}}. Usa este correo y contraseña para iniciar sesión en otro dispositivo.",
+    "signOut": "Cerrar sesión",
+    "haveAccount": "¿Ya guardaste una cuenta en otro dispositivo?",
+    "signInCta": "Iniciar sesión",
+    "backToSignUp": "Crear una cuenta",
+    "errInvalidEmail": "Eso no parece un correo electrónico válido.",
+    "errWeakPassword": "Usa al menos 6 caracteres para tu contraseña.",
+    "errEmailInUse": "Ese correo ya está asociado a otra cuenta. Prueba a iniciar sesión.",
+    "errWrongPassword": "El correo o la contraseña no son correctos.",
+    "errRequiresRecentLogin": "Por seguridad, vuelve a iniciar sesión antes de hacer este cambio.",
+    "errNotConfigured": "Las cuentas no están disponibles en esta versión.",
+    "errGeneric": "Algo salió mal. Inténtalo de nuevo."
   }
 }
