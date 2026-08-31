@@ -9,6 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
+    "test:rules": "firebase emulators:exec --only firestore --project giveall-rules-test \"jest --config jest.rules.config.js\"",
     "seed": "ts-node scripts/seed/import-seed-data.ts",
     "check-firestore": "node scripts/seed/check-firestore.js"
   },
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
+    "@firebase/rules-unit-testing": "^3.0.4",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "firebase-admin": "^12.1.0",
