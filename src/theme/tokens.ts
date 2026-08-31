@@ -3,7 +3,13 @@
 // as CSS shorthand strings, so numeric values here vs. the docs' "32px" etc.
 
 export const colors = {
-  primary: '#FF6B5B',
+  // Darkened from the original #FF6B5B — that coral was only 2.66-2.80:1
+  // against background/surface, failing WCAG AA both as the ~15 inline
+  // link/kicker text colors across every screen (needs 4.5:1) and as the
+  // solid CTA button background under white text (also needs 4.5:1 at
+  // body-text size). This shade clears 4.75:1+ in every role it's used —
+  // same hue family, shifted toward rust/brick rather than bright coral.
+  primary: '#B34B40',
   primaryLight: '#FF8E7A',
   primaryDark: '#E85A4A',
   secondary: '#FFC857',
@@ -20,7 +26,7 @@ export const colors = {
   textInverse: '#FFFFFF',
   success: '#A8D8B9',
   warning: '#FFC857',
-  error: '#FF6B5B',
+  error: '#B34B40', // kept equal to `primary` — unused elsewhere, but would inherit the same contrast fix if that changes
   border: '#FFE4E1',
   blush: '#FFE4E1',
   sage: '#A8D8B9',

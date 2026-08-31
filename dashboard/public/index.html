@@ -10,8 +10,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --primary: #FF6B5B;
-    --primary-dark: #E85A4A;
+    /* Darkened from #FF6B5B / #E85A4A for WCAG AA contrast — matches
+       src/theme/tokens.ts's `primary`/`primaryDark` fix (see README's
+       Accessibility section for the full contrast-ratio writeup). */
+    --primary: #B34B40;
+    --primary-dark: #994037;
     --background: #FFF8F0;
     --surface: #FFFFFF;
     --surface-alt: #FFF1E6;
@@ -20,7 +23,7 @@
     --text-inverse: #FFFFFF;
     --border: #FFE4E1;
     --success: #3f7a52;
-    --error: #E85A4A;
+    --error: #994037; /* darkened alongside --primary — see note above */
   }
   * { box-sizing: border-box; }
   body {

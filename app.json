@@ -28,7 +28,7 @@
       "package": "com.giveall.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#FF6B5B"
+        "backgroundColor": "#B34B40"
       }
     },
     "web": {

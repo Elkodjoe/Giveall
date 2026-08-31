@@ -6,7 +6,7 @@ App name: **GiveAll** — "Give All of your love, daily. Generous, warm, abundan
 
 | Token | Value | Use |
 |---|---|---|
-| `primary` | `#FF6B5B` | CTAs, progress bar fill, selected states |
+| `primary` | `#B34B40` | CTAs, progress bar fill, selected states. Darkened from `#FF6B5B` — the original coral was only 2.66-2.80:1 against `background`/`surface`, failing WCAG AA both as button-background-under-white-text and as the ~15 inline link/kicker text uses across the app (both need 4.5:1). This shade clears 4.75:1+ in every role — see `src/theme/tokens.ts` |
 | `primaryLight` | `#FF8E7A` | |
 | `primaryDark` | `#E85A4A` | |
 | `secondary` | `#FFC857` | |
@@ -19,7 +19,7 @@ App name: **GiveAll** — "Give All of your love, daily. Generous, warm, abundan
 | `textInverse` | `#FFFFFF` | Text on `primary`-colored surfaces |
 | `success` | `#A8D8B9` | |
 | `warning` | `#FFC857` | |
-| `error` | `#FF6B5B` | |
+| `error` | `#B34B40` | Unused elsewhere; kept equal to `primary` |
 | `border` / `blush` | `#FFE4E1` | Card borders |
 | `sage` | `#A8D8B9` | |
 

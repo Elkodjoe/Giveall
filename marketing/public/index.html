@@ -10,8 +10,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --primary: #FF6B5B;
-    --primary-dark: #E85A4A;
+    /* Darkened from #FF6B5B / #E85A4A for WCAG AA contrast — matches
+       src/theme/tokens.ts's `primary`/`primaryDark` fix (see README's
+       Accessibility section for the full contrast-ratio writeup). */
+    --primary: #B34B40;
+    --primary-dark: #994037;
     --secondary: #FFC857;
     --background: #FFF8F0;
     --surface: #FFFFFF;
@@ -252,8 +255,9 @@
 </section>
 
 <footer>
-  <div class="wrap" data-i18n="footerTagline">
-    Give All of your love, daily. Generous, warm, abundant.
+  <div class="wrap">
+    <div data-i18n="footerTagline">Give All of your love, daily. Generous, warm, abundant.</div>
+    <div style="margin-top: 12px;"><a href="/privacy">Privacy Policy</a></div>
   </div>
 </footer>
 

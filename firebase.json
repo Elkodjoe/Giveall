@@ -14,7 +14,8 @@
     {
       "target": "marketing",
       "public": "marketing/public",
-      "ignore": ["firebase.json", "**/.*"]
+      "ignore": ["firebase.json", "**/.*"],
+      "cleanUrls": true
     },
     {
       "target": "dashboard",
