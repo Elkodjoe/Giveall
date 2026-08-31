@@ -181,7 +181,9 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
     borderRadius: radius.full,
-    paddingVertical: 8,
+    // 12 (was 8) so the tappable chip reaches closer to the 44px WCAG 2.5.5
+    // touch-target minimum, not just the visible pill's original ~34px.
+    paddingVertical: 12,
     paddingHorizontal: 14,
   },
   chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
