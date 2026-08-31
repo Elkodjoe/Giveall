@@ -1,0 +1,16 @@
+{
+  "name": "giveall-appreciation-proxy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloudflare Worker that proxies the Appreciation Generator to an LLM provider, keeping the API key server-side without needing Firebase Blaze.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241106.0",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.86.0"
+  }
+}

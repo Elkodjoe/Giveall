@@ -1,0 +1,12 @@
+name = "giveall-appreciation-proxy"
+main = "src/worker.ts"
+compatibility_date = "2024-11-01"
+
+# Set the following as SECRETS (not [vars]) before the first deploy:
+#   npx wrangler secret put ANTHROPIC_API_KEY   # and/or OPENAI_API_KEY (at least one)
+#   npx wrangler secret put OPENAI_API_KEY
+#   npx wrangler secret put APP_TOKEN           # optional; if set, the app must send x-app-token
+#
+# Non-secret config (uncomment and edit once the app/marketing origins exist):
+# [vars]
+# ALLOWED_ORIGINS = "https://giveall-love.web.app,https://giveall-dashboard.web.app"
