@@ -6,12 +6,13 @@ Everything below is ready to paste into App Store Connect / Google Play Console 
 
 - **Apple Developer Program account** ($99/yr) — required for App Store Connect access and any real-device iOS build (the current EAS `preview` build is simulator-only).
 - **Google Play Console account** ($25 one-time) — required for any Play Store listing.
-- **A real, monitored support contact.** `marketing/public/privacy.html` has a placeholder email (`privacy@giveall.app`) clearly marked as a placeholder in the visible page text — both stores require a working support URL or email before they'll approve a listing. Replace it and redeploy (`firebase deploy --only hosting:marketing`) before submitting either listing.
+- **Redeploy the marketing site.** The support contact in `marketing/public/privacy.html` is now `info@giveall.app` (both stores require a working support email before approval). Run `firebase deploy --only hosting:marketing` so the live page at `https://giveall-love.web.app/privacy` reflects it before submitting either listing. Make sure `info@giveall.app` is actually monitored.
 - **EAS account decision** — builds currently run under `kodjoefamily@gmail.com` on Expo's servers, a different account than the one that owns the `giveall-app` Firebase project. Not itself a submission blocker (EAS and the store accounts are independent), but worth resolving so the same person can manage builds and store listings without asking someone else to approve things.
 
 ## Already live and usable
 
-- **Privacy Policy URL**: `https://giveall-love.web.app/privacy` — both stores require this at submission time. Real page, not a placeholder (only the contact address inside it is).
+- **Privacy Policy URL**: `https://giveall-love.web.app/privacy` — both stores require this at submission time. Real page; contact address is `info@giveall.app` (redeploy the marketing site to publish — see above).
+- **Support contact**: `info@giveall.app` — use this for App Store Connect's "Support URL"/contact and Play Console's "Email address" fields.
 - **App icon**: `assets/images/icon.png` (1024×1024, no alpha — meets Apple's "no transparency" requirement directly) and `assets/images/adaptive-icon.png` (Android adaptive icon foreground) are both already wired into `app.json` and match the current brand color.
 - **Bundle identifiers**: `com.giveall.app` for both platforms (`app.json`'s `ios.bundleIdentifier` / `android.package`).
 
