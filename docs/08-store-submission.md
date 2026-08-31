@@ -51,7 +51,14 @@ Everything below is ready to paste into App Store Connect / Google Play Console 
 
 ## Screenshots
 
-Not yet produced. App Store and Play Store both require device-specific screenshot sizes (iOS: 6.7" and 6.5" displays at minimum; Android: phone + optional tablet). The Playwright screenshots already taken during this project's accessibility/contrast verification passes (390×844 viewport) are a reasonable starting composition to reshoot at the exact required dimensions once real device builds exist — worth doing after a real-device iOS build (needs the Apple Developer account above) rather than from the simulator build, so the screenshots reflect what a reviewer/user will actually see.
+`store-assets/screenshots/{ios-6.7,android}/01-hero.png` through `04-todays-action.png` — 8 screenshots total, ready to upload. Real product UI (onboarding hero, the "First Win" appreciation moment, daily check-in, today's prescribed action), not mockups. Generated via Playwright at the exact required pixel dimensions:
+
+- **iOS 6.7"** (iPhone 15/16 Pro Max class): 1290×2796 — Apple's current baseline screenshot requirement.
+- **Android**: 1080×2400 — a common modern flagship resolution, well within Play's accepted range.
+
+Getting these right took two failed attempts worth knowing about if regenerating: (1) setting the Playwright viewport directly to the target pixel dimensions makes the responsive web layout reflow like a desktop page — huge empty space below top-anchored content, not what a phone screen looks like. Fixed by using a real phone-width (390px) viewport matching the target aspect ratio, then letting `deviceScaleFactor` upscale to the exact required output pixels. (2) The first clean-looking batch had Metro's dev-client "Refreshing... Don't see your changes?" overlay baked into one screenshot — dev-server chrome that must never ship. Fixed by explicitly waiting for that text to be absent before every screenshot, not just assuming a fixed delay was enough.
+
+**Caveat**: these come from the web build via the local Expo dev server, not a real device build — a reasonable stand-in given the UI is identical across targets, but worth a final visual pass on an actual device once the Apple Developer / Google Play accounts exist, since native rendering (fonts, safe-area insets, status bar) can differ subtly from the web target these were captured on.
 
 ## Age rating
 
