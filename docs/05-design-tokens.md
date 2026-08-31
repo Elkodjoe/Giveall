@@ -17,7 +17,8 @@ App name: **GiveAll** — "Give All of your love, daily. Generous, warm, abundan
 | `textPrimary` | `#2D2A26` | |
 | `textSecondary` | `#776B65` | Darkened from `#8C7E77` for WCAG AA text contrast — see `src/theme/tokens.ts` |
 | `textInverse` | `#FFFFFF` | Text on `primary`-colored surfaces |
-| `success` | `#A8D8B9` | |
+| `success` | `#A8D8B9` | Badge/pill background only — under 1.6:1 as text color, see `successText` |
+| `successText` | `#546C5D` | Darkened `success` for use as text (5.16:1+) — added after finding `success` itself used directly as text color at 1.51:1 in two places, see `src/theme/tokens.ts` |
 | `warning` | `#FFC857` | |
 | `error` | `#B34B40` | Unused elsewhere; kept equal to `primary` |
 | `border` / `blush` | `#FFE4E1` | Card borders |

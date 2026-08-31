@@ -181,6 +181,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
     marginBottom: 8,
   },
-  statusActive: { fontFamily: fontFamily.bold, color: colors.success, fontSize: 16 },
+  statusActive: { fontFamily: fontFamily.bold, color: colors.successText, fontSize: 16 },
   statusPending: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 14, lineHeight: 20 },
 });

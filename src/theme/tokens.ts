@@ -25,6 +25,13 @@ export const colors = {
   textSecondary: '#776B65',
   textInverse: '#FFFFFF',
   success: '#A8D8B9',
+  // `success` itself is a pale badge-fill color (correct as a background
+  // under dark text, e.g. bids.tsx's "toward" button) — using it directly
+  // as TEXT color on a light background was only 1.51:1, badly failing AA.
+  // Found reading curiosity.tsx's and partner.tsx's "success" messages
+  // during a UX pass; both were using `success` as a text color. This is
+  // the same hue, darkened to actually be readable as text (5.16:1+).
+  successText: '#546C5D',
   warning: '#FFC857',
   error: '#B34B40', // kept equal to `primary` — unused elsewhere, but would inherit the same contrast fix if that changes
   border: '#FFE4E1',

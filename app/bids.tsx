@@ -120,7 +120,9 @@ export default function BidsScreen() {
               onPress={() => logBid(r)}
               accessibilityRole="button"
             >
-              <Text style={styles.responseLabel}>{t(`bids.responses.${r}`)}</Text>
+              <Text style={[styles.responseLabel, r === 'against' && styles.responseLabelOnDark]}>
+                {t(`bids.responses.${r}`)}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -204,6 +206,11 @@ const styles = StyleSheet.create({
   response_away: { backgroundColor: colors.surfaceAlt, borderWidth: 1, borderColor: colors.border },
   response_against: { backgroundColor: colors.primary },
   responseLabel: { fontFamily: fontFamily.semiBold, color: colors.textPrimary, fontSize: 14 },
+  // response_against's background is colors.primary (a solid, dark-ish
+  // color) — the shared dark responseLabel text was only 2.72:1 against it,
+  // failing WCAG AA (needs 4.5:1). toward/away keep dark text since their
+  // backgrounds (success, surfaceAlt) are pale; only against needs light text.
+  responseLabelOnDark: { color: colors.textInverse },
   summaryCard: {
     backgroundColor: colors.surfaceAlt,
     borderRadius: card.radius,

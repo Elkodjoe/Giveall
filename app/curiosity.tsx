@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   ctaLabel: { fontFamily: fontFamily.bold, color: colors.textInverse, fontSize: 16 },
   doneText: {
     fontFamily: fontFamily.semiBold,
-    color: colors.success,
+    color: colors.successText,
     fontSize: 15,
     textAlign: 'center',
   },
