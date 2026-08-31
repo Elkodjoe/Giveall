@@ -12,7 +12,11 @@ export const colors = {
   surface: '#FFFFFF',
   surfaceAlt: '#FFF1E6',
   textPrimary: '#2D2A26',
-  textSecondary: '#8C7E77',
+  // Darkened from the original #8C7E77 — that shade was only 3.72:1 against
+  // `background`, below WCAG AA's 4.5:1 for normal text (this color labels
+  // captions/secondary copy at 12-15px, not large text). This shade clears
+  // 4.5:1 against background, surface, and surfaceAlt alike.
+  textSecondary: '#776B65',
   textInverse: '#FFFFFF',
   success: '#A8D8B9',
   warning: '#FFC857',

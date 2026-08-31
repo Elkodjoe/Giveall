@@ -15,7 +15,7 @@ App name: **GiveAll** — "Give All of your love, daily. Generous, warm, abundan
 | `surface` | `#FFFFFF` | Cards, option rows |
 | `surfaceAlt` | `#FFF1E6` | Appreciation card background |
 | `textPrimary` | `#2D2A26` | |
-| `textSecondary` | `#8C7E77` | |
+| `textSecondary` | `#776B65` | Darkened from `#8C7E77` for WCAG AA text contrast — see `src/theme/tokens.ts` |
 | `textInverse` | `#FFFFFF` | Text on `primary`-colored surfaces |
 | `success` | `#A8D8B9` | |
 | `warning` | `#FFC857` | |

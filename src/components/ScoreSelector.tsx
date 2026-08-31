@@ -50,12 +50,22 @@ export function ScoreSelector({
         accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
         onAccessibilityAction={onAccessibilityAction}
       >
+        {/* Each dot is only 12px tall — well under the 44pt minimum touch
+            target (WCAG 2.5.5 / iOS HIG). hitSlop pads vertically to reach
+            44px total; left/right stay small since dots sit only 6px apart
+            and a wide horizontal hitSlop would make adjacent dots overlap
+            and steal each other's taps. Native-only fix: confirmed live
+            that react-native-web doesn't implement hitSlop at all (the
+            dot's actual click-testable DOM box stays exactly 12px tall,
+            unchanged) — same class of gap as accessibilityValue not
+            mapping to aria-value* on web (see README's Accessibility
+            section). Real iOS/Android builds get the full 44px target. */}
         {SCALE.map((n) => (
           <Pressable
             key={n}
             style={[styles.dot, n <= value && styles.dotFilled]}
             onPress={() => choose(n)}
-            hitSlop={4}
+            hitSlop={{ top: 16, bottom: 16, left: 2, right: 2 }}
             importantForAccessibility="no-hide-descendants"
             accessibilityElementsHidden
           />
