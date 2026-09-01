@@ -331,6 +331,10 @@
     "errWrongPassword": "Email or password isn't right.",
     "errRequiresRecentLogin": "For security, please sign in again before making this change.",
     "errNotConfigured": "Accounts aren't available in this build.",
-    "errGeneric": "Something went wrong. Please try again."
+    "errGeneric": "Something went wrong. Please try again.",
+    "deleteAccount": "Delete my account",
+    "deleteConfirm": "Tap again to permanently delete",
+    "cancelDelete": "Cancel",
+    "deleteBlurb": "Permanently deletes your account and all data tied to it — check-ins, Bid Tracker, Memory Vault, Desire Inventory, onboarding answers, and any partner link. This cannot be undone."
   }
 }

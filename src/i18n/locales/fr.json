@@ -331,6 +331,10 @@
     "errWrongPassword": "L'e-mail ou le mot de passe est incorrect.",
     "errRequiresRecentLogin": "Pour des raisons de sécurité, reconnectez-vous avant d'effectuer cette modification.",
     "errNotConfigured": "Les comptes ne sont pas disponibles dans cette version.",
-    "errGeneric": "Une erreur s'est produite. Veuillez réessayer."
+    "errGeneric": "Une erreur s'est produite. Veuillez réessayer.",
+    "deleteAccount": "Supprimer mon compte",
+    "deleteConfirm": "Appuyez à nouveau pour supprimer définitivement",
+    "cancelDelete": "Annuler",
+    "deleteBlurb": "Supprime définitivement votre compte et toutes les données associées : check-ins, Suivi des Gestes, Coffre à Souvenirs, Inventaire des Désirs, réponses d'intégration et tout lien avec un partenaire. Cette action est irréversible."
   }
 }

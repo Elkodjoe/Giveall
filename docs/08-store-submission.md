@@ -94,3 +94,26 @@ Expected result: **Teen** (or **Everyone 10+** depending on how the suggestive-t
 ## Category
 
 Suggested: **Health & Fitness** (both stores have this category, and "relationship fitness" is the app's own framing) with **Lifestyle** as a plausible secondary/alternate if a reviewer pushes back.
+
+## Data disclosure (Play "Data safety" / App Store "privacy nutrition labels")
+
+Drafted from what the app actually collects (verified against `firestore.rules`, `package.json`, and the screens — no analytics/ad SDKs of any kind). Confirm before submitting; these shouldn't need changing.
+
+**Data collected & linked to the user:**
+
+| Data | Purpose | Optional? | Notes |
+| --- | --- | --- | --- |
+| Email address | Account management (sign-in on a new device) | **Yes** — anonymous use is the default | Firebase Authentication only; never used for marketing |
+| "Other" user content — check-ins, Bid Tracker, Memory Vault, Desire Inventory, curiosity-card progress, onboarding answers (attachment style / love language) | App functionality (personalizing the daily action) | No (created by using the app) | Stored in Firestore under the user's ID |
+| App interactions (which prescribed actions were completed / how they landed) | App functionality (the recalibration logic) | No | `action_logs` — never leaves Google/Cloudflare infrastructure except as below |
+| Approximate identifiers | App functionality | No | The anonymous Firebase UID; not an advertising ID |
+
+**Shared with third parties:** the text you type into the Appreciation Generator (generic compliment + love language + any Memory Vault detail you include) is sent to an AI provider (Cloudflare Workers AI by default; Anthropic/OpenAI if configured) to generate one line, and — only if you tap "Hear it" — to ElevenLabs for text-to-speech. Not retained by us beyond the request. Nothing else is shared.
+
+**Not collected:** name, phone number, address, precise or coarse location, contacts, photos, financial info, health/fitness data in the regulated sense, browsing history, advertising IDs. No third-party analytics, advertising, or tracking SDKs.
+
+**Security practices to declare:** data encrypted in transit (HTTPS/TLS everywhere); user can request deletion in-app ("Delete my account" on the Account screen); this is not a "family"-targeted app.
+
+## Account deletion (Apple guideline 5.1.1(v) / Play data-deletion)
+
+**Done.** `app/account.tsx` has a "Delete my account" action (two-tap confirm) that wipes every Firestore doc tied to the user's ID — `daily_checkins`, `action_logs`, `bids`, `memory_vault`, `curiosity_card_progress`, `desire_inventory`, `recalibration_events`, any `partnerships` row, plus `profiles/{uid}` and `users/{uid}` — then deletes the Firebase Auth user (`deleteAllUserData()` in `collections.ts` + `deleteCurrentUser()` in `auth.ts`). `firestore.rules` grants the owner `delete` on all of the above (regression-tested in `firestore.rules.test.ts`). For Play's "external" data-deletion URL field, point to `https://giveall-love.web.app/privacy` (the "Deleting your data" section documents both the in-app path and the contact address).

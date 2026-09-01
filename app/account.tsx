@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../src/state/AuthContext';
 import { isFirebaseConfigured } from '../src/firebase/config';
@@ -8,8 +9,10 @@ import {
   linkEmailPassword,
   signInWithEmail,
   signOutToAnonymous,
+  deleteCurrentUser,
   AuthActionError,
 } from '../src/firebase/auth';
+import { deleteAllUserData } from '../src/firebase/collections';
 import { colors, radius, button, fontFamily } from '../src/theme/tokens';
 
 // Account — turns the throwaway anonymous session (docs/01-onboarding-flow.md:
@@ -19,7 +22,8 @@ import { colors, radius, button, fontFamily } from '../src/theme/tokens';
 // wired up on purpose: no Apple Developer account, no extra OAuth config.
 export default function AccountScreen() {
   const { t } = useTranslation();
-  const { isAnonymous, email: linkedEmail } = useAuth();
+  const router = useRouter();
+  const { uid, isAnonymous, email: linkedEmail } = useAuth();
 
   const [mode, setMode] = useState<'signUp' | 'signIn'>('signUp');
   const [email, setEmail] = useState('');
@@ -29,6 +33,8 @@ export default function AccountScreen() {
   const [status, setStatus] = useState<string | null>(null);
 
   const disabled = !isFirebaseConfigured;
+
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const run = async (action: () => Promise<unknown>, successKey: string | null) => {
     setError(null);
@@ -46,6 +52,53 @@ export default function AccountScreen() {
     }
   };
 
+  // Apple guideline 5.1.1(v): an app that supports account creation must
+  // let the user delete the account and its data from within the app.
+  // Wipes every Firestore doc for this uid, then the auth user itself; the
+  // AuthContext listener then starts a fresh anonymous session.
+  const deleteAccount = async () => {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    setError(null);
+    setStatus(null);
+    setBusy(true);
+    try {
+      if (uid) await deleteAllUserData(uid);
+      await deleteCurrentUser();
+      router.replace('/');
+    } catch (err) {
+      setError(err instanceof AuthActionError ? t(err.key) : t('account.errGeneric'));
+    } finally {
+      setBusy(false);
+      setConfirmingDelete(false);
+    }
+  };
+
+  const deleteBlock = isFirebaseConfigured && (
+    <View style={styles.dangerZone}>
+      <Text style={styles.dangerBlurb}>{t('account.deleteBlurb')}</Text>
+      <Pressable
+        style={[styles.dangerButton, confirmingDelete && styles.dangerButtonConfirming]}
+        onPress={deleteAccount}
+        disabled={busy}
+        accessibilityRole="button"
+      >
+        <Text
+          style={[styles.dangerButtonLabel, confirmingDelete && styles.dangerButtonLabelConfirming]}
+        >
+          {confirmingDelete ? t('account.deleteConfirm') : t('account.deleteAccount')}
+        </Text>
+      </Pressable>
+      {confirmingDelete && (
+        <Pressable onPress={() => setConfirmingDelete(false)} accessibilityRole="button">
+          <Text style={styles.cancelLink}>{t('account.cancelDelete')}</Text>
+        </Pressable>
+      )}
+    </View>
+  );
+
   // Already upgraded: just show which account and let them sign out.
   if (!isAnonymous) {
     return (
@@ -62,6 +115,7 @@ export default function AccountScreen() {
             <Text style={styles.secondaryButtonLabel}>{t('account.signOut')}</Text>
           </Pressable>
           {error && <Text style={styles.errorText}>{error}</Text>}
+          {deleteBlock}
         </ScrollView>
       </SafeAreaView>
     );
@@ -145,6 +199,8 @@ export default function AccountScreen() {
           </Text>
           {isSignUp && <Text style={styles.switchLinkCta}>{t('account.signInCta')}</Text>}
         </Pressable>
+
+        {deleteBlock}
       </ScrollView>
     </SafeAreaView>
   );
@@ -201,4 +257,35 @@ const styles = StyleSheet.create({
   switchLink: { marginTop: 8, alignItems: 'center' },
   switchLinkText: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 13, textAlign: 'center' },
   switchLinkCta: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14, marginTop: 4 },
+  dangerZone: {
+    marginTop: 40,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  dangerBlurb: {
+    fontFamily: fontFamily.regular,
+    color: colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: 12,
+  },
+  dangerButton: {
+    borderWidth: 1,
+    borderColor: colors.error,
+    borderRadius: button.radius,
+    height: button.height,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dangerButtonConfirming: { backgroundColor: colors.error },
+  dangerButtonLabel: { fontFamily: fontFamily.semiBold, color: colors.error, fontSize: 15 },
+  dangerButtonLabelConfirming: { color: colors.textInverse },
+  cancelLink: {
+    fontFamily: fontFamily.regular,
+    color: colors.textSecondary,
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 12,
+  },
 });

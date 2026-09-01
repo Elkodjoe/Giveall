@@ -331,6 +331,10 @@
     "errWrongPassword": "O e-mail ou a palavra-passe estão incorretos.",
     "errRequiresRecentLogin": "Por segurança, inicie sessão novamente antes de fazer esta alteração.",
     "errNotConfigured": "As contas não estão disponíveis nesta versão.",
-    "errGeneric": "Algo correu mal. Tente novamente."
+    "errGeneric": "Algo correu mal. Tente novamente.",
+    "deleteAccount": "Eliminar a minha conta",
+    "deleteConfirm": "Toque novamente para eliminar permanentemente",
+    "cancelDelete": "Cancelar",
+    "deleteBlurb": "Elimina permanentemente a sua conta e todos os dados associados — registos diários, Registo de Gestos, Cofre de Memórias, Inventário de Desejos, respostas de introdução e qualquer ligação de parceiro(a). Isto não pode ser anulado."
   }
 }

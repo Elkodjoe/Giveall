@@ -84,11 +84,12 @@ service cloud.firestore {
     }
     // Append-only audit trail for docs/02-love-os-brain.md #3's "never
     // silently change loveLanguage" rule — see RecalibrationEventDoc in
-    // src/firebase/types.ts. No update/delete: once written, a
-    // recalibration event is a historical fact.
+    // src/firebase/types.ts. No update (once written, a recalibration event
+    // is a historical fact) — but the owner CAN delete, so "delete my
+    // account" (app/account.tsx) can wipe every trace of a user's data.
     match /recalibration_events/{docId} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, delete: if request.auth != null && request.auth.uid == resource.data.userId;
       allow read: if isAdmin();
     }
     match /bids/{docId} {
@@ -148,6 +149,10 @@ service cloud.firestore {
           .hasOnly(['optIns']) &&
         request.resource.data.optIns[otherPartner(resource.data.users, request.auth.uid)] ==
           resource.data.optIns[otherPartner(resource.data.users, request.auth.uid)];
+      // Either participant may delete the partnership — used by "delete my
+      // account" (app/account.tsx). Ending your account ends the link; the
+      // other person's own data is untouched.
+      allow delete: if request.auth != null && request.auth.uid in resource.data.users;
     }
     // Public read-only collections
     match /suggested_actions/{docId} {

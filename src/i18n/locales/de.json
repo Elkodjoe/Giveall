@@ -331,6 +331,10 @@
     "errWrongPassword": "E-Mail oder Passwort ist falsch.",
     "errRequiresRecentLogin": "Melde dich aus Sicherheitsgründen erneut an, bevor du diese Änderung vornimmst.",
     "errNotConfigured": "Konten sind in dieser Version nicht verfügbar.",
-    "errGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    "errGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "deleteAccount": "Mein Konto löschen",
+    "deleteConfirm": "Zum endgültigen Löschen erneut tippen",
+    "cancelDelete": "Abbrechen",
+    "deleteBlurb": "Löscht dein Konto und alle damit verbundenen Daten dauerhaft — Check-ins, Bid-Tracker, Erinnerungstresor, Wunsch-Inventar, Onboarding-Antworten und jede Partnerverknüpfung. Dies kann nicht rückgängig gemacht werden."
   }
 }

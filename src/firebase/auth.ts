@@ -6,6 +6,7 @@ import {
   linkWithCredential,
   EmailAuthProvider,
   signOut,
+  deleteUser,
   browserLocalPersistence,
   type User,
   // @ts-expect-error — exists on firebase/auth's "react-native" export
@@ -134,4 +135,25 @@ export async function signOutToAnonymous(): Promise<User | null> {
   await signOut(auth);
   const cred = await signInAnonymously(auth);
   return cred.user;
+}
+
+/**
+ * Permanently deletes the Firebase Auth user. Call AFTER deleteAllUserData()
+ * (collections.ts) while still signed in. On success the onAuthStateChanged
+ * listener fires with null and AuthContext starts a fresh anonymous
+ * session, so the app lands back at a clean first-run state.
+ *
+ * A linked email/password account whose sign-in is old throws
+ * `auth/requires-recent-login`; the caller shows `account.errRequiresRecentLogin`
+ * ("sign in again first").
+ */
+export async function deleteCurrentUser(): Promise<void> {
+  if (!auth) throw new AuthActionError('account.errNotConfigured');
+  const current = auth.currentUser;
+  if (!current) throw new AuthActionError('account.errGeneric');
+  try {
+    await deleteUser(current);
+  } catch (err) {
+    throw toAuthActionError(err);
+  }
 }

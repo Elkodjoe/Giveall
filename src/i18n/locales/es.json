@@ -331,6 +331,10 @@
     "errWrongPassword": "El correo o la contraseña no son correctos.",
     "errRequiresRecentLogin": "Por seguridad, vuelve a iniciar sesión antes de hacer este cambio.",
     "errNotConfigured": "Las cuentas no están disponibles en esta versión.",
-    "errGeneric": "Algo salió mal. Inténtalo de nuevo."
+    "errGeneric": "Algo salió mal. Inténtalo de nuevo.",
+    "deleteAccount": "Eliminar mi cuenta",
+    "deleteConfirm": "Toca de nuevo para eliminar permanentemente",
+    "cancelDelete": "Cancelar",
+    "deleteBlurb": "Elimina permanentemente tu cuenta y todos los datos asociados: registros diarios, Registro de Gestos, Bóveda de Recuerdos, Inventario de Deseos, respuestas de introducción y cualquier vínculo de pareja. Esto no se puede deshacer."
   }
 }

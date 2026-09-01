@@ -293,3 +293,42 @@ export async function getPartnership(uidA: string, uidB: string): Promise<Partne
   const snap = await getDoc(doc(partnershipsCol, id));
   return snap.exists() ? snap.data() : undefined;
 }
+
+// Every collection whose docs carry a `userId` field and grant the owner
+// `delete` in firestore.rules. `recalibration_events` is append-only for
+// updates but deletable by its owner, precisely so this can wipe it.
+const USER_OWNED_COLLECTIONS = [
+  'daily_checkins',
+  'action_logs',
+  'bids',
+  'memory_vault',
+  'curiosity_card_progress',
+  'desire_inventory',
+  'recalibration_events',
+] as const;
+
+/**
+ * Deletes every Firestore document tied to this uid — the owned
+ * collections above, any partnership the user is part of, their profile,
+ * and their user doc. Backs "Delete my account" (app/account.tsx); Apple
+ * guideline 5.1.1(v) requires in-app account + data deletion for any app
+ * that supports account creation.
+ *
+ * Must run while the user is still signed in. Delete the auth user
+ * afterwards (deleteCurrentUser in auth.ts). Best-effort per doc — a
+ * single failed delete doesn't abort the rest.
+ */
+export async function deleteAllUserData(uid: string): Promise<void> {
+  for (const name of USER_OWNED_COLLECTIONS) {
+    const snap = await getDocs(query(collection(db, name), where('userId', '==', uid)));
+    await Promise.all(snap.docs.map((d) => deleteDoc(d.ref).catch(() => undefined)));
+  }
+
+  const partnerships = await getDocs(
+    query(collection(db, 'partnerships'), where('users', 'array-contains', uid)),
+  );
+  await Promise.all(partnerships.docs.map((d) => deleteDoc(d.ref).catch(() => undefined)));
+
+  await deleteDoc(doc(db, 'profiles', uid)).catch(() => undefined);
+  await deleteDoc(doc(db, 'users', uid)).catch(() => undefined);
+}
