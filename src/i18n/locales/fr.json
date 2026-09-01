@@ -96,7 +96,9 @@
     "firstWinSubLabel": "Votre Compliment Spontané",
     "saveIt": "Sauvegarder",
     "sendIt": "Envoyer",
-    "firstWinFallback": "J'adore la façon dont tu réfléchis à voix haute quand tu résous quelque chose, tu ne caches pas le côté imparfait."
+    "firstWinFallback": "J'adore la façon dont tu réfléchis à voix haute quand tu résous quelque chose, tu ne caches pas le côté imparfait.",
+    "hearIt": "Écouter",
+    "playing": "Lecture…"
   },
   "ritualTime": {
     "headline": "Quand devrions-nous faire votre check-in de 90 secondes ?",

@@ -96,7 +96,9 @@
     "firstWinSubLabel": "Your Unsolicited Appreciation",
     "saveIt": "Save it",
     "sendIt": "Send it",
-    "firstWinFallback": "I love how you think out loud when you're solving something - you don't hide the messy part."
+    "firstWinFallback": "I love how you think out loud when you're solving something - you don't hide the messy part.",
+    "hearIt": "Hear it",
+    "playing": "Playing…"
   },
   "ritualTime": {
     "headline": "When should we do your 90-sec check-in?",

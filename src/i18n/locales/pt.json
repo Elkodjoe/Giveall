@@ -96,7 +96,9 @@
     "firstWinSubLabel": "Seu Elogio Espontâneo",
     "saveIt": "Salvar",
     "sendIt": "Enviar",
-    "firstWinFallback": "Eu adoro como você pensa em voz alta quando está resolvendo algo, você não esconde a parte bagunçada."
+    "firstWinFallback": "Eu adoro como você pensa em voz alta quando está resolvendo algo, você não esconde a parte bagunçada.",
+    "hearIt": "Ouvir",
+    "playing": "A reproduzir…"
   },
   "ritualTime": {
     "headline": "Quando devemos fazer seu check-in de 90 segundos?",

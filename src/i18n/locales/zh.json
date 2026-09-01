@@ -96,7 +96,9 @@
     "firstWinSubLabel": "你的主动赞美",
     "saveIt": "保存",
     "sendIt": "发送",
-    "firstWinFallback": "我喜欢你解决问题时把想法说出来的样子——你从不隐藏那些混乱的部分。"
+    "firstWinFallback": "我喜欢你解决问题时把想法说出来的样子——你从不隐藏那些混乱的部分。",
+    "hearIt": "朗读",
+    "playing": "播放中…"
   },
   "ritualTime": {
     "headline": "我们该在什么时候做你的90秒签到？",

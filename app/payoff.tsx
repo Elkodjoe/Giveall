@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Share } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { Audio } from 'expo-av';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { useAuth } from '../src/state/AuthContext';
@@ -14,6 +15,7 @@ import {
   isAppreciationProxyConfigured,
 } from '../src/llm/appreciationProxyClient';
 import { generateAppreciationViaOllama } from '../src/llm/ollamaClient';
+import { isSpeechConfigured, speechUrlFor } from '../src/llm/speechClient';
 import { logAction } from '../src/firebase/collections';
 import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 
@@ -88,6 +90,44 @@ export default function PayoffScreen() {
     };
   }, [receivesVia]);
 
+  // "Hear it" — plays the shown appreciation line via the proxy's /speak
+  // route (ElevenLabs TTS, key server-side). Best-effort: the button only
+  // shows when the proxy URL is configured, and any failure just resets to
+  // idle with no error surfaced, same as the rest of this screen.
+  const soundRef = useRef<Audio.Sound | null>(null);
+  const [speechState, setSpeechState] = useState<'idle' | 'loading' | 'playing'>('idle');
+
+  useEffect(() => {
+    return () => {
+      soundRef.current?.unloadAsync().catch(() => undefined);
+      soundRef.current = null;
+    };
+  }, []);
+
+  const playFirstWin = async () => {
+    if (speechState !== 'idle') return;
+    const uri = speechUrlFor(firstWin);
+    if (!uri) return;
+    setSpeechState('loading');
+    try {
+      await soundRef.current?.unloadAsync().catch(() => undefined);
+      const { sound } = await Audio.Sound.createAsync(
+        { uri },
+        { shouldPlay: true },
+        (status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            setSpeechState('idle');
+            sound.unloadAsync().catch(() => undefined);
+          }
+        },
+      );
+      soundRef.current = sound;
+      setSpeechState('playing');
+    } catch {
+      setSpeechState('idle');
+    }
+  };
+
   // Both CTAs persist the shown line to action_logs — docs/01-onboarding-flow.md
   // Screen 5 calls this "instant value delivered before any ask", but until
   // now neither button did anything besides navigate on, discarding the
@@ -134,6 +174,19 @@ export default function PayoffScreen() {
           <Text style={styles.winLabel}>{t('payoff.firstWinLabel')}</Text>
           <Text style={styles.winSubLabel}>{t('payoff.firstWinSubLabel')}</Text>
           <Text style={styles.winText}>"{firstWin}"</Text>
+          {isSpeechConfigured() && (
+            <Pressable
+              style={styles.hearButton}
+              onPress={playFirstWin}
+              disabled={speechState !== 'idle'}
+              accessibilityRole="button"
+              accessibilityLabel={t('payoff.hearIt')}
+            >
+              <Text style={styles.hearButtonLabel}>
+                {speechState === 'idle' ? t('payoff.hearIt') : t('payoff.playing')}
+              </Text>
+            </Pressable>
+          )}
         </View>
       </View>
 
@@ -172,6 +225,16 @@ const styles = StyleSheet.create({
   },
   winSubLabel: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 15, marginTop: 4, marginBottom: 16 },
   winText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 20, lineHeight: 28, fontStyle: 'italic' },
+  hearButton: {
+    marginTop: 16,
+    alignSelf: 'flex-start',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  hearButtonLabel: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14 },
   ctaRow: { flexDirection: 'row', gap: 12, marginTop: 16 },
   ctaSecondary: {
     flex: 1,

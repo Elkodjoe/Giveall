@@ -96,7 +96,9 @@
     "firstWinSubLabel": "Deine unaufgeforderte Wertschätzung",
     "saveIt": "Speichern",
     "sendIt": "Senden",
-    "firstWinFallback": "Ich liebe es, wie du laut nachdenkst, wenn du etwas löst — du versteckst die unordentlichen Momente nicht."
+    "firstWinFallback": "Ich liebe es, wie du laut nachdenkst, wenn du etwas löst — du versteckst die unordentlichen Momente nicht.",
+    "hearIt": "Anhören",
+    "playing": "Wird abgespielt…"
   },
   "ritualTime": {
     "headline": "Wann sollten wir deinen 90-Sekunden-Check-in machen?",

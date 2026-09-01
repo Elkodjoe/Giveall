@@ -15,10 +15,11 @@ uses, so there is one source of truth for the prompt.
 ```sh
 cd proxy
 npm install
-npx wrangler login                       # opens a browser; free Cloudflare account
-npx wrangler secret put ANTHROPIC_API_KEY # paste the key when prompted
-# optional: npx wrangler secret put OPENAI_API_KEY   (fallback provider)
-# optional: npx wrangler secret put APP_TOKEN        (shared token, see below)
+npx wrangler login                        # opens a browser; free Cloudflare account
+npx wrangler secret put ANTHROPIC_API_KEY  # paste the key when prompted
+# optional: npx wrangler secret put OPENAI_API_KEY     (fallback text provider)
+# optional: npx wrangler secret put ELEVENLABS_API_KEY (enables the /speak route)
+# optional: npx wrangler secret put APP_TOKEN          (shared token, see below)
 npm run deploy
 ```
 
@@ -58,14 +59,27 @@ Point `EXPO_PUBLIC_APPRECIATION_PROXY_URL` at `http://localhost:8787` to
 test end-to-end without deploying. `npm run typecheck` type-checks the
 Worker against `@cloudflare/workers-types`.
 
-## Request / response shape
+## Routes
 
-`POST` JSON body (matches `AppreciationInput`):
+### `POST /` — appreciation text
+
+JSON body (matches `AppreciationInput`):
 
 ```json
-{ "genericCompliment": "You are wonderful.", "loveLanguage": "words_of_affirmation", "context": "optional real detail" }
+{ "genericCompliment": "You are wonderful.", "loveLanguage": "words", "context": "optional real detail" }
 ```
 
 Success `200`: `{ "text": "...", "provider": "anthropic" }`
 Errors: `400` bad input, `401` bad/missing token, `413` input too long,
 `502` all providers failed / none configured.
+
+### `POST /speak` or `GET /speak?text=...` — spoken audio
+
+Returns `audio/mpeg` bytes from ElevenLabs (`eleven_multilingual_v2`, so it
+handles the appreciation line in any of the app's 7 languages). The `GET`
+form exists so a player can stream it straight from the URL; when
+`APP_TOKEN` is set, pass it as `?t=<token>` on the `GET`.
+
+Requires the `ELEVENLABS_API_KEY` secret. Optional `ELEVENLABS_VOICE_ID`
+var overrides the default voice (ElevenLabs "Rachel"). Input capped at 500
+characters. `502` if the key is missing or ElevenLabs errors.
