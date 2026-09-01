@@ -6,12 +6,13 @@ Everything below is ready to paste into App Store Connect / Google Play Console 
 
 - **Apple Developer Program account** ($99/yr) — required for App Store Connect access and any real-device iOS build (the current EAS `preview` build is simulator-only).
 - **Google Play Console account** ($25 one-time) — required for any Play Store listing.
-- **A real, monitored support contact.** `marketing/public/privacy.html` has a placeholder email (`privacy@giveall.app`) clearly marked as a placeholder in the visible page text — both stores require a working support URL or email before they'll approve a listing. Replace it and redeploy (`firebase deploy --only hosting:marketing`) before submitting either listing.
+- **Redeploy the marketing site.** The support contact in `marketing/public/privacy.html` is now `info@giveall.app` (both stores require a working support email before approval). Run `firebase deploy --only hosting:marketing` so the live page at `https://giveall-love.web.app/privacy` reflects it before submitting either listing. Make sure `info@giveall.app` is actually monitored.
 - **EAS account decision** — builds currently run under `kodjoefamily@gmail.com` on Expo's servers, a different account than the one that owns the `giveall-app` Firebase project. Not itself a submission blocker (EAS and the store accounts are independent), but worth resolving so the same person can manage builds and store listings without asking someone else to approve things.
 
 ## Already live and usable
 
-- **Privacy Policy URL**: `https://giveall-love.web.app/privacy` — both stores require this at submission time. Real page, not a placeholder (only the contact address inside it is).
+- **Privacy Policy URL**: `https://giveall-love.web.app/privacy` — both stores require this at submission time. Real page; contact address is `info@giveall.app` (redeploy the marketing site to publish — see above).
+- **Support contact**: `info@giveall.app` — use this for App Store Connect's "Support URL"/contact and Play Console's "Email address" fields.
 - **App icon**: `assets/images/icon.png` (1024×1024, no alpha — meets Apple's "no transparency" requirement directly) and `assets/images/adaptive-icon.png` (Android adaptive icon foreground) are both already wired into `app.json` and match the current brand color.
 - **Bundle identifiers**: `com.giveall.app` for both platforms (`app.json`'s `ios.bundleIdentifier` / `android.package`).
 
@@ -62,8 +63,57 @@ Getting these right took two failed attempts worth knowing about if regenerating
 
 ## Age rating
 
-Not yet filled out — both stores' content questionnaires ask about romantic/relationship and mild intimacy themes (the app discusses attachment style, love languages, and a "Desire Inventory" concept). Worth a deliberate answer rather than a default guess; likely lands at Apple's 12+ or Google's Teen tier given no explicit content, but this is a content-policy judgment call for whoever holds the account, not something to pre-fill here.
+Both stores' content questionnaires ask about romantic/relationship and mild intimacy themes (the app discusses attachment style, love languages, and a "Desire Inventory" concept). Draft answers below — checked against what the app actually does — for whoever holds the account to confirm and submit; the final call is theirs, but these shouldn't need changing.
+
+**Apple App Store (App Store Connect → Age Rating questionnaire):**
+
+| Question | Answer | Why |
+| --- | --- | --- |
+| Cartoon or Fantasy Violence | None | — |
+| Realistic Violence | None | — |
+| Sexual Content or Nudity | None | The "Desire Inventory" is about non-sexual acts of connection (a recalled detail, a chosen moment); no sexual descriptions, imagery, or explicit prompts anywhere. |
+| Profanity or Crude Humor | None | — |
+| Alcohol, Tobacco, or Drug Use | None | — |
+| Mature/Suggestive Themes | **Infrequent/Mild** | The app frames itself around romantic relationships and intimacy-of-connection; nothing graphic, but not a children's topic. |
+| Horror/Fear, Gambling, Contests | None | — |
+| Unrestricted Web Access | No | No in-app browser; the only outbound link is the privacy policy. |
+| Medical/Treatment Information | No | It's explicitly framed as "relationship fitness," not therapy or medical advice. |
+
+Expected result: **12+**.
+
+**Google Play (Play Console → Content rating questionnaire, IARC):**
+
+- Category: **Reference, News, or Educational** (or "Social Networking" only if Partner Mode is considered social — it's a private 1:1 double-opt-in link with no feed, no discovery, no messaging, so Reference/Educational is the better fit).
+- Violence / Sexuality / Language / Controlled substances: **No** to all.
+- "Does the app contain any content that could be considered sexually suggestive or refer to sexual activity?" → **No** (see the Apple note above — connection acts, not sexual content).
+- User-generated content shared with other users: **Yes, limited** — Memory Vault / Desire Inventory notes are visible to a linked partner after mutual opt-in. Not publicly broadcast. Declare it; it does not by itself raise the rating.
+- Data collection: point to `https://giveall-love.web.app/privacy`.
+
+Expected result: **Teen** (or **Everyone 10+** depending on how the suggestive-themes question is weighted — either is acceptable; don't overstate to Mature).
 
 ## Category
 
 Suggested: **Health & Fitness** (both stores have this category, and "relationship fitness" is the app's own framing) with **Lifestyle** as a plausible secondary/alternate if a reviewer pushes back.
+
+## Data disclosure (Play "Data safety" / App Store "privacy nutrition labels")
+
+Drafted from what the app actually collects (verified against `firestore.rules`, `package.json`, and the screens — no analytics/ad SDKs of any kind). Confirm before submitting; these shouldn't need changing.
+
+**Data collected & linked to the user:**
+
+| Data | Purpose | Optional? | Notes |
+| --- | --- | --- | --- |
+| Email address | Account management (sign-in on a new device) | **Yes** — anonymous use is the default | Firebase Authentication only; never used for marketing |
+| "Other" user content — check-ins, Bid Tracker, Memory Vault, Desire Inventory, curiosity-card progress, onboarding answers (attachment style / love language) | App functionality (personalizing the daily action) | No (created by using the app) | Stored in Firestore under the user's ID |
+| App interactions (which prescribed actions were completed / how they landed) | App functionality (the recalibration logic) | No | `action_logs` — never leaves Google/Cloudflare infrastructure except as below |
+| Approximate identifiers | App functionality | No | The anonymous Firebase UID; not an advertising ID |
+
+**Shared with third parties:** the text you type into the Appreciation Generator (generic compliment + love language + any Memory Vault detail you include) is sent to an AI provider (Cloudflare Workers AI by default; Anthropic/OpenAI if configured) to generate one line, and — only if you tap "Hear it" — to ElevenLabs for text-to-speech. Not retained by us beyond the request. Nothing else is shared.
+
+**Not collected:** name, phone number, address, precise or coarse location, contacts, photos, financial info, health/fitness data in the regulated sense, browsing history, advertising IDs. No third-party analytics, advertising, or tracking SDKs.
+
+**Security practices to declare:** data encrypted in transit (HTTPS/TLS everywhere); user can request deletion in-app ("Delete my account" on the Account screen); this is not a "family"-targeted app.
+
+## Account deletion (Apple guideline 5.1.1(v) / Play data-deletion)
+
+**Done.** `app/account.tsx` has a "Delete my account" action (two-tap confirm) that wipes every Firestore doc tied to the user's ID — `daily_checkins`, `action_logs`, `bids`, `memory_vault`, `curiosity_card_progress`, `desire_inventory`, `recalibration_events`, any `partnerships` row, plus `profiles/{uid}` and `users/{uid}` — then deletes the Firebase Auth user (`deleteAllUserData()` in `collections.ts` + `deleteCurrentUser()` in `auth.ts`). `firestore.rules` grants the owner `delete` on all of the above (regression-tested in `firestore.rules.test.ts`). For Play's "external" data-deletion URL field, point to `https://giveall-love.web.app/privacy` (the "Deleting your data" section documents both the in-app path and the contact address).

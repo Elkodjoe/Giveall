@@ -1,0 +1,301 @@
+import { buildAppreciationPrompt, type AppreciationInput } from '../../src/engine/appreciationGenerator';
+import { orderAvailableProviders, type LlmProvider } from '../../src/engine/llmProvider';
+
+// Cloudflare Worker: a tiny key-holding proxy so the Appreciation Generator
+// (docs/03-power-ups.md #1) can run live in production without the Firebase
+// Blaze plan. Provider API keys live only here as Worker secrets and never
+// ship in the app bundle. The prompt is built from the same
+// src/engine/appreciationGenerator.ts the (still-optional) Cloud Function
+// uses, so there is one source of truth for the prompt.
+//
+// Routes (both POST):
+//   /            appreciation text — Anthropic/OpenAI, JSON in/out
+//   /speak       text-to-speech — ElevenLabs, JSON in / audio/mpeg out
+//
+// Deploy: see proxy/README.md.
+
+export interface Env {
+  /**
+   * Cloudflare Workers AI binding (see wrangler.toml `[ai]`). Free daily
+   * allocation, no API key, no card — the default provider for the text
+   * route when no paid key is set.
+   */
+  AI?: Ai;
+  /** Optional Workers AI model override. */
+  WORKERS_AI_MODEL?: string;
+  /**
+   * When "true", try the free Workers AI before any paid provider (useful
+   * while the Anthropic/OpenAI accounts have no balance — avoids two
+   * failing calls per request). Set as a plain [vars] value.
+   */
+  PREFER_FREE?: string;
+  /** Optional paid providers, tried before Workers AI when a key is set. */
+  ANTHROPIC_API_KEY?: string;
+  OPENAI_API_KEY?: string;
+  /** Required for the /speak route. */
+  ELEVENLABS_API_KEY?: string;
+  /** Optional ElevenLabs voice id; defaults to a warm public voice. */
+  ELEVENLABS_VOICE_ID?: string;
+  /** Optional shared token. When set, callers must send it as `x-app-token`. */
+  APP_TOKEN?: string;
+  /**
+   * Optional comma-separated Origin allowlist for CORS. When unset the
+   * proxy is open (`*`) — fine for a rate-limited, non-sensitive endpoint,
+   * but set it to the app/marketing origins once they're known.
+   */
+  ALLOWED_ORIGINS?: string;
+}
+
+const MAX_COMPLIMENT_CHARS = 400;
+const MAX_CONTEXT_CHARS = 600;
+const MAX_SPEAK_CHARS = 500;
+const PRIMARY_PROVIDER: LlmProvider = 'anthropic';
+// Good enough for a one-line appreciation, and on the free tier. Override
+// with WORKERS_AI_MODEL if this one is retired — see the model catalog at
+// https://developers.cloudflare.com/workers-ai/models/
+const DEFAULT_WORKERS_AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+// ElevenLabs "Rachel" — a warm, widely-used public voice. Override with the
+// ELEVENLABS_VOICE_ID var. eleven_multilingual_v2 matters: the appreciation
+// line can be in any of the app's 7 languages.
+const DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM';
+const ELEVENLABS_MODEL = 'eleven_multilingual_v2';
+
+function corsHeaders(origin: string | null, env: Env): Record<string, string> {
+  const allowlist = env.ALLOWED_ORIGINS?.split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  let allowOrigin = '*';
+  if (allowlist && allowlist.length > 0) {
+    allowOrigin = origin && allowlist.includes(origin) ? origin : allowlist[0];
+  }
+  return {
+    'access-control-allow-origin': allowOrigin,
+    'access-control-allow-methods': 'GET, POST, OPTIONS',
+    'access-control-allow-headers': 'content-type, x-app-token',
+    'access-control-max-age': '86400',
+    vary: 'origin',
+  };
+}
+
+function json(body: unknown, status: number, extra: Record<string, string>): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json', ...extra },
+  });
+}
+
+/** Pure route dispatch — exported for unit testing. */
+export function routeFor(pathname: string): 'text' | 'speak' | 'not-found' {
+  const p = pathname.replace(/\/+$/, '') || '/';
+  if (p === '/' || p === '/appreciation') return 'text';
+  if (p === '/speak') return 'speak';
+  return 'not-found';
+}
+
+async function callAnthropic(system: string, user: string, apiKey: string): Promise<string> {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 200,
+      system,
+      messages: [{ role: 'user', content: user }],
+    }),
+  });
+  if (!res.ok) throw new Error(`anthropic ${res.status}: ${await res.text()}`);
+  const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+  const text = data.content?.find((b) => b.type === 'text')?.text?.trim();
+  if (!text) throw new Error('anthropic: empty response');
+  return text;
+}
+
+async function callOpenAI(system: string, user: string, apiKey: string): Promise<string> {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      max_tokens: 200,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+    }),
+  });
+  if (!res.ok) throw new Error(`openai ${res.status}: ${await res.text()}`);
+  const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+  const text = data.choices?.[0]?.message?.content?.trim();
+  if (!text) throw new Error('openai: empty response');
+  return text;
+}
+
+const PROVIDER_CALLS: Record<LlmProvider, (system: string, user: string, key: string) => Promise<string>> = {
+  anthropic: callAnthropic,
+  openai: callOpenAI,
+};
+
+async function callWorkersAI(system: string, user: string, env: Env): Promise<string> {
+  const model = env.WORKERS_AI_MODEL || DEFAULT_WORKERS_AI_MODEL;
+  const result = (await env.AI!.run(model, {
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: user },
+    ],
+    max_tokens: 200,
+  })) as { response?: string };
+  const text = result.response?.trim();
+  if (!text) throw new Error('workers-ai: empty response');
+  return text;
+}
+
+async function handleText(request: Request, env: Env, cors: Record<string, string>): Promise<Response> {
+  let input: AppreciationInput;
+  try {
+    input = (await request.json()) as AppreciationInput;
+  } catch {
+    return json({ error: 'invalid JSON body' }, 400, cors);
+  }
+
+  if (!input || typeof input.genericCompliment !== 'string' || !input.genericCompliment.trim()) {
+    return json({ error: 'genericCompliment is required' }, 400, cors);
+  }
+  if (
+    input.genericCompliment.length > MAX_COMPLIMENT_CHARS ||
+    (input.context != null && String(input.context).length > MAX_CONTEXT_CHARS)
+  ) {
+    return json({ error: 'input too long' }, 413, cors);
+  }
+
+  const { system, user } = buildAppreciationPrompt({
+    genericCompliment: input.genericCompliment,
+    loveLanguage: input.loveLanguage,
+    context: input.context,
+  });
+
+  const keys: Record<LlmProvider, string> = {
+    anthropic: env.ANTHROPIC_API_KEY ?? '',
+    openai: env.OPENAI_API_KEY ?? '',
+  };
+  const order = orderAvailableProviders(PRIMARY_PROVIDER, {
+    anthropic: Boolean(keys.anthropic),
+    openai: Boolean(keys.openai),
+  });
+
+  const errors: string[] = [];
+  const tryWorkersAI = async (): Promise<Response | null> => {
+    if (!env.AI) return null;
+    try {
+      const text = await callWorkersAI(system, user, env);
+      return json({ text, provider: 'workers-ai' }, 200, cors);
+    } catch (err) {
+      errors.push(err instanceof Error ? err.message : String(err));
+      return null;
+    }
+  };
+  const tryPaid = async (): Promise<Response | null> => {
+    for (const provider of order) {
+      try {
+        const text = await PROVIDER_CALLS[provider](system, user, keys[provider]);
+        return json({ text, provider }, 200, cors);
+      } catch (err) {
+        errors.push(err instanceof Error ? err.message : String(err));
+      }
+    }
+    return null;
+  };
+
+  const preferFree = env.PREFER_FREE === 'true';
+  const steps = preferFree ? [tryWorkersAI, tryPaid] : [tryPaid, tryWorkersAI];
+  for (const step of steps) {
+    const res = await step();
+    if (res) return res;
+  }
+
+  return json(
+    {
+      error:
+        errors.length > 0
+          ? `all providers failed: ${errors.join('; ')}`
+          : 'no provider available — bind [ai] in wrangler.toml or set ANTHROPIC_API_KEY / OPENAI_API_KEY',
+    },
+    502,
+    cors,
+  );
+}
+
+async function handleSpeak(request: Request, env: Env, cors: Record<string, string>): Promise<Response> {
+  if (!env.ELEVENLABS_API_KEY) {
+    return json({ error: 'no TTS provider configured — set ELEVENLABS_API_KEY' }, 502, cors);
+  }
+
+  // GET (?text=...) so the audio can be played straight from a URL by
+  // expo-av / an <audio> element, which can't send a POST body. POST
+  // (JSON { text }) is kept for callers that can.
+  let text = '';
+  if (request.method === 'GET') {
+    text = (new URL(request.url).searchParams.get('text') ?? '').trim();
+  } else {
+    let body: { text?: unknown };
+    try {
+      body = (await request.json()) as { text?: unknown };
+    } catch {
+      return json({ error: 'invalid JSON body' }, 400, cors);
+    }
+    text = typeof body.text === 'string' ? body.text.trim() : '';
+  }
+
+  if (!text) return json({ error: 'text is required' }, 400, cors);
+  if (text.length > MAX_SPEAK_CHARS) return json({ error: 'text too long' }, 413, cors);
+
+  const voiceId = env.ELEVENLABS_VOICE_ID || DEFAULT_VOICE_ID;
+  const res = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+    {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        accept: 'audio/mpeg',
+        'xi-api-key': env.ELEVENLABS_API_KEY,
+      },
+      body: JSON.stringify({ text, model_id: ELEVENLABS_MODEL }),
+    },
+  );
+
+  if (!res.ok) {
+    return json({ error: `elevenlabs ${res.status}: ${await res.text()}` }, 502, cors);
+  }
+
+  return new Response(res.body, {
+    status: 200,
+    headers: { ...cors, 'content-type': 'audio/mpeg', 'cache-control': 'no-store' },
+  });
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const cors = corsHeaders(request.headers.get('origin'), env);
+
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+
+    const url = new URL(request.url);
+    const route = routeFor(url.pathname);
+    if (route === 'not-found') return json({ error: 'not found' }, 404, cors);
+
+    // GET is only meaningful for /speak (URL-playable audio); the text
+    // route is POST only.
+    const methodOk = request.method === 'POST' || (request.method === 'GET' && route === 'speak');
+    if (!methodOk) return json({ error: 'method not allowed' }, 405, cors);
+
+    if (env.APP_TOKEN) {
+      const provided = request.headers.get('x-app-token') ?? url.searchParams.get('t');
+      if (provided !== env.APP_TOKEN) return json({ error: 'unauthorized' }, 401, cors);
+    }
+
+    return route === 'text' ? handleText(request, env, cors) : handleSpeak(request, env, cors);
+  },
+};

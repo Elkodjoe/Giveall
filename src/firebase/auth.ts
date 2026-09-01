@@ -2,6 +2,11 @@ import {
   initializeAuth,
   onAuthStateChanged,
   signInAnonymously,
+  signInWithEmailAndPassword,
+  linkWithCredential,
+  EmailAuthProvider,
+  signOut,
+  deleteUser,
   browserLocalPersistence,
   type User,
   // @ts-expect-error — exists on firebase/auth's "react-native" export
@@ -16,6 +21,15 @@ import {
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { firebaseApp, isFirebaseConfigured } from './config';
+import { AuthActionError, toAuthActionError, validateCredentials } from './authErrors';
+
+export {
+  type AuthErrorKey,
+  AuthActionError,
+  isAnonymousUser,
+  mapAuthErrorCode,
+  validateCredentials,
+} from './authErrors';
 
 // Firebase JS SDK requires explicit persistence config per platform: RN
 // needs AsyncStorage-backed persistence (without it, auth state — including
@@ -40,10 +54,14 @@ export const auth = isFirebaseConfigured
  * without forcing account creation before onboarding's "First Win" moment
  * (see docs/01-onboarding-flow.md — asks come after value, not before).
  *
- * Upgrading an anonymous user to a real account later (email link, Apple,
- * Google) should use Firebase's linkWithCredential so the uid — and
- * everything already written under it — carries over unchanged. That
- * upgrade path is not implemented yet.
+ * Upgrading an anonymous user to a real account later uses Firebase's
+ * linkWithCredential (see linkEmailPassword below) so the uid — and
+ * everything already written under it — carries over unchanged. Only
+ * email/password is wired up: it needs no third-party developer account
+ * (unlike Apple Sign In) and no extra OAuth client config (unlike Google
+ * on native). The Email/Password provider must be enabled in the Firebase
+ * console (Auth > Sign-in method) — a free toggle. Apple/Google linking
+ * can be layered on later with the same linkWithCredential call.
  */
 export function ensureSignedIn(): Promise<User | null> {
   if (!auth) {
@@ -66,4 +84,76 @@ export function ensureSignedIn(): Promise<User | null> {
       reject,
     );
   });
+}
+
+/**
+ * Upgrades the current anonymous user to a permanent email/password
+ * account, keeping the same uid (and therefore every Firestore doc already
+ * written under it). After this the user can reinstall / switch devices and
+ * get their data back via signInWithEmail below.
+ */
+export async function linkEmailPassword(email: string, password: string): Promise<User> {
+  if (!auth) throw new AuthActionError('account.errNotConfigured');
+  const preflight = validateCredentials(email, password);
+  if (preflight) throw new AuthActionError(preflight);
+  const current = auth.currentUser;
+  if (!current) throw new AuthActionError('account.errGeneric');
+  try {
+    const credential = EmailAuthProvider.credential(email.trim(), password);
+    const result = await linkWithCredential(current, credential);
+    return result.user;
+  } catch (err) {
+    throw toAuthActionError(err);
+  }
+}
+
+/**
+ * Signs in a returning user who already linked an account on another
+ * device. This replaces the throwaway anonymous session created on this
+ * fresh install; the anonymous uid's data (nothing meaningful pre-account)
+ * is left orphaned, which is the expected trade-off.
+ */
+export async function signInWithEmail(email: string, password: string): Promise<User> {
+  if (!auth) throw new AuthActionError('account.errNotConfigured');
+  const preflight = validateCredentials(email, password);
+  if (preflight) throw new AuthActionError(preflight);
+  try {
+    const result = await signInWithEmailAndPassword(auth, email.trim(), password);
+    return result.user;
+  } catch (err) {
+    throw toAuthActionError(err);
+  }
+}
+
+/**
+ * Signs out of the real account and drops back to a fresh anonymous
+ * session, so the app still satisfies firestore.rules' `request.auth != null`
+ * checks and never renders in a signed-out limbo state.
+ */
+export async function signOutToAnonymous(): Promise<User | null> {
+  if (!auth) return null;
+  await signOut(auth);
+  const cred = await signInAnonymously(auth);
+  return cred.user;
+}
+
+/**
+ * Permanently deletes the Firebase Auth user. Call AFTER deleteAllUserData()
+ * (collections.ts) while still signed in. On success the onAuthStateChanged
+ * listener fires with null and AuthContext starts a fresh anonymous
+ * session, so the app lands back at a clean first-run state.
+ *
+ * A linked email/password account whose sign-in is old throws
+ * `auth/requires-recent-login`; the caller shows `account.errRequiresRecentLogin`
+ * ("sign in again first").
+ */
+export async function deleteCurrentUser(): Promise<void> {
+  if (!auth) throw new AuthActionError('account.errNotConfigured');
+  const current = auth.currentUser;
+  if (!current) throw new AuthActionError('account.errGeneric');
+  try {
+    await deleteUser(current);
+  } catch (err) {
+    throw toAuthActionError(err);
+  }
 }

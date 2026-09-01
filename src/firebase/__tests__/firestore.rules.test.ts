@@ -197,3 +197,52 @@ describe('waitlist_signups: public create-only, no read', () => {
     await assertFails(anon.firestore().collection('waitlist_signups').get());
   });
 });
+
+describe('account deletion: owner can wipe every doc tied to their uid (app/account.tsx)', () => {
+  const DELETABLE_OWNED = [
+    'daily_checkins',
+    'action_logs',
+    'bids',
+    'memory_vault',
+    'curiosity_card_progress',
+    'desire_inventory',
+    'recalibration_events',
+  ];
+
+  test.each(DELETABLE_OWNED)('%s: owner can delete their own doc', async (collection) => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection(collection).doc('mine').set({ userId: ALICE });
+    });
+    const alice = testEnv.authenticatedContext(ALICE);
+    await assertSucceeds(alice.firestore().collection(collection).doc('mine').delete());
+  });
+
+  test.each(DELETABLE_OWNED)('%s: a stranger still cannot delete someone else\'s doc', async (collection) => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection(collection).doc('victim').set({ userId: ALICE });
+    });
+    const mallory = testEnv.authenticatedContext(MALLORY);
+    await assertFails(mallory.firestore().collection(collection).doc('victim').delete());
+  });
+
+  test('recalibration_events stays append-only for updates even though delete is now allowed', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('recalibration_events').doc('e1').set({ userId: ALICE, from: 'words' });
+    });
+    const alice = testEnv.authenticatedContext(ALICE);
+    await assertFails(alice.firestore().collection('recalibration_events').doc('e1').update({ from: 'acts' }));
+  });
+
+  test('a participant can delete their partnership; a non-participant cannot', async () => {
+    const docId = sortedPartnershipId(ALICE, BOB);
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('partnerships').doc(docId).set({
+        users: [ALICE, BOB].sort(),
+        optIns: { [ALICE]: true, [BOB]: true },
+        status: 'active',
+      });
+    });
+    await assertFails(testEnv.authenticatedContext(MALLORY).firestore().collection('partnerships').doc(docId).delete());
+    await assertSucceeds(testEnv.authenticatedContext(ALICE).firestore().collection('partnerships').doc(docId).delete());
+  });
+});

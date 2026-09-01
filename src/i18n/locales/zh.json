@@ -96,7 +96,9 @@
     "firstWinSubLabel": "你的主动赞美",
     "saveIt": "保存",
     "sendIt": "发送",
-    "firstWinFallback": "我喜欢你解决问题时把想法说出来的样子——你从不隐藏那些混乱的部分。"
+    "firstWinFallback": "我喜欢你解决问题时把想法说出来的样子——你从不隐藏那些混乱的部分。",
+    "hearIt": "朗读",
+    "playing": "播放中…"
   },
   "ritualTime": {
     "headline": "我们该在什么时候做你的90秒签到？",
@@ -255,7 +257,8 @@
     "cancel": "取消",
     "memoryVaultCleared": "记忆宝库已清空。",
     "couldNotClear": "无法清空记忆宝库。",
-    "language": "语言"
+    "language": "语言",
+    "account": "账户 →"
   },
   "partner": {
     "headline": "伴侣模式",
@@ -303,5 +306,34 @@
     "cc_l2_02": "在爱情中感到安全对你来说意味着什么？",
     "cc_l3_01": "即使我在你身边，你什么时候会感到最孤独？",
     "cc_l3_02": "童年的哪个故事塑造了你爱人的方式？"
+  },
+  "account": {
+    "headline": "账户",
+    "anonBlurb": "目前你的数据仅保存在这台设备上。添加邮箱和密码，以便更换手机后仍能重新登录。",
+    "emailLabel": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "密码",
+    "passwordPlaceholder": "至少 6 个字符",
+    "saveAccount": "保存我的账户",
+    "saving": "保存中…",
+    "signIn": "登录",
+    "savedToast": "账户已保存。现在你可以在任何设备上登录。",
+    "linkedHeadline": "你的账户已保存",
+    "linkedBlurb": "已以 {{email}} 登录。可使用此邮箱和密码在其他设备上登录。",
+    "signOut": "退出登录",
+    "haveAccount": "已经在其他设备上保存过账户？",
+    "signInCta": "去登录",
+    "backToSignUp": "改为创建账户",
+    "errInvalidEmail": "这看起来不是有效的邮箱地址。",
+    "errWeakPassword": "密码请至少使用 6 个字符。",
+    "errEmailInUse": "该邮箱已绑定到其他账户。请尝试直接登录。",
+    "errWrongPassword": "邮箱或密码不正确。",
+    "errRequiresRecentLogin": "出于安全考虑，请重新登录后再进行此更改。",
+    "errNotConfigured": "此版本暂不支持账户功能。",
+    "errGeneric": "出了点问题，请重试。",
+    "deleteAccount": "删除我的账户",
+    "deleteConfirm": "再次点按以永久删除",
+    "cancelDelete": "取消",
+    "deleteBlurb": "永久删除你的账户及其所有相关数据——每日打卡、示好记录、记忆宝库、愿望清单、引导问答以及任何伴侣关联。此操作无法撤销。"
   }
 }

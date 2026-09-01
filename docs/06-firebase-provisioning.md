@@ -42,6 +42,7 @@ firebase use giveall-app
 ### 2. Enable services
 
 - **Authentication** → Sign-in method → enable **Anonymous** (the app signs in anonymously by default — see `src/firebase/auth.ts`). No CLI command for this; console only. Enabling can take a minute or two to actually propagate — a `signInAnonymously()` call made immediately after can fail with `auth/admin-restricted-operation` even though the console shows "Enabled"; just retry after a short wait.
+- **Authentication** → Sign-in method → also enable **Email/Password** (a free toggle, no extra config). This backs the anonymous → permanent-account upgrade on `app/account.tsx` (`linkEmailPassword` / `signInWithEmail` in `src/firebase/auth.ts`). Until it's enabled the Account screen still renders but every save/sign-in attempt returns `auth/operation-not-allowed`, which the app maps to a clean "accounts aren't available in this build" message rather than a raw error — so this is a real feature-completeness gap, not a crash.
 - **Firestore** → create the database via CLI:
   ```
   firebase firestore:databases:create "(default)" --location=nam5 --project=giveall-app
@@ -78,4 +79,4 @@ Copy the printed `apiKey`/`authDomain`/etc. into `.env` (see `.env.example` for 
 
 ## Not yet needed
 
-No third-party API keys required for v1. If the Appreciation Generator (`src/engine/appreciationGenerator.ts`) gets wired to an actual LLM provider later, that provider's API key would be added as a Cloud Functions secret (`firebase functions:secrets:set`), not a client-side env var — the prompt-building logic is already provider-agnostic.
+No third-party API keys required for the app itself. The Appreciation Generator's live LLM output runs through the Cloudflare Worker in `proxy/` (see `proxy/README.md`), which holds the provider key as a **Worker secret** — no Firebase Blaze plan, and the key never reaches the client. If Blaze is later enabled, `functions/src/generateAppreciation.ts` is the same feature as a Cloud Function (key via `firebase functions:secrets:set`); `app/payoff.tsx` prefers it when deployed and falls back to the proxy otherwise.

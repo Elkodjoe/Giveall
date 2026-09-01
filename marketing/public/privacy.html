@@ -64,6 +64,7 @@
 
   <h2>No account or email required to use the app</h2>
   <p>GiveAll signs you in anonymously (Firebase Anonymous Authentication) the first time you open it. This creates a random identifier tied to your device install — we never ask for your name, email, or phone number to use the app itself.</p>
+  <p>Adding an email and password is <strong>optional</strong>, offered only so your data can follow you to a new device. If you choose to create one, we store that email address (via Firebase Authentication) and nothing else new — it's used only to sign you in. You can delete your account, including the email, from the Account screen at any time (see "Deleting your data" below).</p>
 
   <h2>What we store, and why</h2>
   <p>Everything below is stored in Firestore (Google Cloud infrastructure) under your anonymous identifier, used only to run the app's core features:</p>
@@ -80,7 +81,7 @@
   <p>Partner Mode is off by default. If you turn it on and share a connection code, your partner only gains read access to your profile after <strong>both</strong> of you explicitly opt in — enforced by our database security rules, not just app-side logic. Neither person can unilaterally grant themselves access to the other's data.</p>
 
   <h2>The one place we use a third-party AI provider</h2>
-  <p>GiveAll's "Appreciation Generator" can turn a generic compliment into a more specific, personal line. When this feature calls a cloud AI provider (Anthropic or OpenAI) rather than a model running locally, it sends only what you typed — the generic compliment, your love language, and optionally a Memory Vault detail you chose to include — to generate the response. That text is not stored by us beyond the request, and is subject to the AI provider's own data-handling terms for API requests.</p>
+  <p>GiveAll's "Appreciation Generator" can turn a generic compliment into a more specific, personal line. When this feature calls a cloud AI provider (Cloudflare Workers AI by default, or Anthropic / OpenAI if configured) rather than a model running locally, it sends only what you typed — the generic compliment, your love language, and optionally a Memory Vault detail you chose to include — to generate the response. If you use the "Hear it" button, that generated line is also sent to a text-to-speech provider (ElevenLabs) to produce the audio. In every case the text is not stored by us beyond the request, and is subject to that provider's own data-handling terms for API requests.</p>
 
   <h2>What we never do</h2>
   <ul>
@@ -93,7 +94,7 @@
   <p>If you sign up for early access on our landing page, we store only the email address you provide and the time you signed up, so we can notify you when access opens. This list is not readable through the app or any public interface — it's write-only from the signup form.</p>
 
   <h2>Deleting your data</h2>
-  <p>You can delete your Memory Vault at any time from Settings. To request deletion of all data tied to your anonymous identifier, or to ask us anything about this policy, contact us at the address below.</p>
+  <p>You can delete your Memory Vault at any time from Settings. To delete <strong>everything</strong> — your account and all data tied to it (check-ins, Bid Tracker, Memory Vault, Desire Inventory, onboarding answers, and any partner link) — use "Delete my account" on the Account screen. This is immediate and cannot be undone. To ask us anything about this policy, contact us at the address below.</p>
 
   <h2>Children's privacy</h2>
   <p>GiveAll is not directed at children and is not intended for anyone under 16. We don't knowingly collect data from children.</p>
@@ -102,7 +103,7 @@
   <p>If this policy changes in a way that affects how your data is handled, we'll update the "Last updated" date above and, where required, notify you in-app.</p>
 
   <div class="card">
-    <p><strong>Contact:</strong> <!-- TODO before store submission: replace with a real, monitored support address --> privacy@giveall.app (placeholder — set a real monitored address before submitting to the App Store / Play Store).</p>
+    <p><strong>Contact:</strong> <a href="mailto:info@giveall.app">info@giveall.app</a></p>
   </div>
 </div>
 

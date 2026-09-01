@@ -1,15 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Share } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { Audio } from 'expo-av';
 import { ProgressBar } from '../src/components/ProgressBar';
 import { useOnboarding } from '../src/state/OnboardingContext';
 import { useAuth } from '../src/state/AuthContext';
 import { tallyAttachment, tallyLoveLanguage } from '../src/engine/onboardingScoring';
 import { isFirebaseConfigured } from '../src/firebase/config';
 import { generateAppreciation } from '../src/firebase/appreciationClient';
+import {
+  generateAppreciationViaProxy,
+  isAppreciationProxyConfigured,
+} from '../src/llm/appreciationProxyClient';
 import { generateAppreciationViaOllama } from '../src/llm/ollamaClient';
+import { isSpeechConfigured, speechUrlFor } from '../src/llm/speechClient';
 import { logAction } from '../src/firebase/collections';
 import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 
@@ -17,13 +23,14 @@ import { colors, radius, button, card, fontFamily } from '../src/theme/tokens';
 // ask. Renders the translated fallback instantly (this screen must never
 // feel like it's waiting on a network call), then tries two live sources in
 // the background and silently swaps in whichever succeeds first — no
-// loading spinner, no error shown if both fail, just stays on the fallback:
+// loading spinner, no error shown if all fail, just stays on the fallback:
 //   1. generateAppreciation() — the Cloud Function (functions/src/generateAppreciation.ts,
-//      Anthropic/OpenAI). Not deployed yet (Blaze plan deferred), so this
-//      currently always fails fast and falls through to (2).
-//   2. generateAppreciationViaOllama() — a locally running Ollama server,
-//      for testing this live without needing Blaze or a paid API key. Only
-//      works when running the app on the same machine as `ollama serve`.
+//      Anthropic/OpenAI). Only if the Blaze plan is enabled and it's deployed.
+//   2. generateAppreciationViaProxy() — the Cloudflare Worker (proxy/), which
+//      holds the LLM key server-side with no Blaze plan. The production path
+//      once EXPO_PUBLIC_APPRECIATION_PROXY_URL is set; works from a real device.
+//   3. generateAppreciationViaOllama() — a locally running Ollama server, a
+//      dev-only stand-in. Only works on the same machine as `ollama serve`.
 // generatedFirstWin stays null (falling back to the translated line, which
 // reacts live to language switches) until a real LLM result lands — once
 // generated in whatever language the prompt produced, it doesn't retroactively
@@ -63,20 +70,63 @@ export default function PayoffScreen() {
       : Promise.reject(new Error('Firebase not configured'));
 
     tryCloudFunction
+      .catch(() =>
+        isAppreciationProxyConfigured()
+          ? generateAppreciationViaProxy(input)
+          : Promise.reject(new Error('Appreciation proxy not configured')),
+      )
       .catch(() => generateAppreciationViaOllama(input))
       .then((result) => {
         if (!cancelled) setGeneratedFirstWin(result.text);
       })
       .catch(() => {
-        // Neither source available (Cloud Function not deployed, no
-        // Ollama server reachable, etc.) — stays on FIRST_WIN_FALLBACK,
-        // no error surfaced.
+        // No source available (Cloud Function not deployed, no proxy URL
+        // configured, no Ollama server reachable) — stays on the translated
+        // fallback line, no error surfaced.
       });
 
     return () => {
       cancelled = true;
     };
   }, [receivesVia]);
+
+  // "Hear it" — plays the shown appreciation line via the proxy's /speak
+  // route (ElevenLabs TTS, key server-side). Best-effort: the button only
+  // shows when the proxy URL is configured, and any failure just resets to
+  // idle with no error surfaced, same as the rest of this screen.
+  const soundRef = useRef<Audio.Sound | null>(null);
+  const [speechState, setSpeechState] = useState<'idle' | 'loading' | 'playing'>('idle');
+
+  useEffect(() => {
+    return () => {
+      soundRef.current?.unloadAsync().catch(() => undefined);
+      soundRef.current = null;
+    };
+  }, []);
+
+  const playFirstWin = async () => {
+    if (speechState !== 'idle') return;
+    const uri = speechUrlFor(firstWin);
+    if (!uri) return;
+    setSpeechState('loading');
+    try {
+      await soundRef.current?.unloadAsync().catch(() => undefined);
+      const { sound } = await Audio.Sound.createAsync(
+        { uri },
+        { shouldPlay: true },
+        (status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            setSpeechState('idle');
+            sound.unloadAsync().catch(() => undefined);
+          }
+        },
+      );
+      soundRef.current = sound;
+      setSpeechState('playing');
+    } catch {
+      setSpeechState('idle');
+    }
+  };
 
   // Both CTAs persist the shown line to action_logs — docs/01-onboarding-flow.md
   // Screen 5 calls this "instant value delivered before any ask", but until
@@ -124,6 +174,19 @@ export default function PayoffScreen() {
           <Text style={styles.winLabel}>{t('payoff.firstWinLabel')}</Text>
           <Text style={styles.winSubLabel}>{t('payoff.firstWinSubLabel')}</Text>
           <Text style={styles.winText}>"{firstWin}"</Text>
+          {isSpeechConfigured() && (
+            <Pressable
+              style={styles.hearButton}
+              onPress={playFirstWin}
+              disabled={speechState !== 'idle'}
+              accessibilityRole="button"
+              accessibilityLabel={t('payoff.hearIt')}
+            >
+              <Text style={styles.hearButtonLabel}>
+                {speechState === 'idle' ? t('payoff.hearIt') : t('payoff.playing')}
+              </Text>
+            </Pressable>
+          )}
         </View>
       </View>
 
@@ -162,6 +225,16 @@ const styles = StyleSheet.create({
   },
   winSubLabel: { fontFamily: fontFamily.regular, color: colors.textSecondary, fontSize: 15, marginTop: 4, marginBottom: 16 },
   winText: { fontFamily: fontFamily.regular, color: colors.textPrimary, fontSize: 20, lineHeight: 28, fontStyle: 'italic' },
+  hearButton: {
+    marginTop: 16,
+    alignSelf: 'flex-start',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  hearButtonLabel: { fontFamily: fontFamily.semiBold, color: colors.primary, fontSize: 14 },
   ctaRow: { flexDirection: 'row', gap: 12, marginTop: 16 },
   ctaSecondary: {
     flex: 1,

@@ -96,7 +96,9 @@
     "firstWinSubLabel": "Deine unaufgeforderte Wertschätzung",
     "saveIt": "Speichern",
     "sendIt": "Senden",
-    "firstWinFallback": "Ich liebe es, wie du laut nachdenkst, wenn du etwas löst — du versteckst die unordentlichen Momente nicht."
+    "firstWinFallback": "Ich liebe es, wie du laut nachdenkst, wenn du etwas löst — du versteckst die unordentlichen Momente nicht.",
+    "hearIt": "Anhören",
+    "playing": "Wird abgespielt…"
   },
   "ritualTime": {
     "headline": "Wann sollten wir deinen 90-Sekunden-Check-in machen?",
@@ -256,7 +258,8 @@
     "cancel": "Abbrechen",
     "memoryVaultCleared": "Erinnerungstresor gelöscht.",
     "couldNotClear": "Erinnerungstresor konnte nicht gelöscht werden.",
-    "language": "Sprache"
+    "language": "Sprache",
+    "account": "Konto →"
   },
   "partner": {
     "headline": "Partnermodus",
@@ -304,5 +307,34 @@
     "cc_l2_02": "Was bedeutet es für dich, dich in der Liebe sicher zu fühlen?",
     "cc_l3_01": "Wann fühlst du dich am einsamsten, selbst wenn ich da bin?",
     "cc_l3_02": "Welche Geschichte aus deiner Kindheit hat geprägt, wie du liebst?"
+  },
+  "account": {
+    "headline": "Konto",
+    "anonBlurb": "Deine Daten sind derzeit nur auf diesem Gerät gespeichert. Füge eine E-Mail-Adresse und ein Passwort hinzu, damit du dich nach einem Gerätewechsel wieder anmelden kannst.",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "du@beispiel.com",
+    "passwordLabel": "Passwort",
+    "passwordPlaceholder": "Mindestens 6 Zeichen",
+    "saveAccount": "Konto speichern",
+    "saving": "Wird gespeichert…",
+    "signIn": "Anmelden",
+    "savedToast": "Konto gespeichert. Du kannst dich jetzt auf jedem Gerät anmelden.",
+    "linkedHeadline": "Dein Konto ist gespeichert",
+    "linkedBlurb": "Angemeldet als {{email}}. Mit dieser E-Mail-Adresse und diesem Passwort kannst du dich auf einem anderen Gerät anmelden.",
+    "signOut": "Abmelden",
+    "haveAccount": "Bereits ein Konto auf einem anderen Gerät gespeichert?",
+    "signInCta": "Anmelden",
+    "backToSignUp": "Konto erstellen",
+    "errInvalidEmail": "Das sieht nicht nach einer gültigen E-Mail-Adresse aus.",
+    "errWeakPassword": "Verwende mindestens 6 Zeichen für dein Passwort.",
+    "errEmailInUse": "Diese E-Mail-Adresse ist bereits mit einem anderen Konto verknüpft. Melde dich stattdessen an.",
+    "errWrongPassword": "E-Mail oder Passwort ist falsch.",
+    "errRequiresRecentLogin": "Melde dich aus Sicherheitsgründen erneut an, bevor du diese Änderung vornimmst.",
+    "errNotConfigured": "Konten sind in dieser Version nicht verfügbar.",
+    "errGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "deleteAccount": "Mein Konto löschen",
+    "deleteConfirm": "Zum endgültigen Löschen erneut tippen",
+    "cancelDelete": "Abbrechen",
+    "deleteBlurb": "Löscht dein Konto und alle damit verbundenen Daten dauerhaft — Check-ins, Bid-Tracker, Erinnerungstresor, Wunsch-Inventar, Onboarding-Antworten und jede Partnerverknüpfung. Dies kann nicht rückgängig gemacht werden."
   }
 }

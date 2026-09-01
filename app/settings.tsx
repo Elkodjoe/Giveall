@@ -124,6 +124,9 @@ export default function SettingsScreen() {
         <Pressable style={styles.link} onPress={() => router.push('/partner')} accessibilityRole="link">
           <Text style={styles.linkText}>{t('settings.partnerMode')}</Text>
         </Pressable>
+        <Pressable style={styles.link} onPress={() => router.push('/account')} accessibilityRole="link">
+          <Text style={styles.linkText}>{t('settings.account')}</Text>
+        </Pressable>
 
         <Pressable
           style={[styles.dangerButton, confirming && styles.dangerButtonConfirming]}
