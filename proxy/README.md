@@ -16,12 +16,18 @@ uses, so there is one source of truth for the prompt.
 cd proxy
 npm install
 npx wrangler login                        # opens a browser; free Cloudflare account
-npx wrangler secret put ANTHROPIC_API_KEY  # paste the key when prompted
-# optional: npx wrangler secret put OPENAI_API_KEY     (fallback text provider)
+npm run deploy                             # text route works immediately via Workers AI
 # optional: npx wrangler secret put ELEVENLABS_API_KEY (enables the /speak route)
+# optional: npx wrangler secret put ANTHROPIC_API_KEY  (higher-quality text; then set PREFER_FREE = "false")
+# optional: npx wrangler secret put OPENAI_API_KEY     (fallback text provider)
 # optional: npx wrangler secret put APP_TOKEN          (shared token, see below)
-npm run deploy
 ```
+
+The text route works with **no API key and no card** — `wrangler.toml`
+binds Cloudflare **Workers AI** (`[ai]`), which has a free daily
+allocation. `PREFER_FREE = "true"` (in `wrangler.toml` `[vars]`) makes it
+the first choice; set it to `"false"` once you add Anthropic/OpenAI
+credits and want that quality first.
 
 `wrangler deploy` prints the Worker URL, e.g.
 `https://giveall-appreciation-proxy.<your-subdomain>.workers.dev`.
@@ -69,9 +75,12 @@ JSON body (matches `AppreciationInput`):
 { "genericCompliment": "You are wonderful.", "loveLanguage": "words", "context": "optional real detail" }
 ```
 
-Success `200`: `{ "text": "...", "provider": "anthropic" }`
+Success `200`: `{ "text": "...", "provider": "workers-ai" | "anthropic" | "openai" }`
 Errors: `400` bad input, `401` bad/missing token, `413` input too long,
-`502` all providers failed / none configured.
+`502` all providers failed.
+
+Provider order: with `PREFER_FREE = "true"`, Workers AI first, then any
+paid key. Otherwise paid keys first, Workers AI as the fallback.
 
 ### `POST /speak` or `GET /speak?text=...` — spoken audio
 

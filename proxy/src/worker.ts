@@ -15,7 +15,21 @@ import { orderAvailableProviders, type LlmProvider } from '../../src/engine/llmP
 // Deploy: see proxy/README.md.
 
 export interface Env {
-  /** At least one of these must be set for the text route (as a secret). */
+  /**
+   * Cloudflare Workers AI binding (see wrangler.toml `[ai]`). Free daily
+   * allocation, no API key, no card — the default provider for the text
+   * route when no paid key is set.
+   */
+  AI?: Ai;
+  /** Optional Workers AI model override. */
+  WORKERS_AI_MODEL?: string;
+  /**
+   * When "true", try the free Workers AI before any paid provider (useful
+   * while the Anthropic/OpenAI accounts have no balance — avoids two
+   * failing calls per request). Set as a plain [vars] value.
+   */
+  PREFER_FREE?: string;
+  /** Optional paid providers, tried before Workers AI when a key is set. */
   ANTHROPIC_API_KEY?: string;
   OPENAI_API_KEY?: string;
   /** Required for the /speak route. */
@@ -36,6 +50,10 @@ const MAX_COMPLIMENT_CHARS = 400;
 const MAX_CONTEXT_CHARS = 600;
 const MAX_SPEAK_CHARS = 500;
 const PRIMARY_PROVIDER: LlmProvider = 'anthropic';
+// Good enough for a one-line appreciation, and on the free tier. Override
+// with WORKERS_AI_MODEL if this one is retired — see the model catalog at
+// https://developers.cloudflare.com/workers-ai/models/
+const DEFAULT_WORKERS_AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 // ElevenLabs "Rachel" — a warm, widely-used public voice. Override with the
 // ELEVENLABS_VOICE_ID var. eleven_multilingual_v2 matters: the appreciation
 // line can be in any of the app's 7 languages.
@@ -121,6 +139,20 @@ const PROVIDER_CALLS: Record<LlmProvider, (system: string, user: string, key: st
   openai: callOpenAI,
 };
 
+async function callWorkersAI(system: string, user: string, env: Env): Promise<string> {
+  const model = env.WORKERS_AI_MODEL || DEFAULT_WORKERS_AI_MODEL;
+  const result = (await env.AI!.run(model, {
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: user },
+    ],
+    max_tokens: 200,
+  })) as { response?: string };
+  const text = result.response?.trim();
+  if (!text) throw new Error('workers-ai: empty response');
+  return text;
+}
+
 async function handleText(request: Request, env: Env, cors: Record<string, string>): Promise<Response> {
   let input: AppreciationInput;
   try {
@@ -155,13 +187,33 @@ async function handleText(request: Request, env: Env, cors: Record<string, strin
   });
 
   const errors: string[] = [];
-  for (const provider of order) {
+  const tryWorkersAI = async (): Promise<Response | null> => {
+    if (!env.AI) return null;
     try {
-      const text = await PROVIDER_CALLS[provider](system, user, keys[provider]);
-      return json({ text, provider }, 200, cors);
+      const text = await callWorkersAI(system, user, env);
+      return json({ text, provider: 'workers-ai' }, 200, cors);
     } catch (err) {
       errors.push(err instanceof Error ? err.message : String(err));
+      return null;
     }
+  };
+  const tryPaid = async (): Promise<Response | null> => {
+    for (const provider of order) {
+      try {
+        const text = await PROVIDER_CALLS[provider](system, user, keys[provider]);
+        return json({ text, provider }, 200, cors);
+      } catch (err) {
+        errors.push(err instanceof Error ? err.message : String(err));
+      }
+    }
+    return null;
+  };
+
+  const preferFree = env.PREFER_FREE === 'true';
+  const steps = preferFree ? [tryWorkersAI, tryPaid] : [tryPaid, tryWorkersAI];
+  for (const step of steps) {
+    const res = await step();
+    if (res) return res;
   }
 
   return json(
@@ -169,7 +221,7 @@ async function handleText(request: Request, env: Env, cors: Record<string, strin
       error:
         errors.length > 0
           ? `all providers failed: ${errors.join('; ')}`
-          : 'no provider configured — set ANTHROPIC_API_KEY and/or OPENAI_API_KEY',
+          : 'no provider available — bind [ai] in wrangler.toml or set ANTHROPIC_API_KEY / OPENAI_API_KEY',
     },
     502,
     cors,
