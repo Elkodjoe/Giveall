@@ -6,6 +6,30 @@ screenshots from (fonts, safe-area insets, and the status bar render
 differently than a real device). The `device` profile below produces a
 real, installable iOS build.
 
+## You do NOT need a Mac
+
+EAS Build compiles iOS apps on Apple hardware in Expo's cloud. You trigger
+the build from Windows (CLI) or from the expo.dev website; the `.ipa` comes
+back with an install link. A local Mac is never required — for building or
+for `eas submit`. The only hard requirement is an **Apple Developer Program
+membership** ($99/yr) so Apple will issue signing credentials.
+
+### Trigger it from the website (no CLI)
+
+1. Enrol in the Apple Developer Program: <https://developer.apple.com/programs/>
+2. At <https://expo.dev> open the `giveall` project → **GitHub** → connect
+   the `Elkodjoe/Giveall` repository.
+3. → **Workflows** → run **iOS device build** (`.eas/workflows/ios-device-build.yml`),
+   or just push to `main`.
+4. The first run pauses once for an Apple ID sign-in so EAS can create and
+   store the Distribution certificate + provisioning profile. After that
+   every run is unattended.
+5. Register each test iPhone under → **Devices** (or `eas device:create`)
+   so the ad-hoc profile includes it, then open the build's QR link on
+   that phone to install.
+
+The CLI path below does the exact same thing from your machine.
+
 ## What it needs
 
 - **An Apple Developer Program membership** ($99/yr). Required for code

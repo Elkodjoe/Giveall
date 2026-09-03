@@ -1,0 +1,20 @@
+name: iOS device build
+
+# Trigger from the Expo dashboard (expo.dev -> the project -> Workflows ->
+# Run workflow) or on push to main. Runs on EAS's macOS cloud — no local
+# Mac needed. Requires an Apple Developer account: the first run prompts
+# once (in the dashboard) to sign in with your Apple ID so EAS can manage
+# the signing credentials; after that it's fully unattended.
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch: {}
+
+jobs:
+  ios_device:
+    name: Build iOS (device profile)
+    type: build
+    params:
+      platform: ios
+      profile: device
